@@ -185,23 +185,27 @@ confirms it's pure EOL. The wholesale `wwwroot/js/*` copies in
 `sync-streetsamurai.ps1` are byte-for-byte with source and are not
 normalized.)
 
-### Cyberspace `console-bg.js` is CDN-loaded for mindattic.com
+### Cyberspace JS is CDN-loaded for mindattic.com
 
-`console-bg.js` is ~580 KB. Inlining it into `index.htm` bloats the page on
-every load and prevents the browser from caching it separately. So
-`sync-mindattic-com.ps1` keeps the small Cyberspace scripts (loader,
-tv-static, home-bg) and the base64 texture override inline, but emits
-`console-bg.js` as an external `<script src="https://cdn.jsdelivr.net/gh/
-mindattic/MindAttic.UiUx@<tag>/Components/Cyberspace/console-bg.js">` tag.
-The tag is the `-CyberspaceCdnTag` parameter (default `v1.0.1`).
+`console-bg.js` is ~580 KB and `sacred-geometry.js` (the SacredGeometry shape
+catalog it draws from) is ~60 KB. Inlining them into `index.htm` bloats the page
+on every load and prevents the browser from caching them separately. So
+`sync-mindattic-com.ps1` keeps the small Cyberspace scripts (loader, tv-static,
+home-bg) and the circuitboard texture override (jsDelivr URLs) inline, but emits
+**both** `sacred-geometry.js` and `console-bg.js` as external
+`<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@<tag>/…">`
+tags (the CDN set is `@('sacred-geometry.js','console-bg.js')`). The tag is the
+`-CyberspaceCdnTag` parameter (default `v1.1.0`).
 
 Ordering is preserved because non-async `<script>` tags execute in document
-order: the inline block (which defines `window.__cyberspaceCircuitboardSrcs`)
-runs before the external `console-bg.js`, whose `TEX_SRCS` reads that global
-at module-init.
+order, and the CDN tags are emitted in `jsFiles` order: the inline block (which
+defines `window.__cyberspaceCircuitboardSrcs`) runs first, then
+`sacred-geometry.js` (defining `window.SacredGeometry`), then `console-bg.js`
+(whose `TEX_SRCS` reads the circuitboard global and whose SCHEMATIC effect draws
+from `window.SacredGeometry`) — both dependencies are in place before it runs.
 
-To ship a `console-bg.js` change to mindattic.com: edit the source, tag a new
-release (e.g. `v1.0.2`), bump `-CyberspaceCdnTag` to match, then re-run the
-sync/deploy. A content change that *doesn't* touch `console-bg.js` needs no
-tag bump. (Only mindattic.com uses this split; StreetSamurai still copies all
-Cyberspace JS into `wwwroot/js` byte-for-byte.)
+To ship a change to either externalized file: edit the source, tag a new release
+(e.g. `v1.1.1`), bump `-CyberspaceCdnTag` to match, then re-run the sync/deploy.
+A content change that *doesn't* touch those two files needs no tag bump. (Only
+mindattic.com uses this split; StreetSamurai still copies all Cyberspace +
+SacredGeometry JS into `wwwroot/js` byte-for-byte.)

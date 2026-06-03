@@ -6,7 +6,7 @@ formation, network tracers fork and acknowledge across the grid, Morse
 pulsars blink in code, folder-rip heists exfiltrate files in real time, and
 a parallax circuit-board hums behind everything under static scan-lines.
 
-17 named effects, content-aware spawning that stays out of your layout,
+12 named effects, content-aware spawning that stays out of your layout,
 zero build step. Drops into any page with three `<div>`s, one `<link>`, and
 one `<script>`.
 
@@ -18,7 +18,7 @@ one `<script>`.
 Cyberspace/
 ├── frontpage.html   # DOM scaffolding — three fixed-position layer divs
 ├── frontpage.css    # CYBERSPACE rules, scan-lines, neon-flicker keyframes
-├── console-bg.js    # the engine (17 effects, keepout system, parallax)
+├── console-bg.js    # the engine (12 effects, keepout system, parallax)
 ├── home-bg.js       # torn-edge portrait compositor — exposes window.homeBg
 ├── tv-static.js     # navigation-transition TV-static overlay
 ├── loader.js        # tiny global loader show/hide helpers
@@ -43,12 +43,19 @@ it):
 <script src="loader.js"></script>
 <script src="tv-static.js"></script>
 <script src="home-bg.js"></script>
+<script src="../SacredGeometry/sacred-geometry.js"></script>
 <script src="console-bg.js"></script>
 ```
+
+`sacred-geometry.js` must load **before** `console-bg.js`: the SCHEMATIC effect draws its
+shapes from `window.SacredGeometry` (the shape catalog used to live inline here; it was
+extracted into the [SacredGeometry](../SacredGeometry/SacredGeometry.md) component). If it's
+absent, schematic windows simply don't spawn — everything else is unaffected.
 
 Production hosts pull the same files from jsDelivr instead of inlining:
 
 ```html
+<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@v1.0.0/Components/SacredGeometry/sacred-geometry.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@v1.0.0/Components/Cyberspace/console-bg.js"></script>
 <link  rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@v1.0.0/Components/Cyberspace/frontpage.css">
 ```
@@ -90,8 +97,9 @@ window.__cyberspaceCircuitboardSrcs = [
 ];
 ```
 
-mindattic.com inlines them as base64. StreetSamurai serves them via
-`/api/media/…`. The `assets/` folder here is the lossless source — re-pull
+mindattic.com points these at pinned jsDelivr URLs (emitted by
+`sync/sync-mindattic-com.ps1`). StreetSamurai leaves the default and serves them
+via `/api/media/…`. The `assets/` folder here is the lossless source — re-pull
 with `sync/bootstrap-textures.ps1` if upstream changes.
 
 ---
@@ -106,6 +114,12 @@ entirely.
 See the top-level [`../README.md`](../README.md) for the full effect table
 (TERMINAL, CRASH, TREMOR, LEAK, SCHEMATIC, CASCADE, ARTIFACT — including its
 7 behavior variants — FRAGMENT, TRACE, PULSAR, HEIST, PREDATOR).
+
+**SCHEMATIC** is the geometric-shape window. Its shapes (and the canvas/SVG renderer) now
+live in the standalone [SacredGeometry](../SacredGeometry/SacredGeometry.md) component —
+1024 indexed shapes; `spawnGeoWindow()` picks a random index and calls
+`window.SacredGeometry.draw(ctx, idx, phase, …)` each frame. Cyberspace still owns the
+window chrome (`.cyberspace-geo-*`), the scrolling telemetry, keepout positioning, and TTL.
 
 ---
 

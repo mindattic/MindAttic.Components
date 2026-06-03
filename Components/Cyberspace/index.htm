@@ -158,7 +158,7 @@
     <button data-art="">[RANDOM]</button>
     <div id="art-list" class="demo-grid"></div>
 
-    <h2>Geo schematics <span class="demo-count">(<span id="gc">&hellip;</span> keys)</span></h2>
+    <h2>Geo schematics <span class="demo-count">(<span id="gc">&hellip;</span> shapes)</span></h2>
     <button data-geo="">[RANDOM]</button>
     <div id="geo-list" class="demo-grid"></div>
 </aside>
@@ -179,6 +179,7 @@
 <script src="loader.js"></script>
 <script src="tv-static.js"></script>
 <script src="home-bg.js"></script>
+<script src="../SacredGeometry/sacred-geometry.js"></script>
 <script src="console-bg.js"></script>
 
 <!-- Demo wiring -->
@@ -202,14 +203,15 @@
             artList.appendChild(b);
         });
 
+        var SG = demo.SacredGeometry;
         var geoList = document.getElementById('geo-list');
-        document.getElementById('gc').textContent = demo.GEO_KEYS.length;
-        demo.GEO_KEYS.forEach(function (k) {
+        document.getElementById('gc').textContent = SG.count;
+        for (var gi = 0; gi < 85; gi++) {   // named legacy band as buttons; the dropdown covers all 1024
             var b = document.createElement('button');
-            b.textContent = k.toUpperCase();
-            b.dataset.geo = k;
+            b.textContent = '#' + gi + ' ' + SG.label(gi).toUpperCase();
+            b.dataset.geo = gi;
             geoList.appendChild(b);
-        });
+        }
 
         // PREDATOR needs prey — without an artifact on screen the wasps have nothing to hunt.
         // Spawn a random artifact first so the predator has a target as soon as it appears.
@@ -236,7 +238,7 @@
             try {
                 if (fn) { var actual = runShot(fn); bar.textContent = 'spawn: ' + actual + (fn === '__random' ? ' (random)' : ''); }
                 else if (art !== undefined) { demo.spawnArtifact(art || undefined); bar.textContent = 'spawn: artifact/' + (art || 'random'); }
-                else if (geo !== undefined) { demo.spawnGeoWindow(geo || undefined); bar.textContent = 'spawn: geo/' + (geo || 'random'); }
+                else if (geo !== undefined) { var gx = geo === '' ? undefined : parseInt(geo, 10); demo.spawnGeoWindow(gx); bar.textContent = 'spawn: geo/' + (gx === undefined ? 'random' : ('#' + gx + ' ' + SG.label(gx))); }
             } catch (err) { bar.textContent = 'error: ' + err.message; }
         });
 
@@ -275,11 +277,11 @@
         var randOpt2 = document.createElement('option');
         randOpt2.value = ''; randOpt2.textContent = '[RANDOM]';
         pickGeo.appendChild(randOpt2);
-        demo.GEO_KEYS.forEach(function (k) {
+        for (var gj = 0; gj < SG.count; gj++) {
             var op = document.createElement('option');
-            op.value = k; op.textContent = k.toUpperCase();
+            op.value = gj; op.textContent = '#' + gj + ' ' + SG.label(gj);
             pickGeo.appendChild(op);
-        });
+        }
 
         function fire(name) {
             try {
@@ -292,7 +294,8 @@
                     demo.spawnArtifact(v || undefined); bar.textContent = 'spawn: artifact/' + (v || 'random');
                 } else if (name === 'geo') {
                     var k = pickGeo.value;
-                    demo.spawnGeoWindow(k || undefined); bar.textContent = 'spawn: geo/' + (k || 'random');
+                    var gx = k === '' ? undefined : parseInt(k, 10);
+                    demo.spawnGeoWindow(gx); bar.textContent = 'spawn: geo/' + (gx === undefined ? 'random' : ('#' + gx));
                 }
             } catch (err) { bar.textContent = 'error: ' + err.message; }
         }

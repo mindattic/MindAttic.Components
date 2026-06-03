@@ -15,7 +15,7 @@ Currently powers `mindattic.com`, the `StreetSamurai` Blazor home page, and the 
 **Why MindAttic.UiUx:**
 
 - **Three delivery modes, one source of truth.** jsDelivr CDN for runtime, GitHub Actions for cross-repo PRs, PowerShell scripts for local dev — all reading the same [`subscribers.json`](subscribers.json).
-- **Subscribers are declarative.** Add `{ "component": "AtticFont", "applyToSelector": "#claudia" }` to a subscriber's array. The next sync enrolls it. Remove the line, the next sync unenrolls. No hardcoded lists.
+- **Subscribers are declarative.** Add `{ "component": "AtticFont", "applyToSelector": ".site-name" }` to a subscriber's array. The next sync enrolls it. Remove the line, the next sync unenrolls. No hardcoded lists.
 - **Versioned by tag, immutable on CDN.** `@v1.0.0` is edge-cached forever; `@main` always tracks tip-of-tree. Subscribers pick their guarantee.
 - **Self-contained components.** Each folder ships its own source, usage HTML, markdown doc, and JSON config. No cross-component imports — you can vendor a single component without dragging the rest.
 - **Marker-block contract.** Every splice is bounded by `BEGIN/END MINDATTIC.UIUX:<MARKER>` comments. Subscribers hand-author the rest of the file without conflict; only what's between the markers is regenerated.
@@ -29,7 +29,8 @@ comment, a `<FolderName>.md` doc, and any companion `.json` config.
 
 | Component | Type | What it does | Docs |
 |---|---|---|---|
-| **[Cyberspace](Components/Cyberspace/Cyberspace.md)** | HTML + CSS + JS bundle | Cyberpunk console-background effects engine — 17 named effects (TERMINAL, CRASH, TREMOR, LEAK, SCHEMATIC, CASCADE, ARTIFACT × 7 variants, FRAGMENT, TRACE, PULSAR, HEIST, PREDATOR), scan-line overlay, parallax circuit-board, keepout zones around content. | [Cyberspace.md](Components/Cyberspace/Cyberspace.md) |
+| **[Cyberspace](Components/Cyberspace/Cyberspace.md)** | HTML + CSS + JS bundle | Cyberpunk console-background effects engine — 12 named effects (TERMINAL, CRASH, TREMOR, LEAK, SCHEMATIC, CASCADE, ARTIFACT × 7 variants, FRAGMENT, TRACE, PULSAR, HEIST, PREDATOR), scan-line overlay, parallax circuit-board, keepout zones around content. SCHEMATIC pulls its shapes from SacredGeometry. | [Cyberspace.md](Components/Cyberspace/Cyberspace.md) |
+| **[SacredGeometry](Components/SacredGeometry/SacredGeometry.md)** | JS (UMD) + SVG | A catalog of 1024 unique, animatable line-art shapes (polyhedra, parametric curves, knots, fractals). One pure renderer targets a live `<canvas>` or a static SVG string; a Node build emits a poster per shape. Feeds Cyberspace's SCHEMATIC effect and the MindAttic.Legion persona-gallery avatars. | [SacredGeometry.md](Components/SacredGeometry/SacredGeometry.md) |
 | **[OutfitFont](Components/OutfitFont/OutfitFont.md)** | font + CSS | Outfit variable font (Google Fonts, weights 100–900) inlined as base64 woff2. Two `@font-face` declarations (Latin + Latin-Extended) plus `:root { --font-outfit: 'Outfit', system-ui, sans-serif; }` for ergonomic reuse. | [OutfitFont.md](Components/OutfitFont/OutfitFont.md) |
 | **[AtticFont](Components/AtticFont/AtticFont.md)** | font + CSS | Attic display face inlined as base64 woff2. Single `@font-face` plus `:root { --font-attic: 'Attic', serif; }`. Per-subscriber `applyToSelector` controls where Attic is auto-applied (`#claudia`, `#chimesh`, `.site-name`, …). | [AtticFont.md](Components/AtticFont/AtticFont.md) |
 | **[PinFooter](Components/PinFooter/PinFooter.md)** | CSS + JS | Pin-when-short footer. Toggles `position: fixed; bottom: 0` on any element with class `pin-when-short` while the document is shorter than the viewport; releases it when content overflows. | [PinFooter.md](Components/PinFooter/PinFooter.md) |
@@ -46,7 +47,7 @@ MindAttic.UiUx/
 ├── Components/
 │   ├── Cyberspace/              # Cyberpunk console-background effects
 │   │   ├── frontpage.html       #   DOM scaffolding (3 fixed-position layer divs)
-│   │   ├── frontpage.css        #   17 effects + scan-lines + flicker keyframes
+│   │   ├── frontpage.css        #   12 effects + scan-lines + flicker keyframes
 │   │   ├── console-bg.js        #   animation engine
 │   │   ├── home-bg.js           #   torn-edge portrait compositor
 │   │   ├── tv-static.js         #   navigation-transition TV-static overlay
@@ -54,6 +55,14 @@ MindAttic.UiUx/
 │   │   ├── index.htm            #   ad-hoc local test harness
 │   │   ├── assets/              #   parallax textures (circuitboard.*.png)
 │   │   └── Cyberspace.md
+│   │
+│   ├── SacredGeometry/          # 1024 animatable line-art shapes (feeds Cyberspace + Legion)
+│   │   ├── sacred-geometry.js   #   catalog + canvas/SVG renderer (UMD)
+│   │   ├── build-previews.mjs   #   emits previews/*.svg; doubles as smoke test
+│   │   ├── package.json
+│   │   ├── previews/            #   shape-0000.svg .. shape-1023.svg (built posters)
+│   │   ├── index.htm            #   QA grid of every shape
+│   │   └── SacredGeometry.md
 │   │
 │   ├── OutfitFont/              # Outfit variable font, base64 woff2
 │   │   ├── outfit-font.html
@@ -82,7 +91,7 @@ MindAttic.UiUx/
 │       ├── web-snapshot.js      #   Playwright capture engine
 │       ├── snapshot.js          #   CLI wrapper
 │       ├── snapshots.config.js  #   declarative recurring targets
-│       ├── web-snapshot-viewer.js #   browser-side animation runtime
+│       ├── web-snapshot-viewer.js #   browser-side loader (data-src → <img>)
 │       ├── web-snapshot.css     #   .web-snapshot container behavior
 │       ├── web-snapshot.html    #   paste-in usage template
 │       ├── package.json         #   Playwright dep + npm scripts
@@ -326,7 +335,7 @@ near the top of the file — flip any `FX_*` to `false` to kill that effect.
 | **CRASH**   | `spawnError`              | `FX_ERROR` / 1%            | Fatal-error popup |
 | **TREMOR**  | `spawnWarning`            | `FX_WARN` / 1%             | Warning popup |
 | **LEAK**    | `spawnMemo`               | `FX_MEMO` / 4%             | Leaked corporate memo, character-by-character erase |
-| **SCHEMATIC**| `spawnGeoWindow`         | `FX_GEO` / 10%             | Geometric schematic window |
+| **SCHEMATIC**| `spawnGeoWindow`         | `FX_GEO` / 10%             | Geometric schematic window (shape drawn from [SacredGeometry](Components/SacredGeometry/SacredGeometry.md)) |
 | **CASCADE** | `spawnCascade`            | `FX_CASCADE` / 3%          | Burst of 3–6 cascaded console windows |
 | **ARTIFACT**| `spawnArtifact`           | `FX_ARTIFACT` / 12%        | Floating glyph cluster — 7 variants below |
 | **FRAGMENT**| `spawnFrag`               | `FX_FRAG` / 40%            | Floating code fragments (most frequent effect) |

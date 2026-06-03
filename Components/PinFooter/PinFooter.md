@@ -76,8 +76,8 @@ When `pinned` is on the element, `pin-footer.css` applies:
 
 `sync/sync-mindattic-com.ps1` inlines the bundle between
 `<!-- BEGIN MINDATTIC.UIUX:PINFOOTER --> … <!-- END … -->` markers in
-`mindattic.com/index.htm`. `sync/sync-streetsamurai.ps1` copies the JS into
-the Blazor `wwwroot/js/` folder and rewrites the CSS marker block in
-`wwwroot/app.css`.
+`mindattic.com/index.htm`. `sync/sync-streetsamurai.ps1` copies only the JS into
+the Blazor `wwwroot/js/` folder — the subscription is marked `jsOnly`, so no
+`app.css` marker block is written (StreetSamurai keeps its own pin-footer CSS).
 
 Edit in this folder only — downstream copies are derived artifacts.
