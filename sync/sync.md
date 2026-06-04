@@ -195,7 +195,7 @@ home-bg) and the circuitboard texture override (jsDelivr URLs) inline, but emits
 **both** `sacred-geometry.js` and `console-bg.js` as external
 `<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@<tag>/…">`
 tags (the CDN set is `@('sacred-geometry.js','console-bg.js')`). The tag is the
-`-CyberspaceCdnTag` parameter (default `v1.1.0`).
+`-CyberspaceCdnTag` parameter (default `V4`).
 
 Ordering is preserved because non-async `<script>` tags execute in document
 order, and the CDN tags are emitted in `jsFiles` order: the inline block (which
@@ -205,7 +205,7 @@ defines `window.__cyberspaceCircuitboardSrcs`) runs first, then
 from `window.SacredGeometry`) — both dependencies are in place before it runs.
 
 To ship a change to either externalized file: edit the source, tag a new release
-(e.g. `v1.1.1`), bump `-CyberspaceCdnTag` to match, then re-run the sync/deploy.
+(next whole number, e.g. `V5`), bump `-CyberspaceCdnTag` to match, then re-run the sync/deploy.
 A content change that *doesn't* touch those two files needs no tag bump. (Only
 mindattic.com uses this split; StreetSamurai still copies all Cyberspace +
 SacredGeometry JS into `wwwroot/js` byte-for-byte.)

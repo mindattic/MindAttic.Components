@@ -37,7 +37,7 @@ param(
     # sacred-geometry.js (~60 KB shape catalog console-bg.js draws from). Both are
     # browser-cacheable and shipped together by the same repo tag. Bump this when
     # you tag a new release that changes either file, then re-run the sync/deploy.
-    [string]$CyberspaceCdnTag = 'v1.1.0'
+    [string]$CyberspaceCdnTag = 'V4'
 )
 
 $ErrorActionPreference = 'Stop'
