@@ -7,7 +7,10 @@
     "BackHomeM":   { "type": "static-css",  "marker": "BACKHOMEM",   "cssFile": "Components/BackHomeM/back-home-m.css" },
     "Cyberspace":  { "type": "html-bundle", "marker": "CYBERSPACE",  "htmlFile": "Components/Cyberspace/frontpage.html",   "cssFile": "Components/Cyberspace/frontpage.css",     "jsFiles": ["Components/Cyberspace/loader.js", "Components/Cyberspace/tv-static.js", "Components/Cyberspace/home-bg.js", "Components/SacredGeometry/sacred-geometry.js", "Components/Cyberspace/console-bg.js"], "assetsDir": "Components/Cyberspace/assets" },
     "PinFooter":   { "type": "html-bundle", "marker": "PINFOOTER",   "htmlFile": "Components/PinFooter/pin-footer.html",   "cssFile": "Components/PinFooter/pin-footer.css",     "jsFiles": ["Components/PinFooter/pin-footer.js"] },
-    "WebSnapshot": { "type": "html-bundle", "marker": "WEBSNAPSHOT",                                                       "cssFile": "Components/WebSnapshot/web-snapshot.css", "jsFiles": ["Components/WebSnapshot/web-snapshot-viewer.js"] }
+    "WebSnapshot": { "type": "html-bundle", "marker": "WEBSNAPSHOT",                                                       "cssFile": "Components/WebSnapshot/web-snapshot.css", "jsFiles": ["Components/WebSnapshot/web-snapshot-viewer.js"] },
+    "UserLogin":   { "type": "html-bundle", "marker": "USERLOGIN",                                                         "cssFile": "Components/UserLogin/user-login.css",     "jsFiles": ["Components/UserLogin/user-login.js"] },
+    "UserCircle":  { "type": "html-bundle", "marker": "USERCIRCLE",                                                        "cssFile": "Components/UserCircle/user-circle.css",   "jsFiles": ["Components/UserCircle/user-circle.js"] },
+    "UserTimeout": { "type": "html-bundle", "marker": "USERTIMEOUT",                                                       "cssFile": "Components/UserTimeout/user-timeout.css", "jsFiles": ["Components/UserTimeout/user-timeout.js"] }
   },
 
   "subscribers": {
@@ -32,7 +35,10 @@
         { "component": "OutfitFont" },
         { "component": "AtticFont",  "applyToSelector": null },
         { "component": "Cyberspace" },
-        { "component": "PinFooter", "jsOnly": true }
+        { "component": "PinFooter", "jsOnly": true },
+        { "component": "UserLogin" },
+        { "component": "UserCircle" },
+        { "component": "UserTimeout" }
       ]
     },
 
@@ -43,6 +49,30 @@
       "syncScript": "sync-mindattic-psst.ps1",
       "subscriptions": [
         { "component": "OutfitFont" }
+      ]
+    },
+
+    "Ideas": {
+      "$comment":   "MindAttic.Ideas Blazor CMS. Splice-in-place like StreetSamurai (JS -> wwwroot/js, CSS marker blocks in wwwroot/app.css). Subscriptions start empty; the shared auth-visual components (UserLogin, UserCircle, UserTimeout) are added here once authored under Components/.",
+      "kind":       "blazor-wwwroot",
+      "target":     "D:/Projects/MindAttic/MindAttic.Ideas/src/MindAttic.Ideas.Web",
+      "syncScript": "sync-ideas.ps1",
+      "subscriptions": [
+        { "component": "UserLogin" },
+        { "component": "UserCircle" },
+        { "component": "UserTimeout" }
+      ]
+    },
+
+    "Tutor": {
+      "$comment":   "Tutor Blazor study app. Splice-in-place like StreetSamurai. Subscriptions start empty; the shared auth-visual components (UserLogin, UserCircle, UserTimeout) are added here once authored under Components/. (Tutor.Blazor has no wwwroot yet -- create wwwroot/app.css + wwwroot/js when the first subscription is added.)",
+      "kind":       "blazor-wwwroot",
+      "target":     "D:/Projects/MindAttic/Tutor/Tutor.Blazor",
+      "syncScript": "sync-tutor.ps1",
+      "subscriptions": [
+        { "component": "UserLogin" },
+        { "component": "UserCircle" },
+        { "component": "UserTimeout" }
       ]
     }
   }

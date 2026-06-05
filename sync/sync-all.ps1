@@ -6,6 +6,8 @@
 #   - sync-mindattic-com.ps1   → mindattic.com/index.htm (inline)
 #   - sync-mindattic-psst.ps1  → MindAttic.Psst/{terms,privacy}.htm
 #   - sync-streetsamurai.ps1   → StreetSamurai.Blazor/wwwroot/
+#   - sync-ideas.ps1           → MindAttic.Ideas.Web/wwwroot/   (no-op until subscribed)
+#   - sync-tutor.ps1           → Tutor.Blazor/wwwroot/          (no-op until subscribed)
 #
 # Catalog landing pages and the Claudia/ChiMesh long-form HTML builds are
 # rendered by MindAttic.Deploy (D:/Projects/MindAttic/MindAttic.Deploy);
