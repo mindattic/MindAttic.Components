@@ -1,0 +1,33 @@
+@* MindAttic.UiUx — Tooltip (Blazor wrapper)
+
+   Canonical source. Blazor subscribers consume this by syncing a copy into
+   their own Components folder (this repo has no build step). It requires
+   tooltip.css + tooltip.js to be loaded once at the app root (see Tooltip.md).
+
+   The tooltip is driven entirely by the data-* attributes below — no JS
+   interop and no service registration, so it works under Interactive Server,
+   WebAssembly, and static SSR alike. For a plain element you can skip this
+   wrapper and just put data-tooltip="..." directly on the element. *@
+
+<span class="ma-tooltip-host"
+      data-tooltip="@Text"
+      data-tooltip-pos="@Position"
+      data-tooltip-delay="@(Delay > 0 ? Delay.ToString() : null)"
+      @attributes="Extra">
+    @ChildContent
+</span>
+
+@code {
+    [Parameter, EditorRequired] public string Text { get; set; } = "";
+
+    /// <summary>Preferred side: top | bottom | left | right. Auto-flips to stay on screen.</summary>
+    [Parameter] public string Position { get; set; } = "top";
+
+    /// <summary>Show delay in milliseconds (0 = immediate).</summary>
+    [Parameter] public int Delay { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? Extra { get; set; }
+}

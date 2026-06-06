@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindAttic.UiUx — Tooltip demo</title>
+  <link rel="stylesheet" href="tooltip.css">
+  <script src="tooltip.js" defer></script>
+  <style>
+    body { background: #0d1117; color: #e6edf3; font-family: 'Outfit', system-ui, sans-serif;
+           display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: center;
+           min-height: 100vh; margin: 0; }
+    button, span.chip { padding: 10px 16px; border-radius: 8px; border: 1px solid #30363d;
+           background: #161b22; color: #e6edf3; font: inherit; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <button data-tooltip="Default tooltip (top, auto-flips near edges)">Top</button>
+  <button data-tooltip="Shown below the trigger" data-tooltip-pos="bottom">Bottom</button>
+  <button data-tooltip="Appears to the right" data-tooltip-pos="right">Right</button>
+  <button data-tooltip="Appears to the left" data-tooltip-pos="left">Left</button>
+  <button data-tooltip="Waits 400ms before showing" data-tooltip-delay="400">Delayed</button>
+  <span class="chip" tabindex="0" data-tooltip="Works on keyboard focus too — tab to me, Esc to dismiss">Focusable</span>
+  <button data-tooltip="<b>HTML</b> content is allowed with <code>data-tooltip-html</code>" data-tooltip-html>HTML</button>
+</body>
+</html>

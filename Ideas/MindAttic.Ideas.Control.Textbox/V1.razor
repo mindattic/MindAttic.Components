@@ -1,0 +1,28 @@
+@namespace MindAttic.Ideas.Control.Textbox
+@inherits ControlBase
+
+@* MindAttic.Ideas.Control.Textbox.V1 — an Angular-Material-style OUTLINED text field: the label sits in
+   the box at rest and floats up to OVERLAP the top border on focus/fill. Demonstrates a Control that is
+   configured like a React/Angular component — typed [Parameter] props (Label / Type / Value) PLUS
+   pass-through attributes (ControlBase.Attributes spread onto the <input>, e.g. required, maxlength,
+   data-*). Styled by its own bundled css, served from this .idea's wwwroot at /_ideas/Control/textbox/1/. *@
+<link rel="stylesheet" href="/_ideas/Control/textbox/1/textbox.css" />
+<div class="ma-field">
+    <input id="@_id" class="ma-field-input" type="@Type" value="@Value"
+           placeholder=" " @attributes="Attributes" />
+    <label for="@_id" class="ma-field-label">@Label</label>
+</div>
+
+@code {
+    /// <summary>The floating label text.</summary>
+    [Parameter] public string? Label { get; set; }
+
+    /// <summary>Input type (text, email, password, …). Defaults to text.</summary>
+    [Parameter] public string Type { get; set; } = "text";
+
+    /// <summary>Initial value.</summary>
+    [Parameter] public string? Value { get; set; }
+
+    // Stable per-instance id so the <label for> binds to this input (unique across multiple placements).
+    private readonly string _id = "ma-tb-" + Guid.NewGuid().ToString("N").Substring(0, 8);
+}

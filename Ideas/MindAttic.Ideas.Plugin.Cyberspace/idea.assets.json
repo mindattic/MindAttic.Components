@@ -1,0 +1,12 @@
+{
+  "$comment": "Canonical UiUx assets (from=canonical, default, relative to UiUx root) staged into this package's wwwroot/, plus the target-glue shim (from=project, relative to this project dir). dest paths must match V1 StylesheetUrls/ScriptUrls and the shim's /_ideas/Plugin/cyberspace/1/ URLs.",
+  "assets": [
+    { "src": "Components/Cyberspace/frontpage.css", "dest": "frontpage.css" },
+    { "src": "Components/Cyberspace/loader.js", "dest": "loader.js" },
+    { "src": "Components/Cyberspace/console-bg.js", "dest": "console-bg.js" },
+    { "src": "Components/Cyberspace/assets/circuitboard.00.png", "dest": "assets/circuitboard.00.png" },
+    { "src": "Components/Cyberspace/assets/circuitboard.01.png", "dest": "assets/circuitboard.01.png" },
+    { "src": "Components/Cyberspace/assets/circuitboard.02.png", "dest": "assets/circuitboard.02.png" },
+    { "src": "assets/circuitboard-srcs.js", "from": "project", "dest": "circuitboard-srcs.js" }
+  ]
+}

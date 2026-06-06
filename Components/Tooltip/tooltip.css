@@ -1,0 +1,82 @@
+/* MindAttic.UiUx — Tooltip
+ * A standalone, dependency-free tooltip. One floating element is reused for
+ * every trigger; triggers opt in with the `data-tooltip` attribute. All visual
+ * tokens are CSS variables, so a host theme can restyle without touching JS.
+ *
+ * Everything here is namespaced under `.ma-tooltip*` so it can never bleed into
+ * a host's own styles (the whole point of rolling our own).
+ */
+
+:root {
+  --ma-tooltip-bg:      #161b22;
+  --ma-tooltip-fg:      #e6edf3;
+  --ma-tooltip-border:  #dc3545;
+  --ma-tooltip-radius:  7px;
+  --ma-tooltip-shadow:  0 8px 24px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.4);
+  --ma-tooltip-maxw:    280px;
+  --ma-tooltip-font:    'Outfit', system-ui, -apple-system, sans-serif;
+  --ma-tooltip-fontsz:  0.82rem;
+  --ma-tooltip-gap:     10px; /* set by JS; kept here for reference */
+}
+
+.ma-tooltip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2147483000; /* above app chrome + overlays */
+  max-width: var(--ma-tooltip-maxw);
+  padding: 7px 11px;
+  background: var(--ma-tooltip-bg);
+  color: var(--ma-tooltip-fg);
+  border: 1px solid var(--ma-tooltip-border);
+  border-radius: var(--ma-tooltip-radius);
+  box-shadow: var(--ma-tooltip-shadow);
+  font-family: var(--ma-tooltip-font);
+  font-size: var(--ma-tooltip-fontsz);
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  white-space: normal;
+  word-break: break-word;
+  pointer-events: none; /* never steals hover from the trigger */
+  opacity: 0;
+  transform: translateY(2px) scale(0.98);
+  transition: opacity 0.14s ease, transform 0.14s ease;
+}
+
+.ma-tooltip.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.ma-tooltip__body {
+  display: block;
+}
+
+.ma-tooltip__arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--ma-tooltip-bg);
+  border: 1px solid var(--ma-tooltip-border);
+  transform: rotate(45deg);
+}
+
+/* Arrow sits on the edge facing the trigger; its cross-axis offset is set in JS
+   so it always points at the trigger's center, even when the box is clamped. */
+.ma-tooltip[data-pos="top"]    .ma-tooltip__arrow { bottom: -5px; border-top: 0;    border-left: 0;   }
+.ma-tooltip[data-pos="bottom"] .ma-tooltip__arrow { top: -5px;    border-bottom: 0; border-right: 0;  }
+.ma-tooltip[data-pos="left"]   .ma-tooltip__arrow { right: -5px;  border-bottom: 0; border-left: 0;   }
+.ma-tooltip[data-pos="right"]  .ma-tooltip__arrow { left: -5px;   border-top: 0;    border-right: 0;  }
+
+/* Layout-neutral host emitted by the Blazor wrapper (see Tooltip.razor). */
+.ma-tooltip-host {
+  display: inline-flex;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ma-tooltip {
+    transition: none;
+    transform: none;
+  }
+}

@@ -1,0 +1,30 @@
+@namespace MindAttic.Ideas.Theme.Cyberspace
+@inherits ThemeBase
+@attribute [Uses(ContentKind.Plugin, "outfitfont", 1)]
+@attribute [Uses(ContentKind.Plugin, "atticfont", 1)]
+@attribute [Uses(ContentKind.Plugin, "backhomem", 1)]
+@attribute [Uses(ContentKind.Plugin, "cyberspace", 1)]
+
+@* MindAttic.Ideas.Theme.Cyberspace.V1 — chrome (theme.css) + ONE @Body hole, and it COMPOSES its
+   look/feel from separately-installed Plugin .ideas BY STRING ID (the "multi-target source" model):
+   the two fonts, the back-home glyph, and the console-bg effects engine. Each Plugin emits its own
+   css/js from its own .idea wwwroot, so this theme bundles only its own chrome. The effect-layer divs
+   are rendered here; the Cyberspace plugin's engine paints into them. *@
+<CmsInclude Ref="MindAttic.Ideas.Plugin.OutfitFont.V1" />
+<CmsInclude Ref="MindAttic.Ideas.Plugin.AtticFont.V1" />
+<CmsInclude Ref="MindAttic.Ideas.Plugin.BackHomeM.V1" />
+<CmsInclude Ref="MindAttic.Ideas.Plugin.Cyberspace.V1" />
+
+<div class="cyberspace-sl-fine" aria-hidden="true"></div>
+<div class="cyberspace-sl-coarse" aria-hidden="true"></div>
+<div class="console-bg-host" aria-hidden="true"></div>
+<div class="page">
+    @Body
+</div>
+
+@code {
+    // The theme owns only its chrome CSS; fonts/effects come from the composed Plugins above.
+    private const string Mount = "/_ideas/Theme/cyberspace/1";
+
+    public override IReadOnlyList<string> ThemeCssUrls { get; } = new[] { Mount + "/theme.css" };
+}

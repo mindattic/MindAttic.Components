@@ -1,0 +1,6 @@
+{
+  "$comment": "Canonical UiUx asset staged into this Control package's wwwroot/. dest must match the <link> href in V1.razor under /_ideas/Control/textbox/1/.",
+  "assets": [
+    { "src": "Components/Textbox/textbox.css", "dest": "textbox.css" }
+  ]
+}

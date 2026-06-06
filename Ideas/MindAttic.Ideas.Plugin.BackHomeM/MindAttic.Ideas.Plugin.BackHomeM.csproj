@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Version>1.0.0</Version>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\MindAttic.Ideas\src\MindAttic.Ideas.Abstractions\MindAttic.Ideas.Abstractions.csproj"
+                      Private="false" ExcludeAssets="runtime" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,61 @@
+/* MindAttic.UiUx Components/Textbox — an Angular-Material-style OUTLINED text field.
+   The label sits centered in the box at rest and floats up to OVERLAP the top border on focus or when
+   filled (Material "outline" notch effect), knocking out the border behind it. Theme-able via CSS vars;
+   uses the OutfitFont plugin's --font-outfit token when present. Multi-target source: this same css is
+   the standalone asset, the Blazor wrapper's css, and the Control .idea's bundled wwwroot css. */
+
+.ma-field {
+    position: relative;
+    display: inline-flex;
+    margin: 14px 0;
+    font-family: var(--font-outfit, system-ui, -apple-system, "Segoe UI", sans-serif);
+}
+
+.ma-field-input {
+    font: inherit;
+    font-size: 1rem;
+    line-height: 1.2;
+    padding: 15px 12px;
+    min-width: 240px;
+    color: var(--ma-field-fg, #1f1f1f);
+    background: transparent;
+    border: 1px solid var(--ma-field-border, #79747e);
+    border-radius: 6px;
+    outline: none;
+    transition: border-color .15s ease, border-width .15s ease;
+}
+
+.ma-field-input:hover {
+    border-color: var(--ma-field-fg, #1f1f1f);
+}
+
+.ma-field-input:focus {
+    border-color: var(--ma-field-accent, #6750a4);
+    border-width: 2px;
+    /* keep the text from shifting when the border grows by 1px */
+    padding: 14px 11px;
+}
+
+.ma-field-label {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 0 5px;
+    color: var(--ma-field-border, #79747e);
+    /* knock the border out behind the floated label — match this to the field's backdrop */
+    background: var(--ma-field-bg, #ffffff);
+    pointer-events: none;
+    transition: top .15s ease, transform .15s ease, color .15s ease;
+}
+
+/* Float the label when the field is focused, or filled (placeholder=" " => :not(:placeholder-shown)). */
+.ma-field-input:focus + .ma-field-label,
+.ma-field-input:not(:placeholder-shown) + .ma-field-label {
+    top: 0;
+    transform: translateY(-50%) scale(.85);
+}
+
+.ma-field-input:focus + .ma-field-label {
+    color: var(--ma-field-accent, #6750a4);
+}
