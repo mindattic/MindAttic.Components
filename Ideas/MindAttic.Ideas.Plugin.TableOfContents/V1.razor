@@ -1,0 +1,30 @@
+@namespace MindAttic.Ideas.Plugin.TableOfContents
+@inherits PluginBase
+
+@* MindAttic.Ideas.Plugin.TableOfContents.V1 — an OPTIONAL table of contents. Add it to a page and it
+   renders that page's child pages as a nav list; add it to a leaf page (no children) and it renders
+   NOTHING — harmless either way. It reads the children from the host IPageTree feature (the page
+   hierarchy: Page.ParentId / SortOrder) through the render context, with no compile-time host reference,
+   so it works for ANY page the moment that page has children. *@
+@if (_children.Count > 0)
+{
+    <nav class="ma-toc" aria-label="Table of contents">
+        <ul class="ma-toc-list">
+            @foreach (var child in _children)
+            {
+                <li class="ma-toc-item"><a class="ma-toc-link" href="/@child.Slug">@child.Title</a></li>
+            }
+        </ul>
+    </nav>
+}
+
+@code {
+    private IReadOnlyList<ChildPage> _children = Array.Empty<ChildPage>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        // Resolve the host page-tree feature; if absent (or the page has no children), render nothing.
+        if (Context is not null && Context.TryGetFeature<IPageTree>(out var tree) && tree is not null)
+            _children = await tree.ChildrenOfAsync(Context.Page.PageId);
+    }
+}
