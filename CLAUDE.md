@@ -1,5 +1,13 @@
 # MindAttic.UiUx Project Rules
 
+## Codex documentation standard (read this first)
+- The **source of truth** is `docs/BIBLE.md` (L0). Amendments in `docs/AMENDMENTS.md` (L1) **win** over the bible. User stories with status + evidence live in `docs/USER_STORIES.md` (L2). Design notes are in `docs/rfc/`. Tabular canon (the component catalog) is L5 data in `docs/data/` (schemas under `docs/data/_schema/`).
+- A fact lives in **exactly one layer**; everything else links to it by stable ID (`{#MAU-§N}`, `{#MAU-LAW-n}`, `MAU-US-<Epic><n>`, `MAU-A<n>`, data `id:"<type>.<slug>"`). Never reference line numbers.
+- Project laws (`MAU-LAW-1..6`) are in BIBLE §5 and **inherit** `../MindAttic.HouseRules.md` by reference — do not restate or edit the house rules here.
+- `docs/BIBLE.digest.md` is **generated** by `tools/codex.ps1 digest` — never hand-edit it. The SessionStart hook (`.claude/hooks/inject-digest.ps1`) injects it as authoritative context.
+- After editing any `docs/` canon: run `powershell -File tools/codex.ps1 digest` then `powershell -File tools/codex.ps1 doctor`. **doctor must pass** (exit 0) before the change is done. `✅` requires a named, real test/build per [HOUSE-LAW-8](../MindAttic.HouseRules.md#HOUSE-LAW-8).
+- Known broken: the `Ideas/Plugin.*` `.idea` build (`CS0246 PluginBase`) — see `docs/BIBLE.md` §6 and `docs/rfc/0001-pluginbase-sdk-drift.md`.
+
 ## Conversation
 - A bare "do" / "do it" / "yes" from the user means "continue", "keep going", "proceed". Resume the current task without asking for clarification.
 

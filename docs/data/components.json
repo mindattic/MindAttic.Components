@@ -1,0 +1,74 @@
+{
+  "$comment": "L5 canon-as-data: the MindAttic.UiUx component catalog. codex front-matter equivalent: { codex:1, project:MindAttic.UiUx, code:MAU, layer:data, status:living, updated:2026-06-07 }. Schema: _schema/component.schema.json. Prose (BIBLE/README) cites these by id; do not restate fields. Folders verified on disk 2026-06-07.",
+  "codex": 1,
+  "project": "MindAttic.UiUx",
+  "code": "MAU",
+  "layer": "data",
+  "status": "living",
+  "updated": "2026-06-07",
+  "components": [
+    {
+      "id": "component.cyberspace",
+      "name": "Cyberspace",
+      "type": "html-css-js-bundle",
+      "folder": "Components/Cyberspace",
+      "doc": "Components/Cyberspace/Cyberspace.md",
+      "summary": "Cyberpunk console-background effects engine: 12 named effects, scan-line overlay, parallax circuit board, content keepout zones.",
+      "feeds": []
+    },
+    {
+      "id": "component.sacredgeometry",
+      "name": "SacredGeometry",
+      "type": "js-umd-svg",
+      "folder": "Components/SacredGeometry",
+      "doc": "Components/SacredGeometry/SacredGeometry.md",
+      "summary": "Catalog of 1024 animatable line-art shapes; one pure renderer to live <canvas> or static SVG; build-previews.mjs emits one poster per shape.",
+      "feeds": ["component.cyberspace"]
+    },
+    {
+      "id": "component.outfitfont",
+      "name": "OutfitFont",
+      "type": "font-css",
+      "folder": "Components/OutfitFont",
+      "doc": "Components/OutfitFont/OutfitFont.md",
+      "summary": "Outfit variable font inlined as base64 woff2; two @font-face declarations plus the --font-outfit token.",
+      "feeds": []
+    },
+    {
+      "id": "component.atticfont",
+      "name": "AtticFont",
+      "type": "font-css",
+      "folder": "Components/AtticFont",
+      "doc": "Components/AtticFont/AtticFont.md",
+      "summary": "Attic display face inlined as base64 woff2; @font-face plus the --font-attic token; per-subscriber applyToSelector.",
+      "feeds": []
+    },
+    {
+      "id": "component.pinfooter",
+      "name": "PinFooter",
+      "type": "css-js",
+      "folder": "Components/PinFooter",
+      "doc": "Components/PinFooter/PinFooter.md",
+      "summary": "Pin-when-short footer: toggles position:fixed bottom:0 on .pin-when-short while the document is shorter than the viewport.",
+      "feeds": []
+    },
+    {
+      "id": "component.backhomem",
+      "name": "BackHomeM",
+      "type": "static-css",
+      "folder": "Components/BackHomeM",
+      "doc": "Components/BackHomeM/BackHomeM.md",
+      "summary": "A capital M in AtticFont pinned upper-left, linking back to mindattic.com; used on satellite sites.",
+      "feeds": ["component.atticfont"]
+    },
+    {
+      "id": "component.websnapshot",
+      "name": "WebSnapshot",
+      "type": "node-cli-viewer",
+      "folder": "Components/WebSnapshot",
+      "doc": "Components/WebSnapshot/WebSnapshot.md",
+      "summary": "Capture a fresh screenshot of any URL with Playwright, cover-fit + crop it, and inline the result as a base64 data URI in any .web-snapshot container.",
+      "feeds": []
+    }
+  ]
+}

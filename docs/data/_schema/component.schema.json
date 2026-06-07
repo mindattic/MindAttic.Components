@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://mindattic.dev/uiux/schema/component.schema.json",
+  "title": "MindAttic.UiUx component catalog entry",
+  "type": "object",
+  "required": ["id", "name", "type", "folder", "doc", "summary"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable id, form 'component.<slug>'.",
+      "pattern": "^component\\.[a-z0-9-]+$"
+    },
+    "name": { "type": "string", "description": "Folder/display name, e.g. Cyberspace." },
+    "type": {
+      "type": "string",
+      "description": "Bundle shape.",
+      "enum": [
+        "html-css-js-bundle",
+        "js-umd-svg",
+        "font-css",
+        "static-css",
+        "css-js",
+        "node-cli-viewer"
+      ]
+    },
+    "folder": { "type": "string", "description": "Path under the repo root." },
+    "doc": { "type": "string", "description": "Path to the component's markdown doc." },
+    "summary": { "type": "string", "description": "One-line description." },
+    "feeds": {
+      "type": "array",
+      "description": "ids of other components this one feeds at runtime (host-resolved, optional).",
+      "items": { "type": "string", "pattern": "^component\\.[a-z0-9-]+$" }
+    }
+  }
+}
