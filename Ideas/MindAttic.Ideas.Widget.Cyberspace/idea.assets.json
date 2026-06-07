@@ -1,5 +1,5 @@
 {
-  "$comment": "Canonical UiUx assets (from=canonical, default, relative to UiUx root) staged into this package's wwwroot/, plus the target-glue shim (from=project, relative to this project dir). dest paths must match V1 StylesheetUrls/ScriptUrls and the shim's /_ideas/Plugin/cyberspace/1/ URLs.",
+  "$comment": "Canonical UiUx assets (from=canonical, default, relative to UiUx root) staged into this package's wwwroot/, plus the target-glue shim (from=project, relative to this project dir). dest paths must match V1 StylesheetUrls/ScriptUrls and the shim's /_ideas/Widget/cyberspace/1/ URLs.",
   "assets": [
     { "src": "Components/Cyberspace/frontpage.css", "dest": "frontpage.css" },
     { "src": "Components/Cyberspace/loader.js", "dest": "loader.js" },

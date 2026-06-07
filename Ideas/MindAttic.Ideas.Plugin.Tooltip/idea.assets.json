@@ -1,7 +1,0 @@
-{
-  "$comment": "Canonical UiUx Tooltip assets staged into this Plugin's wwwroot/. dest paths must match V1 StylesheetUrls/ScriptUrls under /_ideas/Plugin/tooltip/1/.",
-  "assets": [
-    { "src": "Components/Tooltip/tooltip.css", "dest": "tooltip.css" },
-    { "src": "Components/Tooltip/tooltip.js", "dest": "tooltip.js" }
-  ]
-}

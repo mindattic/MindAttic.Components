@@ -1,6 +1,0 @@
-{
-  "$comment": "Canonical UiUx assets staged into this package's wwwroot/ by build.ps1. src is relative to the UiUx repo root; dest is the path under /_ideas/Plugin/atticfont/1/ and must match V1 StylesheetUrls.",
-  "assets": [
-    { "src": "Components/AtticFont/attic-font.css", "dest": "attic-font.css" }
-  ]
-}
