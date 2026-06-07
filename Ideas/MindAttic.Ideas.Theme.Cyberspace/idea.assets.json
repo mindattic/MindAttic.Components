@@ -1,6 +1,0 @@
-{
-  "$comment": "The theme bundles only its own chrome CSS; fonts/glyph/effects come from the composed Plugin .ideas it [Uses]. dest must match V1 ThemeCssUrls under /_ideas/Theme/cyberspace/1/.",
-  "assets": [
-    { "src": "Themes/Cyberspace/theme.css", "dest": "theme.css" }
-  ]
-}

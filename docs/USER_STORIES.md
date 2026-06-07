@@ -19,7 +19,8 @@ updated: 2026-06-07
 - **MAU-US-A1 🟡** As a component author, I can add a self-contained component under `Components/<Name>/`
   (source + `.json` config + `.md` doc) without touching any other component, so the catalog grows by
   addition. *Given a new folder, When I register it in `subscribers.json` `components`, Then it is
-  shippable.* *(Present for 7 components; no test harness — manual.)*
+  shippable.* *(Present for 13 components including PageScrollbar, Textbox, Tooltip, UserLogin, UserCircle,
+  UserTimeout; no test harness — manual.)*
 - **MAU-US-A2 🟡** As an author, I can compose a Theme under `Themes/<Name>/` that references components
   via `deps.json`, so a property can adopt a whole look at once. *(Present: `Themes/Cyberspace/`; manual.)*
 - **MAU-US-A3 🟡** As an author, I can regenerate SacredGeometry shape posters with
@@ -41,25 +42,24 @@ updated: 2026-06-07
   three splice subscribers. *(Workflow committed; not exercised this session.)*
 
 ## Epic C — `.idea` packaging
-- **MAU-US-C1 ⬜** As a `.idea` consumer, I can run `build.ps1 -Build <Name> -Output idea` and get a
+- **MAU-US-C1 🗑️** As a `.idea` consumer, I can run `build.ps1 -Build <Name> -Output idea` and get a
   packed `*.V1.idea` whose `wwwroot/` is staged from canonical UiUx assets
-  ([MAU-LAW-5](BIBLE.md#MAU-LAW-5)). *Currently blocked by SDK drift: `Plugin.*` fail (`CS0246 PluginBase`)
-  and `Theme.Cyberspace` fails (`CS0117 ContentKind.Plugin`); only `Control.Textbox` builds. See
-  [RFC 0001](rfc/0001-pluginbase-sdk-drift.md) and [BIBLE §6](BIBLE.md#MAU-§6).*
+  ([MAU-LAW-5](BIBLE.md#MAU-LAW-5)). *Cut: the `Ideas/` RCL subtree was removed from this repo
+  (2026-06-07, MAU-A3). The `idea` output target in `build.ps1` is a stub. Reintroduce as a new story
+  when the packaging approach is revisited.* *(Original spec audit: was ⬜, blocked by SDK drift
+  CS0246/CS0117 — see [RFC 0001](rfc/0001-pluginbase-sdk-drift.md) and prior BIBLE §6.)*
 - **MAU-US-C2 🟡** As a consumer, I can run `build.ps1 -Build <Name> -Output standalone` to copy the raw
-  canonical assets verbatim, so I can vendor without packaging. *(Path does not invoke the failing SDK
-  build; not run this session.)*
-- **MAU-US-C3 ⬜** As a consumer, I can run `build.ps1 -Build <Name> -Output blazor` to get a Blazor RCL
-  wrapper. *Stub: warns "not yet implemented".*
+  canonical assets verbatim, so I can vendor without packaging. *(Path unaffected by `Ideas/` removal;
+  not run this session.)*
+- **MAU-US-C3 🗑️** As a consumer, I can run `build.ps1 -Build <Name> -Output blazor` to get a Blazor RCL
+  wrapper. *Cut: moot without the `Ideas/` subtree. `build.ps1 -Output blazor` was and remains a stub.*
+  *(Original spec audit: was ⬜, warns "not yet implemented".)*
 
 ## Priority backlog
-1. **MAU-US-C1** — reconcile `Ideas/Plugin.*` with the current `MindAttic.Ideas.Abstractions` so the
-   `.idea` build compiles (the one hard-broken path). → [RFC 0001](rfc/0001-pluginbase-sdk-drift.md).
-2. Add a minimal in-repo verification harness (sync idempotency check + a `.idea` build smoke) so Epic B
-   and C stories can graduate to ✅ with a named test.
-3. **MAU-US-C3** — implement the `blazor` output target in `build.ps1`.
-4. Author the auth-visual components (UserLogin/UserCircle/UserTimeout) the Ideas/Tutor subscribers are
-   pre-registered for.
+1. Add a minimal in-repo verification harness (sync idempotency check) so Epic B stories can graduate to
+   ✅ with a named test.
+2. Update `README.md` component table and `CLAUDE.md` layout to list all 13 components.
+3. Revisit `.idea` packaging: if reintroduced, author a new Epic C approach (RFC required per MAU-A3).
 
 ### Audit log
 No stories have been changed from an original spec yet. (When a story's ask changes, the original text is

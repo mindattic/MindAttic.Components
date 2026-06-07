@@ -1,5 +1,5 @@
 {
-  "$comment": "L5 canon-as-data: the MindAttic.UiUx component catalog. codex front-matter equivalent: { codex:1, project:MindAttic.UiUx, code:MAU, layer:data, status:living, updated:2026-06-07 }. Schema: _schema/component.schema.json. Prose (BIBLE/README) cites these by id; do not restate fields. Folders verified on disk 2026-06-07.",
+  "$comment": "L5 canon-as-data: the MindAttic.UiUx component catalog. codex front-matter equivalent: { codex:1, project:MindAttic.UiUx, code:MAU, layer:data, status:living, updated:2026-06-07 }. Schema: _schema/component.schema.json. Prose (BIBLE/README) cites these by id; do not restate fields. Folders verified on disk 2026-06-07 (13 components).",
   "codex": 1,
   "project": "MindAttic.UiUx",
   "code": "MAU",
@@ -68,6 +68,60 @@
       "folder": "Components/WebSnapshot",
       "doc": "Components/WebSnapshot/WebSnapshot.md",
       "summary": "Capture a fresh screenshot of any URL with Playwright, cover-fit + crop it, and inline the result as a base64 data URI in any .web-snapshot container.",
+      "feeds": []
+    },
+    {
+      "id": "component.pagescrollbar",
+      "name": "PageScrollbar",
+      "type": "css-js-razor",
+      "folder": "Components/PageScrollbar",
+      "doc": "Components/PageScrollbar/PageScrollbar.md",
+      "summary": "Themed, draggable overlay scrollbar replacing the native browser scrollbar; Blazor razor wrapper for flash-free SSR; CSS-var themeable under .ma-scrollbar*.",
+      "feeds": []
+    },
+    {
+      "id": "component.textbox",
+      "name": "Textbox",
+      "type": "css-only",
+      "folder": "Components/Textbox",
+      "doc": "Components/Textbox/textbox.css",
+      "summary": "Angular-Material-style outlined text field with floating label (Material notch effect); themeable via CSS vars; pairs with OutfitFont --font-outfit token.",
+      "feeds": ["component.outfitfont"]
+    },
+    {
+      "id": "component.tooltip",
+      "name": "Tooltip",
+      "type": "css-js-razor",
+      "folder": "Components/Tooltip",
+      "doc": "Components/Tooltip/Tooltip.md",
+      "summary": "Standalone, dependency-free, accessible tooltip driven by data-tooltip attribute; one reused floating node; namespaced under .ma-tooltip*; optional Blazor wrapper.",
+      "feeds": []
+    },
+    {
+      "id": "component.userlogin",
+      "name": "UserLogin",
+      "type": "css-js-razor",
+      "folder": "Components/UserLogin",
+      "doc": "Components/UserLogin/UserLogin.md",
+      "summary": "Styling wrapper around the MindAttic.Authentication MaLogin static-SSR form; scoped CSS under .ul-card; Blazor Razor wrapper; does not implement authentication.",
+      "feeds": []
+    },
+    {
+      "id": "component.usercircle",
+      "name": "UserCircle",
+      "type": "css-js-razor",
+      "folder": "Components/UserCircle",
+      "doc": "Components/UserCircle/UserCircle.md",
+      "summary": "Authenticated-only avatar/initials circle (upper-right); click opens a menu or signs out; reads ClaimsPrincipal via AuthorizeView; logout via native form+AntiforgeryToken.",
+      "feeds": []
+    },
+    {
+      "id": "component.usertimeout",
+      "name": "UserTimeout",
+      "type": "css-js-razor",
+      "folder": "Components/UserTimeout",
+      "doc": "Components/UserTimeout/UserTimeout.md",
+      "summary": "30-minute idle-timeout warning + auto-logout; countdown modal; renders and arms only when authenticated; logout via native form+AntiforgeryToken; static-SSR safe.",
       "feeds": []
     }
   ]

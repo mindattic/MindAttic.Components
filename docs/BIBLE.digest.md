@@ -10,8 +10,7 @@ AUTHORITATIVE - full detail in docs/BIBLE.md
 MindAttic.UiUx is the org's **one-repo, every-front-end component library**: a catalog of
 self-contained CSS/JS/HTML bundles (fonts, effects, helpers) that is the single source of truth,
 delivered three ways — jsDelivr CDN at runtime, splice-in-place marker-block sync at build time,
-and a cross-repo GitHub Actions PR — with the **same source** additionally packageable as first-party
-`.idea` widget packages via the sibling `MindAttic.Ideas` SDK.
+and a cross-repo GitHub Actions PR.
 
 ## 3. What it is NOT {#MAU-§3}
 - **NOT a deploying repo.** It owns no hosting. Catalog landing pages and the Claudia/ChiMesh long-form
@@ -23,8 +22,9 @@ and a cross-repo GitHub Actions PR — with the **same source** additionally pac
   import graph, no dependency resolver beyond per-component declared assets.
 - **NOT semantically versioned.** Tags are whole numbers (`V1`, `V2`, …) only — never SemVer
   ([HOUSE-LAW-1](../MindAttic.HouseRules.md#HOUSE-LAW-1)).
-- **NOT the owner of the `.idea` runtime/SDK.** The `Ideas/` projects only *consume* the sibling
-  `MindAttic.Ideas` Abstractions + `ma-idea` packer at compile time; the SDK lives in that repo.
+- **NOT the owner of the `.idea` runtime/SDK.** If `.idea` packaging is reintroduced, any `Ideas/`
+  projects would only *consume* the sibling `MindAttic.Ideas` Abstractions + `ma-idea` packer at
+  compile time; the SDK lives in that repo. The `Ideas/` subtree was removed as of 2026-06-07 (see MAU-A3).
 
 ## 5. The Laws {#MAU-§5}
 This project **inherits the org-wide House Rules** verbatim — see
@@ -59,11 +59,12 @@ which pulls from jsDelivr at runtime. Do not add `landing-page`/`build-html-js` 
 `subscribers.json` or recreate the deleted `sync-landing-page.ps1` / `sync-claudia.ps1` /
 `sync-chimesh.ps1`. Brand-new catalog pages are configured in `MindAttic.Deploy/projects.json`.
 
-### MAU-LAW-5 — Canonical assets are never duplicated into `Ideas/` {#MAU-LAW-5}
-An `Ideas/*` project declares the canonical UiUx assets it bundles in `idea.assets.json` (`src` relative
-to repo root, `dest` under the package `wwwroot/`). `build.ps1` stages them at build time. Raw source
-under `Components/`/`Themes/` stays the single source of truth and is never copied into source control
-under `Ideas/`.
+### MAU-LAW-5 — Canonical assets are never duplicated into packaging subtrees {#MAU-LAW-5}
+If an `Ideas/*` or other packaging project is reintroduced, it must declare canonical UiUx assets via a
+manifest (`idea.assets.json` or equivalent) and stage them at build time. Raw source under `Components/`
+and `Themes/` is always the single source of truth and is never copied into source control under any
+packaging subtree. (The `Ideas/` subtree was removed as of 2026-06-07; this law governs any future
+reinstatement — see MAU-A3.)
 
 ### MAU-LAW-6 — Published CDN tags are immutable {#MAU-LAW-6}
 Never mutate a published whole-number tag (`V1`, `V2`, …). Ship the next number alongside it; subscribers
@@ -77,9 +78,6 @@ pin the exact one (e.g. `MindAttic.Deploy/projects.json:componentsVersion`, or
 - **Subscription** — one component entry (with overrides) on a subscriber.
 - **Marker block** — `BEGIN/END MINDATTIC.UIUX:<MARKER>` region a sync regenerates.
 - **Splice-in-place** — delivery mode that rewrites only the marker block in a subscriber file.
-- **`.idea` package** — a packed RCL artifact (`*.V1.idea`) produced by `build.ps1` via `ma-idea`.
-- **`idea.assets.json`** — per-Ideas-project manifest mapping canonical `src` → package `wwwroot/` `dest`.
-- **ma-idea / Abstractions** — the packer + SDK base types, owned by the sibling `MindAttic.Ideas` repo.
 - **jsDelivr CDN** — `cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@<ref>/<path>`, the runtime delivery.
 - **`subscribers.json`** — canonical components-registry + subscriber map (L5 data).
 - **`Vn` tag** — a whole-number release tag; immutable once published ([MAU-LAW-6](#MAU-LAW-6)).
@@ -87,17 +85,29 @@ pin the exact one (e.g. `MindAttic.Deploy/projects.json:componentsVersion`, or
 </invoke>
 
 ## Status index (from USER_STORIES.md)
-- done: 4 | partial: 10 | planned: 3 | cut: 1
+- done: 4 | partial: 10 | planned: 3 | cut: 3
 
 ## Latest amendment
-## MAU-A2 — Record the broken `.idea` plugin build as verified state (supersedes —)
-Captured the real, currently-failing `.idea` build in [BIBLE §6](BIBLE.md#MAU-§6) rather than asserting
-"done". Verified 2026-06-07 against the sibling SDK at `../MindAttic.Ideas`: `Plugin.*` (6 projects) fail
-with `CS0246: 'PluginBase' could not be found` (its `Bases.cs` has `ThemeBase`/`ControlBase`/`IdeaBase`
-only); `Theme.Cyberspace` fails with `CS0117: 'ContentKind' does not contain a definition for 'Plugin'`;
-`Control.Textbox` builds clean (`ControlBase`). The Abstractions API was refactored around the "Plugin"
-concept (both base class and `ContentKind` enum). Tracked for resolution in
-[RFC 0001](rfc/0001-pluginbase-sdk-drift.md). *No fix applied* (Codex install does not modify
-application/source code).
+## MAU-A3 — Six new components landed; `Ideas/` packaging subtree removed (supersedes MAU-A2 §build, §frontier) {#MAU-A3}
+Full-sync 2026-06-07 against the actual repo tree revealed two material changes not yet captured in canon:
+
+**New components (6).** The following component folders exist on disk and are now registered in
+`docs/data/components.json` and referenced in [BIBLE §4.1](BIBLE.md#MAU-§4) and
+[BIBLE §6](BIBLE.md#MAU-§6): `PageScrollbar` (css-js-razor overlay scrollbar), `Textbox` (css-only
+Material-style outlined field), `Tooltip` (css-js-razor accessible tooltip), `UserLogin` (css-js-razor
+login-form styling wrapper), `UserCircle` (css-js-razor authenticated avatar/menu), `UserTimeout`
+(css-js-razor idle-timeout warning). Total catalog: 13 components. The auth-visual trio (UserLogin,
+UserCircle, UserTimeout) is now authored and wired into `subscribers.json` for StreetSamurai, Ideas,
+and Tutor subscribers — previous docs called them "not yet authored / intentional no-op". The component
+schema (`docs/data/_schema/component.schema.json`) was extended with two new `type` values: `css-js-razor`
+(CSS + JS + optional Razor wrapper) and `css-only`.
+
+**`Ideas/` subtree removed.** The `Ideas/` directory (containing `MindAttic.Ideas.{Plugin|Theme|Control}.*`
+RCL csproj files) is **absent** from the repo. All BIBLE references to the `Ideas/` tree, `idea.assets.json`,
+`ma-idea`, `PluginBase`, and the `build.ps1 -Output idea` path have been updated to reflect removal.
+Epic C stories MAU-US-C1 and MAU-US-C3 are downgraded from ⬜ to 🗑️. MAU-LAW-5 is reworded to govern
+any future reinstatement. [RFC 0001](rfc/0001-pluginbase-sdk-drift.md) (PluginBase SDK drift) is
+superseded by the removal and kept for historical reference only. *No fix applied to application code
+(Codex sync-only).*
 </content>
 

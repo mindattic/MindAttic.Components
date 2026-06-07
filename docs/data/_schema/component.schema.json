@@ -21,6 +21,8 @@
         "font-css",
         "static-css",
         "css-js",
+        "css-js-razor",
+        "css-only",
         "node-cli-viewer"
       ]
     },

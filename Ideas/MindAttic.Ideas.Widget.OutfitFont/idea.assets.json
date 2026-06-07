@@ -1,6 +1,0 @@
-{
-  "$comment": "The .idea target's wwwroot manifest: canonical UiUx assets build.ps1 stages into this package's wwwroot/ (so the source stays canonical, never duplicated). src is relative to the UiUx repo root; dest is the path under the package wwwroot (and under /_ideas/Widget/outfitfont/1/). The V1 WidgetBase StylesheetUrls must match these dest paths.",
-  "assets": [
-    { "src": "Components/OutfitFont/outfit-font.css", "dest": "outfit-font.css" }
-  ]
-}

@@ -1,6 +1,0 @@
-# .NET build artifacts for the UiUx Ideas-target (.idea) build projects.
-# The canonical source stays under ../Components and ../Themes; these are generated.
-bin/
-obj/
-dist/
-_bazaar/
