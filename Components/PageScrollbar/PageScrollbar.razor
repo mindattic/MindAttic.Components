@@ -1,0 +1,14 @@
+@* MindAttic.UiUx — PageScrollbar (Blazor wrapper)
+
+   Canonical source. Blazor subscribers sync a copy into their own Components
+   folder (this repo has no build step). Requires page-scrollbar.css +
+   page-scrollbar.js loaded once at the app root (see PageScrollbar.md).
+
+   Rendering the track in markup (rather than letting the JS create it) means it
+   is present in the SSR'd HTML, so there is no flash before hydration. The JS
+   reuses this element if present, or creates one if it is absent. Drop a single
+   <PageScrollbar /> in your layout. *@
+
+<div class="ma-scrollbar" aria-hidden="true">
+    <div class="ma-scrollbar__thumb"></div>
+</div>

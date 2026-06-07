@@ -1,0 +1,61 @@
+/* MindAttic.UiUx — PageScrollbar
+ * Replaces the browser's native page scrollbar with a themed overlay scrollbar.
+ * The native scrollbar is hidden only once JS adds `.ma-sb-active` to <html>, so
+ * a no-JS client keeps its normal scrollbar (progressive enhancement).
+ *
+ * Namespaced under `.ma-scrollbar*` / `.ma-sb-*` so it can't bleed into a host.
+ * All visual tokens are CSS variables.
+ */
+
+:root {
+  --ma-sb-width:       14px;   /* hit area / track width            */
+  --ma-sb-thumb-w:     8px;    /* visible thumb width               */
+  --ma-sb-thumb-w-hov: 10px;   /* thumb width on hover/drag         */
+  --ma-sb-track-bg:    transparent;
+  --ma-sb-thumb-bg:    #30363d;
+  --ma-sb-thumb-hover: #dc3545;
+  --ma-sb-min-thumb:   28px;
+}
+
+/* Hide the native scrollbar once enhanced. */
+html.ma-sb-active { scrollbar-width: none; -ms-overflow-style: none; }
+html.ma-sb-active::-webkit-scrollbar,
+html.ma-sb-active body::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+.ma-scrollbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--ma-sb-width);
+  background: var(--ma-sb-track-bg);
+  z-index: 2147482000;
+  user-select: none;
+  touch-action: none;
+}
+.ma-scrollbar.is-hidden { display: none; }
+
+.ma-scrollbar__thumb {
+  position: absolute;
+  top: 0;
+  right: calc((var(--ma-sb-width) - var(--ma-sb-thumb-w)) / 2);
+  width: var(--ma-sb-thumb-w);
+  min-height: var(--ma-sb-min-thumb);
+  border-radius: 999px;
+  background: var(--ma-sb-thumb-bg);
+  cursor: grab;
+  transition: background 0.15s ease, width 0.12s ease, right 0.12s ease;
+  will-change: transform;
+}
+.ma-scrollbar:hover .ma-scrollbar__thumb,
+.ma-sb-dragging .ma-scrollbar__thumb {
+  background: var(--ma-sb-thumb-hover);
+  width: var(--ma-sb-thumb-w-hov);
+  right: calc((var(--ma-sb-width) - var(--ma-sb-thumb-w-hov)) / 2);
+}
+.ma-sb-dragging .ma-scrollbar__thumb { cursor: grabbing; }
+.ma-sb-dragging { user-select: none; cursor: grabbing; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ma-scrollbar__thumb { transition: background 0.15s ease; }
+}

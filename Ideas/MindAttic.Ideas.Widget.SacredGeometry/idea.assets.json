@@ -1,0 +1,7 @@
+{
+  "$comment": "The .idea target's wwwroot manifest. The renderer is staged from the canonical UiUx SacredGeometry source (src relative to UiUx root, so the source stays canonical, never duplicated); the auto-init driver is target glue (from=project, relative to this project dir). dest paths must match V1 ScriptUrls and the /_ideas/Widget/sacredgeometry/1/ URLs.",
+  "assets": [
+    { "src": "Components/SacredGeometry/sacred-geometry.js", "dest": "sacred-geometry.js" },
+    { "src": "assets/sacred-geometry-init.js", "from": "project", "dest": "sacred-geometry-init.js" }
+  ]
+}
