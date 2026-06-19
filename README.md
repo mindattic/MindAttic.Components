@@ -8,15 +8,15 @@ Currently powers `mindattic.com`, the `StreetSamurai` Blazor home page, and the 
 
 ```html
 <!-- pinned production -->
-<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@v1.0.0/Components/Cyberspace/console-bg.js"></script>
-<link  rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@v1.0.0/Components/Cyberspace/frontpage.css">
+<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@V5/Components/Cyberspace/console-bg.js"></script>
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@V5/Components/Cyberspace/frontpage.css">
 ```
 
 **Why MindAttic.UiUx:**
 
 - **Three delivery modes, one source of truth.** jsDelivr CDN for runtime, GitHub Actions for cross-repo PRs, PowerShell scripts for local dev — all reading the same [`subscribers.json`](subscribers.json).
 - **Subscribers are declarative.** Add `{ "component": "AtticFont", "applyToSelector": ".site-name" }` to a subscriber's array. The next sync enrolls it. Remove the line, the next sync unenrolls. No hardcoded lists.
-- **Versioned by tag, immutable on CDN.** `@v1.0.0` is edge-cached forever; `@main` always tracks tip-of-tree. Subscribers pick their guarantee.
+- **Versioned by tag, immutable on CDN.** `@V5` is edge-cached forever; `@main` always tracks tip-of-tree. Subscribers pick their guarantee. Tags are whole-number integers (`V1`, `V2`, … `V5`).
 - **Self-contained components.** Each folder ships its own source, usage HTML, markdown doc, and JSON config. No cross-component imports — you can vendor a single component without dragging the rest.
 - **Marker-block contract.** Every splice is bounded by `BEGIN/END MINDATTIC.UIUX:<MARKER>` comments. Subscribers hand-author the rest of the file without conflict; only what's between the markers is regenerated.
 
@@ -123,7 +123,7 @@ See [`.github/PIPELINES.md`](.github/PIPELINES.md) for the full setup
 
 | Pipeline | What it does | When it runs |
 |---|---|---|
-| **jsDelivr CDN** | Serves any file at `https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@<ref>/<path>` — versioned, edge-cached, no infra to run | Continuously; cache-immutable for `@v*` tags. Consumed by `MindAttic.Deploy` (pins `componentsVersion` in `projects.json`) for every catalog landing page and the Claudia/ChiMesh long-form builds |
+| **jsDelivr CDN** | Serves any file at `https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@<ref>/<path>` — versioned, edge-cached, no infra to run | Continuously; cache-immutable for `@V*` whole-number tags. Consumed by `MindAttic.Deploy` (pins `componentsVersion` in `projects.json`) for every catalog landing page and the Claudia/ChiMesh long-form builds |
 | **GitHub Actions cross-repo sync** | On push to `main`, opens PRs against `mindattic/mindattic.com`, `mindattic/StreetSamurai`, and `mindattic/MindAttic.Psst` with refreshed marker blocks / wwwroot copies | Every push to `main` (workflow: [`.github/workflows/sync-subscribers.yml`](.github/workflows/sync-subscribers.yml)) |
 | **PowerShell `sync/*.ps1`** | Local dev fallback — same logic as the Action, runs against your working copies. Also invoked by `MindAttic.Deploy` as a `preDeploy` hook for `mindattic.com` and `StreetSamurai` so the bundle is fresh before FTPS upload | Manual (`powershell -File sync/sync-all.ps1`) |
 
