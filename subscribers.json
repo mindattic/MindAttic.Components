@@ -27,9 +27,24 @@
       ]
     },
 
-    "StreetSamurai": {
+    "StreetSamurai.Writer": {
       "kind":       "blazor-wwwroot",
-      "target":     "D:/Projects/MindAttic/StreetSamurai/v3/StreetSamurai.Blazor",
+      "target":     "D:/Projects/MindAttic/StreetSamurai/v3/StreetSamurai.Writer",
+      "syncScript": "sync-streetsamurai.ps1",
+      "subscriptions": [
+        { "component": "OutfitFont" },
+        { "component": "AtticFont",  "applyToSelector": null },
+        { "component": "Cyberspace" },
+        { "component": "PinFooter", "jsOnly": true },
+        { "component": "UserLogin" },
+        { "component": "UserCircle" },
+        { "component": "UserTimeout" }
+      ]
+    },
+
+    "StreetSamurai.Codex": {
+      "kind":       "blazor-wwwroot",
+      "target":     "D:/Projects/MindAttic/StreetSamurai/v3/StreetSamurai.Codex",
       "syncScript": "sync-streetsamurai.ps1",
       "subscriptions": [
         { "component": "OutfitFont" },

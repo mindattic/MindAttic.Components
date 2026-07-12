@@ -1,34 +1,16 @@
 # ====================================================================
-# MindAttic.UiUx -> StreetSamurai
+# MindAttic.UiUx -> StreetSamurai.Writer + StreetSamurai.Codex
 # --------------------------------------------------------------------
-# Drives StreetSamurai's wwwroot from MindAttic.UiUx/subscribers.json.
-# Per-component effect on this subscriber (matched by component name below):
-#   - OutfitFont / AtticFont  -> splice CSS marker block in wwwroot/app.css
-#                                with applyToSelector taken from subscribers.json
-#                                (override) or the font's *.json default.
-#   - Cyberspace              -> copy all jsFiles to wwwroot/js, then
-#                                splice the CYBERSPACE.CSS marker in app.css
-#                                from frontpage.css.
-#   - PinFooter               -> copy jsFiles to wwwroot/js only (StreetSamurai
-#                                inlines its own equivalent of pin-footer.css
-#                                elsewhere; the JSON subscription carries
-#                                "jsOnly": true to signal this).
-#
-# Adding a new component for StreetSamurai requires:
-#   1. an entry in subscribers."StreetSamurai".subscriptions (subscribers.json)
-#   2. a dispatch case in this script's switch below
-#   3. matching marker pair(s) in wwwroot/app.css for any CSS the component
-#      contributes (use bootstrap-streetsamurai-appcss.ps1 to insert them
-#      the first time).
+# Drives both apps' wwwroot from MindAttic.UiUx/subscribers.json.
+# Runs the same component dispatch against each subscriber in turn so
+# the two apps are always in sync after every UiUx update.
 #
 # Usage:
 #   powershell -File sync-streetsamurai.ps1
-#   powershell -File sync-streetsamurai.ps1 -BlazorRoot 'D:/path/StreetSamurai.Blazor'
 # ====================================================================
 [CmdletBinding()]
 param(
-    [string]$ContentRoot,
-    [string]$BlazorRoot
+    [string]$ContentRoot
 )
 
 $ErrorActionPreference = 'Stop'
@@ -41,15 +23,6 @@ if (-not $ContentRoot) {
 . (Join-Path $PSScriptRoot '_subscribers.ps1')
 
 $utf8 = [System.Text.UTF8Encoding]::new($false)
-$sub  = Get-Subscriber -Name 'StreetSamurai' -ContentRoot $ContentRoot
-
-if (-not $BlazorRoot) { $BlazorRoot = $sub.target }
-
-$wwwJs  = Join-Path $BlazorRoot 'wwwroot/js'
-$appCss = Join-Path $BlazorRoot 'wwwroot/app.css'
-foreach ($p in @($BlazorRoot, $wwwJs, $appCss)) {
-    if (-not (Test-Path $p)) { throw "Path not found: $p" }
-}
 
 function Splice-CssMarkerBlock {
     param([string]$CssText, [string]$Begin, [string]$End, [string]$Body, [string]$SourcePath)
@@ -80,73 +53,83 @@ function Copy-ComponentJsFiles {
         $dest = Join-Path $DestDir $name
         Copy-Item -Path $src -Destination $dest -Force
         $kb = [math]::Round(((Get-Item $dest).Length / 1024), 1)
-        # Write-Host so the status line doesn't pollute the function's return value.
-        Write-Host "  [JS]  $name  ($kb KB)"
+        Write-Host "    [JS]  $name  ($kb KB)"
         $count++
     }
     return $count
 }
 
-$cssText = [System.IO.File]::ReadAllText($appCss, $utf8)
-$cssEol  = Get-DominantEol -Text $cssText
-$summary = New-Object System.Collections.Generic.List[string]
+function Sync-Subscriber {
+    param([string]$SubscriberName, [string]$ContentRoot)
 
-foreach ($subscription in $sub.subscriptions) {
-    $comp = Get-ComponentDescriptor -Name $subscription.component -ContentRoot $ContentRoot
+    $sub       = Get-Subscriber -Name $SubscriberName -ContentRoot $ContentRoot
+    $blazorRoot = $sub.target
+    $wwwJs     = Join-Path $blazorRoot 'wwwroot/js'
+    $appCss    = Join-Path $blazorRoot 'wwwroot/app.css'
 
-    switch ($comp.name) {
-        # Fonts: splice the @font-face CSS (+ optional applyToSelector rule) into app.css.
-        { $_ -in 'OutfitFont', 'AtticFont' } {
-            $bodyArgs = @{ Component = $comp; ContentRoot = $ContentRoot; Encoding = $utf8 }
-            if ($subscription.PSObject.Properties.Name -contains 'applyToSelector') {
-                $bodyArgs['SelectorOverride'] = $subscription.applyToSelector
+    foreach ($p in @($blazorRoot, $wwwJs, $appCss)) {
+        if (-not (Test-Path $p)) { throw "[$SubscriberName] Path not found: $p" }
+    }
+
+    $cssText = [System.IO.File]::ReadAllText($appCss, $utf8)
+    $cssEol  = Get-DominantEol -Text $cssText
+    $summary = New-Object System.Collections.Generic.List[string]
+
+    foreach ($subscription in $sub.subscriptions) {
+        $comp = Get-ComponentDescriptor -Name $subscription.component -ContentRoot $ContentRoot
+
+        switch ($comp.name) {
+            { $_ -in 'OutfitFont', 'AtticFont' } {
+                $bodyArgs = @{ Component = $comp; ContentRoot = $ContentRoot; Encoding = $utf8 }
+                if ($subscription.PSObject.Properties.Name -contains 'applyToSelector') {
+                    $bodyArgs['SelectorOverride'] = $subscription.applyToSelector
+                }
+                $body = Build-FontCssBody @bodyArgs
+                $cssText = Splice-CssMarkerBlock -CssText $cssText `
+                    -Begin "/* == BEGIN MINDATTIC.UIUX:$($comp.marker).CSS == */" `
+                    -End   "/* == END MINDATTIC.UIUX:$($comp.marker).CSS == */" `
+                    -Body  $body -SourcePath $appCss
+                $summary.Add(("    {0,-12} css {1} KB" -f "$($comp.name):", [math]::Round($body.Length / 1024, 1)))
             }
-            $body = Build-FontCssBody @bodyArgs
-            $cssText = Splice-CssMarkerBlock -CssText $cssText `
-                -Begin "/* == BEGIN MINDATTIC.UIUX:$($comp.marker).CSS == */" `
-                -End   "/* == END MINDATTIC.UIUX:$($comp.marker).CSS == */" `
-                -Body  $body -SourcePath $appCss
-            $summary.Add(("  {0,-12} css {1} KB" -f "$($comp.name):", [math]::Round($body.Length / 1024, 1)))
-        }
 
-        # Cyberspace: copy the JS files into wwwroot/js, splice its frontpage.css into app.css.
-        'Cyberspace' {
-            $count = Copy-ComponentJsFiles -Component $comp -ContentRoot $ContentRoot -DestDir $wwwJs
-            $css = [System.IO.File]::ReadAllText((Join-Path $ContentRoot $comp.cssFile), $utf8)
-            $cssText = Splice-CssMarkerBlock -CssText $cssText `
-                -Begin "/* == BEGIN MINDATTIC.UIUX:$($comp.marker).CSS == */" `
-                -End   "/* == END MINDATTIC.UIUX:$($comp.marker).CSS == */" `
-                -Body  $css -SourcePath $appCss
-            $summary.Add(("  {0,-12} {1} JS files, css {2} KB" -f "$($comp.name):", $count, [math]::Round($css.Length / 1024, 1)))
-        }
+            'Cyberspace' {
+                $count = Copy-ComponentJsFiles -Component $comp -ContentRoot $ContentRoot -DestDir $wwwJs
+                $css = [System.IO.File]::ReadAllText((Join-Path $ContentRoot $comp.cssFile), $utf8)
+                $cssText = Splice-CssMarkerBlock -CssText $cssText `
+                    -Begin "/* == BEGIN MINDATTIC.UIUX:$($comp.marker).CSS == */" `
+                    -End   "/* == END MINDATTIC.UIUX:$($comp.marker).CSS == */" `
+                    -Body  $css -SourcePath $appCss
+                $summary.Add(("    {0,-12} {1} JS files, css {2} KB" -f "$($comp.name):", $count, [math]::Round($css.Length / 1024, 1)))
+            }
 
-        # PinFooter: JS-only here (StreetSamurai keeps its own pin-footer CSS).
-        'PinFooter' {
-            $count = Copy-ComponentJsFiles -Component $comp -ContentRoot $ContentRoot -DestDir $wwwJs
-            $summary.Add(("  {0,-12} {1} JS files (jsOnly)" -f "$($comp.name):", $count))
-        }
+            'PinFooter' {
+                $count = Copy-ComponentJsFiles -Component $comp -ContentRoot $ContentRoot -DestDir $wwwJs
+                $summary.Add(("    {0,-12} {1} JS files (jsOnly)" -f "$($comp.name):", $count))
+            }
 
-        # Auth-visual components (UiUx): copy JS into wwwroot/js + splice the CSS marker block.
-        { $_ -in 'UserLogin', 'UserCircle', 'UserTimeout' } {
-            $count = Copy-ComponentJsFiles -Component $comp -ContentRoot $ContentRoot -DestDir $wwwJs
-            $css = [System.IO.File]::ReadAllText((Join-Path $ContentRoot $comp.cssFile), $utf8)
-            $cssText = Splice-CssMarkerBlock -CssText $cssText `
-                -Begin "/* == BEGIN MINDATTIC.UIUX:$($comp.marker).CSS == */" `
-                -End   "/* == END MINDATTIC.UIUX:$($comp.marker).CSS == */" `
-                -Body  $css -SourcePath $appCss
-            $summary.Add(("  {0,-12} {1} JS files, css {2} KB" -f "$($comp.name):", $count, [math]::Round($css.Length / 1024, 1)))
-        }
+            { $_ -in 'UserLogin', 'UserCircle', 'UserTimeout' } {
+                $count = Copy-ComponentJsFiles -Component $comp -ContentRoot $ContentRoot -DestDir $wwwJs
+                $css = [System.IO.File]::ReadAllText((Join-Path $ContentRoot $comp.cssFile), $utf8)
+                $cssText = Splice-CssMarkerBlock -CssText $cssText `
+                    -Begin "/* == BEGIN MINDATTIC.UIUX:$($comp.marker).CSS == */" `
+                    -End   "/* == END MINDATTIC.UIUX:$($comp.marker).CSS == */" `
+                    -Body  $css -SourcePath $appCss
+                $summary.Add(("    {0,-12} {1} JS files, css {2} KB" -f "$($comp.name):", $count, [math]::Round($css.Length / 1024, 1)))
+            }
 
-        default {
-            throw "StreetSamurai has no dispatch for component '$($comp.name)'. Add a case in sync-streetsamurai.ps1."
+            default {
+                throw "StreetSamurai has no dispatch for component '$($comp.name)'. Add a case in sync-streetsamurai.ps1."
+            }
         }
     }
+
+    [System.IO.File]::WriteAllText($appCss, (ConvertTo-Eol -Text $cssText -Eol $cssEol), $utf8)
+    $kb = [math]::Round(((Get-Item $appCss).Length / 1024), 1)
+    Write-Output "  Synced MindAttic.UiUx -> $blazorRoot"
+    Write-Output "    [CSS] app.css marker blocks updated ($kb KB)"
+    $summary | ForEach-Object { Write-Output $_ }
 }
 
-[System.IO.File]::WriteAllText($appCss, (ConvertTo-Eol -Text $cssText -Eol $cssEol), $utf8)
-
-$kb = [math]::Round(((Get-Item $appCss).Length / 1024), 1)
-Write-Output "  [CSS] app.css marker blocks updated ($kb KB)"
+Sync-Subscriber -SubscriberName 'StreetSamurai.Writer' -ContentRoot $ContentRoot
 Write-Output ""
-Write-Output "Synced MindAttic.UiUx -> $BlazorRoot"
-$summary | ForEach-Object { Write-Output $_ }
+Sync-Subscriber -SubscriberName 'StreetSamurai.Codex'  -ContentRoot $ContentRoot
