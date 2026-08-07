@@ -3,7 +3,7 @@ name: Sync content to subscribers
 # ====================================================================
 # This workflow only handles the three remaining "splice-in-place"
 # subscribers that MindAttic.UiUx still owns: mindattic.com (html-inline),
-# StreetSamurai (blazor-wwwroot), and MindAttic.Psst legal pages
+# Prose (blazor-wwwroot), and MindAttic.Psst legal pages
 # (html-inline-multi -> terms.htm/privacy.htm).
 #
 # Catalog landing pages and the Claudia/ChiMesh long-form HTML builds are
@@ -73,8 +73,8 @@ jobs:
           author: "MindAttic Components Bot <noreply@mindattic.com>"
           committer: "MindAttic Components Bot <noreply@mindattic.com>"
 
-  sync-streetsamurai:
-    name: Sync into StreetSamurai
+  sync-prose:
+    name: Sync into Prose
     runs-on: ubuntu-latest
     steps:
       - name: Checkout MindAttic.UiUx
@@ -82,24 +82,24 @@ jobs:
         with:
           path: content
 
-      - name: Checkout StreetSamurai
+      - name: Checkout Prose
         uses: actions/checkout@v4
         with:
-          repository: mindattic/StreetSamurai
-          path: streetsamurai
+          repository: mindattic/Prose
+          path: prose
           token: ${{ secrets.SUBSCRIBER_REPO_TOKEN }}
 
-      - name: Run sync-streetsamurai.ps1
+      - name: Run sync-prose.ps1
         shell: pwsh
         run: |
-          ./content/sync/sync-streetsamurai.ps1 `
+          ./content/sync/sync-prose.ps1 `
             -ContentRoot "$PWD/content" `
-            -BlazorRoot "$PWD/streetsamurai/v3/StreetSamurai.Blazor"
+            -BlazorRoot "$PWD/prose/v3/Prose.Blazor"
 
       - name: Open or update PR if there are changes
         uses: peter-evans/create-pull-request@v6
         with:
-          path: streetsamurai
+          path: prose
           token: ${{ secrets.SUBSCRIBER_REPO_TOKEN }}
           commit-message: "chore(components): sync from MindAttic.UiUx@${{ github.sha }}"
           title: "Sync from MindAttic.UiUx"

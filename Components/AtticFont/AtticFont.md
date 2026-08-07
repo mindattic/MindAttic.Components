@@ -60,9 +60,9 @@ Two subscribers receive Attic via marker-block splice:
 - `mindattic.com/index.htm` — inlined between
   `<!-- BEGIN MINDATTIC.UIUX:ATTICFONT --> … <!-- END … -->` markers by
   `sync/sync-mindattic-com.ps1`.
-- `StreetSamurai/wwwroot/app.css` — rewritten between
+- `Prose/wwwroot/app.css` — rewritten between
   `/* == BEGIN MINDATTIC.UIUX:ATTICFONT.CSS == */` markers by
-  `sync/sync-streetsamurai.ps1`.
+  `sync/sync-prose.ps1`.
 
 Every other subscriber (catalog landing pages, Claudia, ChiMesh) gets
 Attic from the jsDelivr CDN at runtime — pulled via `<link>` tags emitted

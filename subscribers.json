@@ -1,5 +1,5 @@
 {
-  "$comment": "Canonical map of which MindAttic.UiUx components flow to each downstream subscriber, with per-subscriber configuration. Sync scripts read this file to drive their splicing -- edit THIS file (not the sync scripts) when adding or removing subscriptions. Marker names are base names: the html-inline kinds (mindattic.com, MindAttic.Psst legal pages) splice on the bare marker, while the blazor-wwwroot kind (StreetSamurai) appends a .CSS suffix. NOTE: catalog landing pages (IdiotProof, GridGame2026, MindAttic.Legion, MediaButler, MindAttic.Vault, TaxRateCollector, ThinkTank, Tutor, MindAttic.Psst index) and the long-form HTML builds (Claudia, ChiMesh) are owned by MindAttic.Deploy now; they pull components from jsDelivr at runtime instead of being spliced here.",
+  "$comment": "Canonical map of which MindAttic.UiUx components flow to each downstream subscriber, with per-subscriber configuration. Sync scripts read this file to drive their splicing -- edit THIS file (not the sync scripts) when adding or removing subscriptions. Marker names are base names: the html-inline kinds (mindattic.com, MindAttic.Psst legal pages) splice on the bare marker, while the blazor-wwwroot kind (Prose) appends a .CSS suffix. NOTE: catalog landing pages (IdiotProof, GridGame2026, MindAttic.Legion, MediaButler, MindAttic.Vault, TaxRateCollector, ThinkTank, Tutor, MindAttic.Psst index) and the long-form HTML builds (Claudia, ChiMesh) are owned by MindAttic.Deploy now; they pull components from jsDelivr at runtime instead of being spliced here.",
 
   "components": {
     "OutfitFont":  { "type": "font-css",    "marker": "OUTFITFONT",  "cssFile": "Components/OutfitFont/outfit-font.css",   "jsonFile": "Components/OutfitFont/outfit-font.json", "htmlFile": "Components/OutfitFont/outfit-font.html" },
@@ -27,10 +27,10 @@
       ]
     },
 
-    "StreetSamurai.Writer": {
+    "Prose.Writer": {
       "kind":       "blazor-wwwroot",
-      "target":     "D:/Projects/MindAttic/StreetSamurai/v3/StreetSamurai.Writer",
-      "syncScript": "sync-streetsamurai.ps1",
+      "target":     "D:/Projects/MindAttic/Prose/v3/Prose.Writer",
+      "syncScript": "sync-prose.ps1",
       "subscriptions": [
         { "component": "OutfitFont" },
         { "component": "AtticFont",  "applyToSelector": null },
@@ -42,10 +42,10 @@
       ]
     },
 
-    "StreetSamurai.Codex": {
+    "Prose.Codex": {
       "kind":       "blazor-wwwroot",
-      "target":     "D:/Projects/MindAttic/StreetSamurai/v3/StreetSamurai.Codex",
-      "syncScript": "sync-streetsamurai.ps1",
+      "target":     "D:/Projects/MindAttic/Prose/v3/Prose.Codex",
+      "syncScript": "sync-prose.ps1",
       "subscriptions": [
         { "component": "OutfitFont" },
         { "component": "AtticFont",  "applyToSelector": null },
@@ -68,7 +68,7 @@
     },
 
     "Ideas": {
-      "$comment":   "MindAttic.Ideas Blazor CMS. Splice-in-place like StreetSamurai (JS -> wwwroot/js, CSS marker blocks in wwwroot/app.css). Subscriptions start empty; the shared auth-visual components (UserLogin, UserCircle, UserTimeout) are added here once authored under Components/.",
+      "$comment":   "MindAttic.Ideas Blazor CMS. Splice-in-place like Prose (JS -> wwwroot/js, CSS marker blocks in wwwroot/app.css). Subscriptions start empty; the shared auth-visual components (UserLogin, UserCircle, UserTimeout) are added here once authored under Components/.",
       "kind":       "blazor-wwwroot",
       "target":     "D:/Projects/MindAttic/MindAttic.Ideas/src/MindAttic.Ideas.Web",
       "syncScript": "sync-ideas.ps1",
@@ -80,7 +80,7 @@
     },
 
     "Tutor": {
-      "$comment":   "Tutor Blazor study app. Splice-in-place like StreetSamurai. Subscriptions start empty; the shared auth-visual components (UserLogin, UserCircle, UserTimeout) are added here once authored under Components/. (Tutor.Blazor has no wwwroot yet -- create wwwroot/app.css + wwwroot/js when the first subscription is added.)",
+      "$comment":   "Tutor Blazor study app. Splice-in-place like Prose. Subscriptions start empty; the shared auth-visual components (UserLogin, UserCircle, UserTimeout) are added here once authored under Components/. (Tutor.Blazor has no wwwroot yet -- create wwwroot/app.css + wwwroot/js when the first subscription is added.)",
       "kind":       "blazor-wwwroot",
       "target":     "D:/Projects/MindAttic/Tutor/Tutor.Blazor",
       "syncScript": "sync-tutor.ps1",

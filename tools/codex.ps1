@@ -241,7 +241,7 @@ function Invoke-Doctor {
     [void]$cited.Add($m.Groups[1].Value)
   }
   # sibling repos / out-of-tree prefixes a UiUx-rooted Test-Path can't resolve
-  $siblingPrefixes = @('MindAttic.Deploy/', 'MindAttic.Ideas/', 'StreetSamurai/', 'Tutor/', 'MindAttic.Psst/', 'mindattic.com/')
+  $siblingPrefixes = @('MindAttic.Deploy/', 'MindAttic.Ideas/', 'Prose/', 'Tutor/', 'MindAttic.Psst/', 'mindattic.com/')
   foreach ($rel in $cited) {
     if ($rel -match '^\.\./') { continue }            # explicit sibling-repo path
     if ($rel -match '[<>*|]') { continue }             # placeholder or glob

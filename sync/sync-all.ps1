@@ -5,7 +5,7 @@
 # whatever is wired up in sync/*.ps1 and subscribers.json. Currently:
 #   - sync-mindattic-com.ps1   → mindattic.com/index.htm (inline)
 #   - sync-mindattic-psst.ps1  → MindAttic.Psst/{terms,privacy}.htm
-#   - sync-streetsamurai.ps1   → StreetSamurai.Blazor/wwwroot/
+#   - sync-prose.ps1   → Prose.Blazor/wwwroot/
 #   - sync-ideas.ps1           → MindAttic.Ideas.Web/wwwroot/   (no-op until subscribed)
 #   - sync-tutor.ps1           → Tutor.Blazor/wwwroot/          (no-op until subscribed)
 #
@@ -18,7 +18,7 @@
 # (push-triggered cross-repo PRs). This script is the local equivalent
 # for fast iteration without round-tripping through GitHub; it is also
 # invoked piecewise by MindAttic.Deploy as a preDeploy hook for the
-# mindattic.com and StreetSamurai builds.
+# mindattic.com and Prose builds.
 #
 # Idempotent. Safe to re-run after any edit under Components/ or
 # Themes/, or to subscribers.json.

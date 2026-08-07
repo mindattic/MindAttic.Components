@@ -4,7 +4,7 @@
 
 A growing catalog of self-contained components — fonts, effects, helpers — that any subscriber can pull in via jsDelivr CDN at runtime, splice in via marker-block sync at build time, or accept as a cross-repo PR from GitHub Actions. Zero build step on the subscriber side, no `npm install`, no peerdeps.
 
-Currently powers `mindattic.com`, the `StreetSamurai` Blazor home page, and the `MindAttic.Psst` legal pages via splice-in-place sync. Everything else in the MindAttic fleet — the catalog landing pages and the Claudia/ChiMesh long-form guides — is rendered by [`MindAttic.Deploy`](../MindAttic.Deploy/README.md), which pulls components from jsDelivr at runtime.
+Currently powers `mindattic.com`, the `Prose` Blazor home page, and the `MindAttic.Psst` legal pages via splice-in-place sync. Everything else in the MindAttic fleet — the catalog landing pages and the Claudia/ChiMesh long-form guides — is rendered by [`MindAttic.Deploy`](../MindAttic.Deploy/README.md), which pulls components from jsDelivr at runtime.
 
 ```html
 <!-- pinned production -->
@@ -102,10 +102,10 @@ MindAttic.UiUx/
 │   ├── _subscribers.ps1                   # helper dot-sourced by every sync script (reads subscribers.json)
 │   ├── sync-all.ps1                       # umbrella runner (glob-discovers sync-*.ps1)
 │   ├── sync-mindattic-com.ps1             # inlines bundles into mindattic.com/index.htm
-│   ├── sync-streetsamurai.ps1             # rewrites StreetSamurai.Blazor wwwroot/*
+│   ├── sync-prose.ps1             # rewrites Prose.Blazor wwwroot/*
 │   ├── sync-mindattic-psst.ps1            # splices terms.htm + privacy.htm in MindAttic.Psst
-│   ├── bootstrap-textures.ps1             # one-shot: pull circuitboard PNGs from StreetSamurai
-│   ├── bootstrap-streetsamurai-appcss.ps1 # one-shot: insert CYBERSPACE markers into app.css
+│   ├── bootstrap-textures.ps1             # one-shot: pull circuitboard PNGs from Prose
+│   ├── bootstrap-prose-appcss.ps1 # one-shot: insert CYBERSPACE markers into app.css
 │   └── sync.md
 │
 ├── subscribers.json             # canonical map: which components flow to which subscribers + per-subscriber config
@@ -124,13 +124,13 @@ See [`.github/PIPELINES.md`](.github/PIPELINES.md) for the full setup
 | Pipeline | What it does | When it runs |
 |---|---|---|
 | **jsDelivr CDN** | Serves any file at `https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@<ref>/<path>` — versioned, edge-cached, no infra to run | Continuously; cache-immutable for `@V*` whole-number tags. Consumed by `MindAttic.Deploy` (pins `componentsVersion` in `projects.json`) for every catalog landing page and the Claudia/ChiMesh long-form builds |
-| **GitHub Actions cross-repo sync** | On push to `main`, opens PRs against `mindattic/mindattic.com`, `mindattic/StreetSamurai`, and `mindattic/MindAttic.Psst` with refreshed marker blocks / wwwroot copies | Every push to `main` (workflow: [`.github/workflows/sync-subscribers.yml`](.github/workflows/sync-subscribers.yml)) |
-| **PowerShell `sync/*.ps1`** | Local dev fallback — same logic as the Action, runs against your working copies. Also invoked by `MindAttic.Deploy` as a `preDeploy` hook for `mindattic.com` and `StreetSamurai` so the bundle is fresh before FTPS upload | Manual (`powershell -File sync/sync-all.ps1`) |
+| **GitHub Actions cross-repo sync** | On push to `main`, opens PRs against `mindattic/mindattic.com`, `mindattic/Prose`, and `mindattic/MindAttic.Psst` with refreshed marker blocks / wwwroot copies | Every push to `main` (workflow: [`.github/workflows/sync-subscribers.yml`](.github/workflows/sync-subscribers.yml)) |
+| **PowerShell `sync/*.ps1`** | Local dev fallback — same logic as the Action, runs against your working copies. Also invoked by `MindAttic.Deploy` as a `preDeploy` hook for `mindattic.com` and `Prose` so the bundle is fresh before FTPS upload | Manual (`powershell -File sync/sync-all.ps1`) |
 
 | Subscriber | Runtime source | In-repo copy |
 |---|---|---|
 | `mindattic.com` | Inlined HTML+CSS+JS marker blocks in `index.htm` | Refreshed by GitHub Action / `sync-mindattic-com.ps1` |
-| `StreetSamurai` (Blazor) | `wwwroot/js/*.js` + CSS marker blocks in `wwwroot/app.css` | Refreshed by GitHub Action / `sync-streetsamurai.ps1` |
+| `Prose` (Blazor) | `wwwroot/js/*.js` + CSS marker blocks in `wwwroot/app.css` | Refreshed by GitHub Action / `sync-prose.ps1` |
 | `MindAttic.Psst` (legal pages) | Inlined HTML+CSS marker blocks in `terms.htm` + `privacy.htm` | Refreshed by GitHub Action / `sync-mindattic-psst.ps1`. The repo's `index.htm` is rendered by `MindAttic.Deploy` from its own `README.md` — not touched here |
 | **Everyone else** (IdiotProof, GridGame2026, MindAttic.Legion, MediaButler, MindAttic.Vault, TaxRateCollector, ThinkTank, Tutor, MindAttic.Psst.Index, Claudia, ChiMesh) | jsDelivr CDN at runtime, pinned via `MindAttic.Deploy/projects.json:componentsVersion` | Owned by [`MindAttic.Deploy`](../MindAttic.Deploy/README.md); not in this repo's `subscribers.json` |
 
@@ -193,14 +193,14 @@ array).
 Per-subscription overrides — like AtticFont's `applyToSelector` — live on
 the subscription entry. Override precedence: explicit subscription value >
 component JSON default > no apply rule. Pass `null` on the subscription to
-explicitly suppress (e.g. StreetSamurai opts out of AtticFont's auto-apply
+explicitly suppress (e.g. Prose opts out of AtticFont's auto-apply
 rule).
 
 ```jsonc
-"StreetSamurai": {
+"Prose": {
   "kind":       "blazor-wwwroot",
-  "target":     "D:/Projects/MindAttic/StreetSamurai/v3/StreetSamurai.Blazor",
-  "syncScript": "sync-streetsamurai.ps1",
+  "target":     "D:/Projects/MindAttic/Prose/v3/Prose.Blazor",
+  "syncScript": "sync-prose.ps1",
   "subscriptions": [
     { "component": "OutfitFont" },
     { "component": "AtticFont",  "applyToSelector": null },
@@ -219,7 +219,7 @@ the next run; removing the line unenrolls it.
 | Subscriber kind        | What "add a subscription" means |
 |---|---|
 | `html-inline` (mindattic.com)         | Edit `subscribers.json` only **if** the component's type already has a `switch` case in `sync-mindattic-com.ps1`. New types need a builder + dispatch case. HTML marker pair must exist in `index.htm` once. |
-| `blazor-wwwroot` (StreetSamurai)      | Edit `subscribers.json` only **if** the component's type already has a `switch` case in `sync-streetsamurai.ps1`. CSS marker pairs in `app.css` are one-time hand-inserts (`bootstrap-streetsamurai-appcss.ps1` helps). |
+| `blazor-wwwroot` (Prose)      | Edit `subscribers.json` only **if** the component's type already has a `switch` case in `sync-prose.ps1`. CSS marker pairs in `app.css` are one-time hand-inserts (`bootstrap-prose-appcss.ps1` helps). |
 | `html-inline-multi` (MindAttic.Psst legal) | Same contract as `html-inline`, but `target` is a folder and `targets[]` lists the files (currently `terms.htm` + `privacy.htm`). |
 
 Adding a brand-new catalog landing page or long-form HTML build is **not** done here — that work belongs in `MindAttic.Deploy/projects.json`.
@@ -253,7 +253,7 @@ powershell -File sync/sync-all.ps1
 
 # or invoke an individual target
 powershell -File sync/sync-mindattic-com.ps1
-powershell -File sync/sync-streetsamurai.ps1
+powershell -File sync/sync-prose.ps1
 powershell -File sync/sync-mindattic-psst.ps1
 ```
 
@@ -310,7 +310,7 @@ spawning in the margins.
 Baked-in selectors — any host gets these for free:
 - `.cyberspace-keepout` — opt-in marker; add to any container you want protected.
 - `main` — both subscribers use `<main>` for their content area.
-- `.home-content` — StreetSamurai's Home wrapper.
+- `.home-content` — Prose's Home wrapper.
 - `.board-grid` — any tab/tile board.
 
 Hosts can extend at runtime:

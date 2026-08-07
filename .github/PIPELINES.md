@@ -3,7 +3,7 @@
 MindAttic.UiUx is a source-of-truth repo. Content reaches subscribers two ways:
 
 1. **jsDelivr CDN** — every file is served at a versioned URL. `MindAttic.Deploy` consumes the CDN for every catalog landing page (IdiotProof, GridGame2026, MindAttic.Legion, MediaButler, MindAttic.Vault, TaxRateCollector, ThinkTank, Tutor, MindAttic.Psst index) and the Claudia / ChiMesh long-form HTML builds. That's the default path for anything new.
-2. **Marker-block sync** (GitHub Action + local PowerShell) — for the three subscribers that need build-time splice into hand-authored files: `mindattic.com/index.htm`, `StreetSamurai/wwwroot/`, and `MindAttic.Psst/{terms,privacy}.htm`.
+2. **Marker-block sync** (GitHub Action + local PowerShell) — for the three subscribers that need build-time splice into hand-authored files: `mindattic.com/index.htm`, `Prose/wwwroot/`, and `MindAttic.Psst/{terms,privacy}.htm`.
 
 If you are wiring up a new subscriber, prefer pipeline 1. Pipeline 2 is reserved for cases where the subscriber genuinely needs content inlined inside files it also hand-authors.
 
@@ -59,7 +59,7 @@ To propagate a release to every `MindAttic.Deploy`-rendered subscriber, bump `co
 It targets only the three splice-in-place subscribers:
 
 - **mindattic.com** — marker blocks in `index.htm` are inlined for first-paint perf and to keep the page self-contained for FTPS upload by `MindAttic.Deploy`.
-- **StreetSamurai** — Blazor's `wwwroot/js/*` is part of the build output; carrying the JS locally keeps the offline dev loop fast and gives the .csproj a deterministic input.
+- **Prose** — Blazor's `wwwroot/js/*` is part of the build output; carrying the JS locally keeps the offline dev loop fast and gives the .csproj a deterministic input.
 - **MindAttic.Psst (terms.htm + privacy.htm)** — small legal pages that are hand-authored around the OutfitFont marker block; `index.htm` is NOT touched (it's rendered by `MindAttic.Deploy` from `MindAttic.Psst/README.md`).
 
 For each subscriber it:
@@ -99,14 +99,14 @@ For fast iteration without pushing to GitHub, the `sync/sync-all.ps1` script doe
 powershell -File sync/sync-all.ps1
 ```
 
-`MindAttic.Deploy` also invokes the individual `sync-mindattic-com.ps1` and `sync-streetsamurai.ps1` scripts as `preDeploy` hooks so the bundle is fresh before each FTPS upload.
+`MindAttic.Deploy` also invokes the individual `sync-mindattic-com.ps1` and `sync-prose.ps1` scripts as `preDeploy` hooks so the bundle is fresh before each FTPS upload.
 
 ## Choosing a pipeline per subscriber
 
 | Subscriber kind | Recommended runtime source | Why |
 |---|---|---|
 | `mindattic.com` | Inlined marker block (kept fresh by Action / `sync-mindattic-com.ps1`) | Static HTML site; inlining = zero-RTT first paint, also avoids a CDN dependency in the FTPS-uploaded artifact |
-| `StreetSamurai` (Blazor) | Local `wwwroot/js/*.js` + `app.css` marker blocks (kept fresh by Action / `sync-streetsamurai.ps1`) | Blazor build needs deterministic input; offline-dev friendly |
+| `Prose` (Blazor) | Local `wwwroot/js/*.js` + `app.css` marker blocks (kept fresh by Action / `sync-prose.ps1`) | Blazor build needs deterministic input; offline-dev friendly |
 | `MindAttic.Psst` legal pages | Inlined marker blocks in `terms.htm` + `privacy.htm` (kept fresh by Action / `sync-mindattic-psst.ps1`) | Same as mindattic.com — these pages get FTPS-uploaded as self-contained HTML |
 | Any catalog landing page | jsDelivr CDN, pinned via `MindAttic.Deploy/projects.json:componentsVersion` | No PR overhead; `MindAttic.Deploy` renders these from each project's `README.md` and pulls fonts/effects from the CDN at runtime |
 | Claudia / ChiMesh | jsDelivr CDN, same path as catalog landing pages | They render long-form READMEs with the Cyberspace theme + the parts-picker augmentation; CDN keeps each guide page small |

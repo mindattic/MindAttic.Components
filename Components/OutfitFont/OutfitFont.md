@@ -63,9 +63,9 @@ Three subscribers receive Outfit via marker-block splice:
 - `mindattic.com/index.htm` — inlined between
   `<!-- BEGIN MINDATTIC.UIUX:OUTFITFONT --> … <!-- END … -->` markers by
   `sync/sync-mindattic-com.ps1`.
-- `StreetSamurai/wwwroot/app.css` — rewritten between
+- `Prose/wwwroot/app.css` — rewritten between
   `/* == BEGIN MINDATTIC.UIUX:OUTFITFONT.CSS == */` markers by
-  `sync/sync-streetsamurai.ps1`.
+  `sync/sync-prose.ps1`.
 - `MindAttic.Psst/{terms,privacy}.htm` — inlined by
   `sync/sync-mindattic-psst.ps1`.
 

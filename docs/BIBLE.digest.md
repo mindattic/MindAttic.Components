@@ -97,7 +97,7 @@ Full-sync 2026-06-07 against the actual repo tree revealed two material changes 
 Material-style outlined field), `Tooltip` (css-js-razor accessible tooltip), `UserLogin` (css-js-razor
 login-form styling wrapper), `UserCircle` (css-js-razor authenticated avatar/menu), `UserTimeout`
 (css-js-razor idle-timeout warning). Total catalog: 13 components. The auth-visual trio (UserLogin,
-UserCircle, UserTimeout) is now authored and wired into `subscribers.json` for StreetSamurai, Ideas,
+UserCircle, UserTimeout) is now authored and wired into `subscribers.json` for Prose, Ideas,
 and Tutor subscribers — previous docs called them "not yet authored / intentional no-op". The component
 schema (`docs/data/_schema/component.schema.json`) was extended with two new `type` values: `css-js-razor`
 (CSS + JS + optional Razor wrapper) and `css-only`.

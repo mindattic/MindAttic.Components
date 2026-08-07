@@ -6,7 +6,7 @@ locally against working copies — so you can iterate on content changes
 without round-tripping through GitHub.
 
 This folder only handles the **three splice-in-place subscribers** that
-MindAttic.UiUx still owns: `mindattic.com`, `StreetSamurai`, and the
+MindAttic.UiUx still owns: `mindattic.com`, `Prose`, and the
 `MindAttic.Psst` legal pages. Everything else in the MindAttic fleet
 (catalog landing pages, Claudia, ChiMesh) is rendered by
 [`MindAttic.Deploy`](../../MindAttic.Deploy/README.md) and pulls components
@@ -32,7 +32,7 @@ with precedence: explicit subscription override > component JSON default
 | Subscriber kind                            | What "add a subscription" means |
 |---|---|
 | `html-inline` (mindattic.com)              | Edit `subscribers.json` only **if** the component's type already has a `switch` case in `sync-mindattic-com.ps1` (font-css, html-bundle for Cyberspace/PinFooter/WebSnapshot). New component types need a builder + dispatch case. Marker pair must exist in `index.htm` once. |
-| `blazor-wwwroot` (StreetSamurai)           | Edit `subscribers.json` only **if** the component's type already has a `switch` case in `sync-streetsamurai.ps1`. New types need a dispatch case. CSS marker pairs in `app.css` are one-time hand-inserts (`bootstrap-streetsamurai-appcss.ps1` helps). |
+| `blazor-wwwroot` (Prose)           | Edit `subscribers.json` only **if** the component's type already has a `switch` case in `sync-prose.ps1`. New types need a dispatch case. CSS marker pairs in `app.css` are one-time hand-inserts (`bootstrap-prose-appcss.ps1` helps). |
 | `html-inline-multi` (MindAttic.Psst legal) | Same contract as `html-inline`, but `target` is a folder and `targets[]` lists the files (currently `terms.htm` + `privacy.htm`). |
 
 ---
@@ -44,10 +44,10 @@ sync/
 ├── _subscribers.ps1                   # helper dot-sourced by each sync-*.ps1 (reads subscribers.json)
 ├── sync-all.ps1                       # umbrella; invokes every sync-*.ps1 in this folder
 ├── sync-mindattic-com.ps1             # inlines bundles into mindattic.com/index.htm
-├── sync-streetsamurai.ps1             # rewrites StreetSamurai.Blazor wwwroot files
+├── sync-prose.ps1             # rewrites Prose.Blazor wwwroot files
 ├── sync-mindattic-psst.ps1            # inlines bundles into MindAttic.Psst/{terms,privacy}.htm
-├── bootstrap-textures.ps1             # one-shot: pull circuitboard PNGs from StreetSamurai
-└── bootstrap-streetsamurai-appcss.ps1 # one-shot: insert CYBERSPACE markers into app.css
+├── bootstrap-textures.ps1             # one-shot: pull circuitboard PNGs from Prose
+└── bootstrap-prose-appcss.ps1 # one-shot: insert CYBERSPACE markers into app.css
 ```
 
 ---
@@ -57,8 +57,8 @@ sync/
 | Trigger | What runs | When |
 |---|---|---|
 | **jsDelivr CDN** | Every tag is served at `https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@<ref>/<path>` — versioned, edge-cached, no infra. Consumed by `MindAttic.Deploy` for every catalog landing page and Claudia/ChiMesh. | Continuously; cache-immutable for `@v*` tags. |
-| **GitHub Action** | `.github/workflows/sync-subscribers.yml` opens cross-repo PRs against `mindattic/mindattic.com`, `mindattic/StreetSamurai`, and `mindattic/MindAttic.Psst` with refreshed marker blocks. | Every push to `main`. |
-| **`sync/*.ps1`** | Same logic as the Action, but runs locally against working copies. Also invoked by `MindAttic.Deploy` as a `preDeploy` hook for `mindattic.com` and `StreetSamurai`. | Manual (`powershell -File sync-all.ps1`). |
+| **GitHub Action** | `.github/workflows/sync-subscribers.yml` opens cross-repo PRs against `mindattic/mindattic.com`, `mindattic/Prose`, and `mindattic/MindAttic.Psst` with refreshed marker blocks. | Every push to `main`. |
+| **`sync/*.ps1`** | Same logic as the Action, but runs locally against working copies. Also invoked by `MindAttic.Deploy` as a `preDeploy` hook for `mindattic.com` and `Prose`. | Manual (`powershell -File sync-all.ps1`). |
 
 ---
 
@@ -86,7 +86,7 @@ its own marker pair. Groups (in load order):
 | PinFooter   | `BEGIN/END MINDATTIC.UIUX:PINFOOTER`   | `Components/PinFooter/`   |
 | WebSnapshot | `BEGIN/END MINDATTIC.UIUX:WEBSNAPSHOT` | `Components/WebSnapshot/` (CSS + viewer JS only; `.b64.txt` payloads are inlined per-tile by the subscriber) |
 
-### `sync-streetsamurai.ps1`
+### `sync-prose.ps1`
 
 1. Overwrites `wwwroot/js/{loader,tv-static,home-bg,console-bg}.js` from `Components/Cyberspace/`.
 2. Overwrites `wwwroot/js/pin-footer.js` from `Components/PinFooter/`.
@@ -95,11 +95,11 @@ its own marker pair. Groups (in load order):
 
 All CSS marker pairs must already exist in `wwwroot/app.css` before the
 first run. If you're standing up a new subscriber, use
-`bootstrap-streetsamurai-appcss.ps1` first to insert them.
+`bootstrap-prose-appcss.ps1` first to insert them.
 
 ```powershell
-powershell -File sync/sync-streetsamurai.ps1
-powershell -File sync/sync-streetsamurai.ps1 -BlazorRoot 'D:/path/StreetSamurai.Blazor'
+powershell -File sync/sync-prose.ps1
+powershell -File sync/sync-prose.ps1 -BlazorRoot 'D:/path/Prose.Blazor'
 ```
 
 ### `sync-mindattic-psst.ps1`
@@ -117,17 +117,17 @@ powershell -File sync/sync-mindattic-psst.ps1 -TargetRoot 'D:/path/to/MindAttic.
 ### `bootstrap-textures.ps1`
 
 One-shot. Pulls the three `circuitboard.0X.png` parallax textures from
-StreetSamurai's media folder into `Components/Cyberspace/assets/` as lossless
+Prose's media folder into `Components/Cyberspace/assets/` as lossless
 copies. JPEG block compression breaks the edge-pixel match between tile
 copies and produces visible seams — keep these as PNG.
 
 Re-run only when upstream PNGs change.
 
-### `bootstrap-streetsamurai-appcss.ps1`
+### `bootstrap-prose-appcss.ps1`
 
 One-shot. Replaces a hard-coded line range in
-`StreetSamurai/wwwroot/app.css` (the legacy CYBERSPACE block) with a
-marker pair, so subsequent `sync-streetsamurai.ps1` runs have somewhere to
+`Prose/wwwroot/app.css` (the legacy CYBERSPACE block) with a
+marker pair, so subsequent `sync-prose.ps1` runs have somewhere to
 write into. Read the file before running on a new branch — the line numbers
 are tied to a specific historical revision.
 
@@ -182,7 +182,7 @@ content diff, never an EOL flip. (The first sync after this was introduced
 may show a one-time, content-free normalization for any host file that was
 previously committed with mixed endings — `git diff --ignore-cr-at-eol`
 confirms it's pure EOL. The wholesale `wwwroot/js/*` copies in
-`sync-streetsamurai.ps1` are byte-for-byte with source and are not
+`sync-prose.ps1` are byte-for-byte with source and are not
 normalized.)
 
 ### Cyberspace JS is CDN-loaded for mindattic.com
@@ -207,5 +207,5 @@ from `window.SacredGeometry`) — both dependencies are in place before it runs.
 To ship a change to either externalized file: edit the source, tag a new release
 (next whole number, e.g. `V5`), bump `-CyberspaceCdnTag` to match, then re-run the sync/deploy.
 A content change that *doesn't* touch those two files needs no tag bump. (Only
-mindattic.com uses this split; StreetSamurai still copies all Cyberspace +
+mindattic.com uses this split; Prose still copies all Cyberspace +
 SacredGeometry JS into `wwwroot/js` byte-for-byte.)

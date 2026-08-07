@@ -153,7 +153,7 @@ Status legend: ✅ done (verified) · 🟡 partial · ⬜ planned · 🗑️ cut
   authored and wired into `subscribers.json` as of 2026-06-07. No automated test suite in this repo;
   correctness is verified manually / downstream. Marked 🟡 (present, not test-proven here).
 - 🟡 **Distribution (`sync/`, CDN, Action).** Five sync scripts (`sync-mindattic-com.ps1`,
-  `sync-streetsamurai.ps1`, `sync-mindattic-psst.ps1`, `sync-ideas.ps1`, `sync-tutor.ps1`) + `sync-all.ps1`
+  `sync-prose.ps1`, `sync-mindattic-psst.ps1`, `sync-ideas.ps1`, `sync-tutor.ps1`) + `sync-all.ps1`
   umbrella present; the GitHub Action workflow is committed. Not exercised in this session — 🟡 (no green
   run captured here).
 - 🗑️ **`.idea` packaging build (`build.ps1` + `Ideas/*`).** The `Ideas/` RCL subtree was **removed** from

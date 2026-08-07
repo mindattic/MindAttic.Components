@@ -71,9 +71,9 @@ Baked-in selectors (free, no setup):
 
 - `.cyberspace-keepout` — opt-in marker; add to any container you want
   protected.
-- `main` — both subscribers (`StreetSamurai`, `mindattic.com`) use `<main>` for
+- `main` — both subscribers (`Prose`, `mindattic.com`) use `<main>` for
   page content.
-- `.home-content` — StreetSamurai's Home wrapper.
+- `.home-content` — Prose's Home wrapper.
 - `.board-grid` — any tab/tile board.
 
 Add more at runtime:
@@ -98,7 +98,7 @@ window.__cyberspaceCircuitboardSrcs = [
 ```
 
 mindattic.com points these at pinned jsDelivr URLs (emitted by
-`sync/sync-mindattic-com.ps1`). StreetSamurai leaves the default and serves them
+`sync/sync-mindattic-com.ps1`). Prose leaves the default and serves them
 via `/api/media/…`. The `assets/` folder here is the lossless source — re-pull
 with `sync/bootstrap-textures.ps1` if upstream changes.
 

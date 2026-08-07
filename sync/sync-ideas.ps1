@@ -2,7 +2,7 @@
 # MindAttic.UiUx -> MindAttic.Ideas
 # --------------------------------------------------------------------
 # Drives MindAttic.Ideas.Web's wwwroot from MindAttic.UiUx/subscribers.json.
-# Splice-in-place, identical model to sync-streetsamurai.ps1:
+# Splice-in-place, identical model to sync-prose.ps1:
 #   - OutfitFont / AtticFont -> CSS marker block in wwwroot/app.css
 #   - html-bundle components  -> jsFiles copied to wwwroot/js + CSS marker block
 #

@@ -41,7 +41,7 @@ A consumer declares `theme: "Cyberspace"` in `MindAttic.Deploy/projects.json` an
 
 ## Direct (non-theme) consumption
 
-StreetSamurai consumes the **Cyberspace Component directly** from its Blazor `wwwroot` — not via this theme. If you want only the effects engine without the page chrome, depend on `Components/Cyberspace/` rather than `Themes/Cyberspace/`.
+Prose consumes the **Cyberspace Component directly** from its Blazor `wwwroot` — not via this theme. If you want only the effects engine without the page chrome, depend on `Components/Cyberspace/` rather than `Themes/Cyberspace/`.
 
 ## Related
 

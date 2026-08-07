@@ -1,14 +1,14 @@
-# One-shot: pull the 3 circuitboard PNG textures from StreetSamurai's media dir
+# One-shot: pull the 3 circuitboard PNG textures from Prose's media dir
 # into MindAttic.UiUx/Components/Cyberspace/assets/ as lossless copies. The textures are
 # tiled across the canvas by console-bg.js, so they must be lossless — JPEG
 # block compression breaks the edge-pixel match between adjacent tile copies
 # and produces visible seams (see the parallax background on mindattic.com
 # before this script was switched from JPEG to PNG).
 #
-# Re-run this only when the upstream PNGs in StreetSamurai change.
+# Re-run this only when the upstream PNGs in Prose change.
 [CmdletBinding()]
 param(
-    [string]$SourceDir = 'D:/Projects/MindAttic/StreetSamurai/engine/data/media',
+    [string]$SourceDir = 'D:/Projects/MindAttic/Prose/engine/data/media',
     [string]$DestDir   = 'D:/Projects/MindAttic/MindAttic.UiUx/Components/Cyberspace/assets'
 )
 

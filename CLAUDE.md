@@ -20,12 +20,12 @@
 - **MindAttic.Deploy** (`D:/Projects/MindAttic/MindAttic.Deploy`) owns: catalog landing pages (IdiotProof, GridGame2026, MindAttic.Legion, MindAttic.Mobile, MediaButler, MindAttic.Vault, TaxRateCollector, ThinkTank, Tutor, MindAttic.Psst index) and the Claudia/ChiMesh long-form HTML builds. Those subscribers pull components from jsDelivr at runtime; they are **not** spliced from this repo. Do not add `landing-page` or `build-html-js` kinds back to `subscribers.json`, and do not recreate `sync-landing-page.ps1`, `sync-claudia.ps1`, or `sync-chimesh.ps1`. Those were deleted on purpose.
 - **MindAttic.UiUx still owns splice-in-place delivery** for these subscribers, because they consume content in formats jsDelivr can't satisfy alone:
   - `mindattic.com/index.htm` — html-inline marker blocks (`sync-mindattic-com.ps1`). One exception: the Cyberspace `console-bg.js` (~580 KB) and `sacred-geometry.js` are loaded from jsDelivr at a pinned tag (`sync-mindattic-com.ps1 -CyberspaceCdnTag`, default `V4`) rather than inlined; everything else in the block is still inline. Bump the tag (and re-tag the repo) when `console-bg.js` or `sacred-geometry.js` changes.
-  - `StreetSamurai/v3/StreetSamurai.Blazor/wwwroot/` — JS copy + CSS marker blocks in `app.css` (`sync-streetsamurai.ps1`).
+  - `Prose/v3/Prose.Blazor/wwwroot/` — JS copy + CSS marker blocks in `app.css` (`sync-prose.ps1`).
   - `MindAttic.Ideas/src/MindAttic.Ideas.Web/wwwroot/` — same `blazor-wwwroot` model (`sync-ideas.ps1`). Subscriber registered for the shared auth-visual components (UserLogin/UserCircle/UserTimeout); subscriptions are empty until those are authored, so the script is a no-op for now.
   - `Tutor/Tutor.Blazor/wwwroot/` — same `blazor-wwwroot` model (`sync-tutor.ps1`). Registered for the same auth-visual components; no-op until subscribed (Tutor.Blazor has no `wwwroot` yet — create it with the marker pairs when the first subscription lands).
   - `MindAttic.Psst/{terms,privacy}.htm` — html-inline marker blocks (`sync-mindattic-psst.ps1`). The `index.htm` in MindAttic.Psst is rendered by MindAttic.Deploy from `README.md`; this repo does not touch it.
 
-  NOTE: Ideas and Tutor are Blazor *apps* (splice subscribers like StreetSamurai), distinct from the MindAttic.Deploy-owned catalog landing pages — the "Tutor" in the `subscribers.json` `$comment`'s landing-page list refers to Tutor's marketing page on MindAttic.Deploy, not this Blazor app subscriber.
+  NOTE: Ideas and Tutor are Blazor *apps* (splice subscribers like Prose), distinct from the MindAttic.Deploy-owned catalog landing pages — the "Tutor" in the `subscribers.json` `$comment`'s landing-page list refers to Tutor's marketing page on MindAttic.Deploy, not this Blazor app subscriber.
 
 ## Layout
 - `Components/` — canonical component source (Cyberspace, OutfitFont, AtticFont, BackHomeM, PinFooter, WebSnapshot).
@@ -40,7 +40,7 @@
 ## Delivery pipelines
 - **jsDelivr CDN** — `https://cdn.jsdelivr.net/gh/mindattic/MindAttic.UiUx@<Vn>/Components/<file>`. This is how MindAttic.Deploy and any other future runtime-loader subscriber pulls content. Tag the repo (whole number) to ship; subscribers pin the tag in their own configs (e.g. `MindAttic.Deploy/projects.json:componentsVersion`).
 - **GitHub Actions cross-repo sync** — on push to `main`, opens PRs into the three splice-in-place subscriber repos.
-- **Local PowerShell** — `powershell -File sync/sync-all.ps1` runs the three scripts against your working copies for fast iteration. (Also invoked by `MindAttic.Deploy` as a `preDeploy` hook for `mindattic.com` and `StreetSamurai` so the bundle is fresh before FTPS upload.)
+- **Local PowerShell** — `powershell -File sync/sync-all.ps1` runs the three scripts against your working copies for fast iteration. (Also invoked by `MindAttic.Deploy` as a `preDeploy` hook for `mindattic.com` and `Prose` so the bundle is fresh before FTPS upload.)
 
 ## Editing rule
 - Edit only in `Components/`. Push to `main` and let GitHub Actions deliver, or run `sync/sync-all.ps1` locally for fast iteration. Downstream copies are derived artifacts — never hand-edit them.

@@ -3349,7 +3349,7 @@ window.consoleBg = (function () {
     // Baked-in selectors (any host gets these for free):
     //   .cyberspace-keepout     — opt-in marker; add to any container you want protected
     //   main             — top-level page content (mindattic.com #content lives here)
-    //   .home-content    — StreetSamurai Home page wrapper
+    //   .home-content    — Prose Home page wrapper
     //   .board-grid      — any tab/tile board
     //
     // Hosts can extend the list via window.__cyberspaceKeepoutSelectors (CSS selector
@@ -3959,7 +3959,7 @@ window.consoleBg = (function () {
 
     // Hosts can override these by defining window.__cyberspaceCircuitboardSrcs = [a, b, c]
     // before this script loads. mindattic.com sets them to pinned jsDelivr URLs;
-    // StreetSamurai leaves the default (/api/media/... served by MediaController).
+    // Prose leaves the default (/api/media/... served by MediaController).
     var TEX_SRCS = (typeof window !== 'undefined' && window.__cyberspaceCircuitboardSrcs) || [
         '/api/media/circuitboard.00.png',
         '/api/media/circuitboard.01.png',
