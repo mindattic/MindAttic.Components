@@ -1,0 +1,15 @@
+/* ====================================================================
+ * MindAttic.Web.Shared - PinFooter/pin-footer.css
+ * Pinned-when-short footer companion styles.
+ * Hosts opt in by giving their footer (or any other element) the class
+ * `pin-when-short`. pin-footer.js toggles `.pinned` whenever the
+ * document is shorter than the viewport.
+ * Canonical source. DO NOT EDIT downstream copies - edit here and re-sync.
+ * ==================================================================== */
+
+.pin-when-short.pinned {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

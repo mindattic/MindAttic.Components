@@ -1,0 +1,17 @@
+{
+  "name": "websnapshot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Capture web page screenshots, crop to a preview rectangle, and write a base64 data URI for inline rendering.",
+  "main": "web-snapshot.js",
+  "bin": {
+    "websnapshot": "snapshot.js"
+  },
+  "scripts": {
+    "snapshot": "node snapshot.js",
+    "install:browser": "playwright install chromium"
+  },
+  "dependencies": {
+    "playwright": "^1.49.0"
+  }
+}

@@ -1,0 +1,12 @@
+/* MindAttic.Components - Lightbox/lightbox.css
+   Themed by the shared tokens every web/themes palette defines (--bg, --bg2, --bg3, --border,
+   --accent, --text, --text2, --text3, --font-resume); a page sets anything it does differently in its
+   own CSS on top. */
+.ma-lightbox{display:none;position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,0.85);align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px);}
+.ma-lightbox.is-open{display:flex;}
+.ma-lightbox__inner{display:flex;flex-direction:column;align-items:center;gap:20px;cursor:default;}
+.ma-lightbox__links{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;}
+.ma-lightbox__links a{color:rgba(255,255,255,0.75);font-size:13px;text-decoration:none;letter-spacing:0.03em;padding:5px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:20px;transition:color 0.15s,border-color 0.15s,text-shadow 0.15s;white-space:nowrap;}
+.ma-lightbox__links a:hover{color:var(--accent);border-color:var(--accent);text-shadow:0 0 8px var(--accent);}
+.ma-lightbox__img{width:400px;height:400px;border-radius:100%;box-shadow:0 20px 60px rgba(0,0,0,0.6);animation:ma-lightbox-in 0.25s ease-out;}
+@keyframes ma-lightbox-in{from{opacity:0;transform:scale(0.85)}to{opacity:1;transform:scale(1)}}

@@ -1,0 +1,12 @@
+/* MindAttic.Components - Modal/modal.css
+   Themed by the shared tokens every web/themes palette defines (--bg, --bg2, --bg3, --border,
+   --accent, --text, --text2, --text3, --font-resume); a page sets anything it does differently in its
+   own CSS on top. */
+/* Full-screen dimmed overlay; show it with display:flex. The dialog's size is the page's call. */
+.ma-modal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;}
+.ma-modal__dialog{background:var(--bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 8px 40px rgba(0,0,0,0.4);}
+.ma-modal__header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.ma-modal__title{font-family:var(--font-resume);font-size:15px;font-weight:600;color:var(--text);}
+.ma-modal__close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;}
+.ma-modal__footer{display:flex;justify-content:flex-end;padding:12px 20px;border-top:1px solid var(--border);}
+.ma-modal__footer .ma-tool-btn{padding:7px 14px;font-size:12px;}

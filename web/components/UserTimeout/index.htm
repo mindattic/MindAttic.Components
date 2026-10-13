@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!--
+  UserTimeout — preview with SHORTENED timers (15s idle / 10s warn) and action="#".
+  Production is 30m idle / 60s warn / POST /_ma-auth/logout, and #ut-root is rendered ONLY when
+  authenticated (so the JS no-ops on anonymous pages). Stop interacting to see the modal appear.
+-->
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UserTimeout — preview</title>
+    <link rel="stylesheet" href="user-timeout.css" />
+    <style>body { margin: 0; min-height: 100vh; background: #0a0c10; color: #9aa3af; font-family: system-ui, sans-serif; display: flex; align-items: center; justify-content: center; }</style>
+</head>
+<body>
+    <p>Idle for 5s to see the warning (15s idle / 10s warn demo).</p>
+
+    <div id="ut-root" data-idle-ms="15000" data-warn-ms="10000" data-logout-action="#"></div>
+    <div class="ut-overlay">
+        <div class="ut-modal">
+            <h2>Still there?</h2>
+            <p>You'll be signed out due to inactivity in</p>
+            <div class="ut-count">60</div>
+            <div class="ut-actions">
+                <button class="ut-btn ut-stay">Stay signed in</button>
+                <button class="ut-btn ut-logout">Log out now</button>
+            </div>
+        </div>
+    </div>
+    <form id="ut-logout-form" method="post" action="#"></form>
+
+    <script src="user-timeout.js"></script>
+</body>
+</html>

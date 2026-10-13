@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!--
+  UserCircle — preview. The real wrapper (UserCircle.razor) reads the auth principal via
+  <AuthorizeView> and posts logout to /_ma-auth/logout. Here action="#" is demo-only.
+  Two circles show both modes: "menu" (dropdown w/ logout) and "logout" (one-click).
+-->
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UserCircle — preview</title>
+    <link rel="stylesheet" href="user-circle.css" />
+    <style>body { margin: 0; min-height: 100vh; background: #0a0c10; display: flex; gap: 3rem; align-items: flex-start; justify-content: flex-end; padding: 1.5rem; font-family: system-ui, sans-serif; }</style>
+</head>
+<body>
+    <div class="uc-root" data-uc-click="menu">
+        <button type="button" class="uc-btn" aria-haspopup="true">RD</button>
+        <div class="uc-menu">
+            <div class="uc-name">Ryan (Admin)</div>
+            <form class="uc-logout-form" method="post" action="#">
+                <button type="submit" class="uc-logout">Sign out</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="uc-root" data-uc-click="logout" style="--uc-size:48px">
+        <button type="button" class="uc-btn" aria-haspopup="true" title="Click to sign out">ER</button>
+        <div class="uc-menu">
+            <div class="uc-name">Erin</div>
+            <form class="uc-logout-form" method="post" action="#">
+                <button type="submit" class="uc-logout">Sign out</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="user-circle.js"></script>
+</body>
+</html>

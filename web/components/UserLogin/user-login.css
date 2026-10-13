@@ -1,0 +1,58 @@
+/* UserLogin — styling ONLY for the MindAttic.Authentication MaLogin static-SSR form.
+   The form, inputs, and antiforgery POST are owned by the library; this component never
+   reimplements them. Every rule is scoped under .ul-card so it can't leak into the host.
+   Theming hooks: --ul-accent, --ul-bg. */
+
+.ul-card .ma-auth-login {
+    display: flex;
+    flex-direction: column;
+    gap: .85rem;
+    max-width: 22rem;
+    margin: 0 auto;
+    padding: 1.75rem;
+    border-radius: 14px;
+    background: var(--ul-bg, #14171c);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .35);
+}
+
+.ul-card .ma-auth-field {
+    display: flex;
+    flex-direction: column;
+    gap: .3rem;
+    font-size: .85rem;
+}
+
+.ul-card .ma-auth-field input {
+    padding: .6rem .7rem;
+    border-radius: 8px;
+    border: 1px solid #2a2f37;
+    background: #0c0e12;
+    color: #e7eaf0;
+}
+
+.ul-card .ma-auth-field input:focus {
+    outline: none;
+    border-color: var(--ul-accent, #e2231a);
+    box-shadow: 0 0 0 2px rgba(226, 35, 26, .25);
+}
+
+.ul-card .ma-auth-submit {
+    margin-top: .4rem;
+    padding: .65rem 1rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--ul-accent, #e2231a);
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ul-card .ma-auth-submit:hover {
+    filter: brightness(1.08);
+}
+
+.ul-card .ma-auth-error {
+    color: #ff6b6b;
+    font-size: .8rem;
+    margin: 0;
+}

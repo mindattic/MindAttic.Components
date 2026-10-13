@@ -1,0 +1,6 @@
+/* MindAttic.Components - Toolbar/toolbar.css
+   Themed by the shared tokens every web/themes palette defines (--bg, --bg2, --bg3, --border,
+   --accent, --text, --text2, --text3, --font-resume); a page sets anything it does differently in its
+   own CSS on top. */
+.ma-toolbar{position:sticky;top:0;z-index:200;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;}
+.ma-toolbar__label{font-size:11px;color:var(--text3);white-space:nowrap;}

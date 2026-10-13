@@ -1,0 +1,6 @@
+/* MindAttic.Components - SkipLink/skip-link.css
+   Themed by the shared tokens every web/themes palette defines (--bg, --bg2, --bg3, --border,
+   --accent, --text, --text2, --text3, --font-resume); a page sets anything it does differently in its
+   own CSS on top. */
+.ma-skip-link{position:fixed;top:-40px;left:8px;background:var(--accent);color:var(--bg);padding:8px 14px;border-radius:6px;font-family:var(--font-resume);font-size:13px;font-weight:600;text-decoration:none;z-index:10000;transition:top 0.15s;}
+.ma-skip-link:focus{top:8px;outline:2px solid var(--bg);outline-offset:2px;}

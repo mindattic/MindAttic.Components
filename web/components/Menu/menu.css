@@ -1,0 +1,12 @@
+/* MindAttic.Components - Menu/menu.css
+   Themed by the shared tokens every web/themes palette defines (--bg, --bg2, --bg3, --border,
+   --accent, --text, --text2, --text3, --font-resume); a page sets anything it does differently in its
+   own CSS on top. */
+/* A dropdown panel, positioned under its (position:relative) wrapper; shown with display:block. */
+.ma-menu{display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--bg);border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 18px rgba(0,0,0,0.22);z-index:999;padding:6px 0;min-width:120px;}
+.ma-menu.is-open{display:block;}
+.ma-menu__group{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;padding:8px 14px 3px;font-weight:600;}
+.ma-menu__group:first-child{padding-top:2px;}
+.ma-menu__item{display:block;padding:5px 14px;font-size:12px;color:var(--text2);text-decoration:none;cursor:pointer;font-family:var(--font-resume);white-space:nowrap;transition:color 0.15s,background 0.15s,padding-left 0.15s;}
+.ma-menu__item:hover{color:var(--accent);background:var(--bg3);padding-left:18px;}
+.ma-menu__item--active{color:var(--accent);font-weight:600;}

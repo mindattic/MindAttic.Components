@@ -43,6 +43,8 @@ export const SITES = {
     // The theme-rotation progress bar's width is elapsed time since load; it differs by fractions of a
     // millisecond run to run (and is site UI the themes never touch).
     mask: '#rotate-bar',
+    // Lightbox (MindAttic.Components) namespaces the entrance animation the page called lb-in.
+    equivalent: [['animation-name:lb-in;', 'animation-name:ma-lightbox-in;']],
     scenarios: [
       // Every piece of chrome in its open/hovered/focused states, on a light and a dark theme.
       ...[['light', desktop], ['dark', desktop], ['light', phone], ['dark', phone]].map(([theme, viewport]) => ({

@@ -1,0 +1,12 @@
+/* MindAttic.Components - ProgressBar/progress-bar.css
+   Themed by the shared tokens every web/themes palette defines; a page sets anything it does
+   differently in its own CSS on top. */
+/* A track and its fill; set the fill's width (0-100%). */
+.ma-progress{display:block;flex:1;height:5px;background:rgba(128,128,128,0.2);border-radius:3px;overflow:hidden;}
+.ma-progress__fill{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,#5b8dee 0%,#00c9a7 100%);}
+
+/* Edge: a thin accent bar along the bottom edge of its (position:relative) container, e.g. a
+   countdown under a toolbar. The track is a taller, invisible hit area for clicking it. */
+.ma-progress--edge{position:absolute;left:0;right:0;bottom:-1px;height:7px;z-index:1;cursor:pointer;flex:0 1 auto;background:none;border-radius:0;overflow:visible;}
+.ma-progress--edge .ma-progress__fill{position:absolute;left:0;bottom:0;height:3px;width:0;background:var(--accent);border-radius:0;pointer-events:none;}
+@media print{.ma-progress--edge{display:none;}}

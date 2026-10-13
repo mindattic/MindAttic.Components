@@ -37,11 +37,26 @@ top of it (mindattic.com's link buttons are the base `Button` plus their own glo
 | VideoEmbed | mindatticcares.com | Click-to-play YouTube |
 | HashPages | mindatticcares.com | Several pages in one document, hash-routed |
 | ThemeFx | ryandebraal.com | Canvas engine for the theme effects |
+| Toolbar | ryandebraal.com | `.ma-toolbar` (sticky themed bar), `__label` |
+| ToolButton | ryandebraal.com | `.ma-tool-btn` (`--primary`, `--block`), `.ma-tool-link` |
+| IconButton | ryandebraal.com | `.ma-icon-btn` 32x32 (`--fixed`) |
+| Select, Range | ryandebraal.com | `.ma-select`, `.ma-range` |
+| Menu | ryandebraal.com | `.ma-menu` dropdown panel, `__group`, `__item` (`--active`); open with `display:block` or `.is-open` |
+| Modal | ryandebraal.com | `.ma-modal` overlay, `__dialog`, `__header`, `__title`, `__close`, `__footer` |
+| Lightbox | ryandebraal.com | `.ma-lightbox` (`.is-open`), `__inner`, `__links`, `__img` |
+| Tag | ryandebraal.com | `.ma-tag` pill with a hover tip `__tip` (`--below`) |
+| ProgressBar | ryandebraal.com | `.ma-progress` + `__fill`; `--edge` for a thin bar along a container's bottom |
+| FormRow | ryandebraal.com | `.ma-form-section__title`, `__rows`, `.ma-form-row`, `__label`, `__value` |
+| Avatar, SkipLink | ryandebraal.com | `.ma-avatar` (`--ma-avatar-size`), `.ma-skip-link` |
 | `web/themes/*` (16) | ryandebraal.com | Palettes, per-theme CSS and animated effects; see `web/themes/README.md` |
 
+The UI components above read the same tokens the themes define (`--bg`, `--bg2`, `--bg3`, `--border`,
+`--accent`, `--text`, `--text2`, `--text3`, `--rule`, `--tag-*`, `--font-resume`), so a page re-skins
+them by switching theme, and a site keeps only what is unique to it as local CSS.
+
 The other `web/components` and `web/themes` folders are still placeholders: each README records where
-that component lives today (MindAttic.Web/MindAttic.Web.Shared is current; the copy in the local
-MindAttic.UiUx repo is stale).
+that component lives today (MindAttic.Web/MindAttic.Web.Shared; the MindAttic.UiUx repo it
+came from is archived).
 
 ### Building a site
 
@@ -94,13 +109,19 @@ Merge the theme once, in `App.xaml`:
 | `McTextBox` | Dark text box |
 | `McDropdownMenu`, `McDropdownMenuItem`, `McSeparator`, `McPinToggle` | Dropdown parts (used by `DropdownMenu`) |
 | *(implicit)* `ToolTip` | Every tooltip in the app |
+| `Controls.AddressBar` | Back/Forward/Reload(/Home) + URL textbox for a WebView2 pane |
 
 Every templated control restores a keyboard-focus outline (`McFocus`). `Controls.DropdownMenu` is a
 pinnable action menu driven by a trigger button; see its XML docs.
 
-Consumers so far: MindAttic.Browser, JobHunt, Prose.Launcher, Prose.Writer. Automata, KdpPublish,
-MediaButler, ProcessLogger and MindAttic.Log.Reader are WebView2/Blazor shells with no native WPF
-chrome, so their UI belongs to the web side, not this package.
+`Controls.AddressBar` is a themed WPF address bar for a WebView2 pane: `Attach(CoreWebView2?)` binds
+(or rebinds) it to a live core, Enter navigates with an optional `{query}` search-template fallback,
+and an optional `NavigationGuard` lets a host veto Back/Forward/Reload/Navigate/Home (e.g. while
+recording or mid-run) with a reason string surfaced via `NavigationBlocked`.
+
+Consumers so far: MindAttic.Browser, JobHunt, Prose.Launcher, Prose.Writer, Automata, KdpPublish.
+MediaButler, ProcessLogger and MindAttic.Log.Reader are still WebView2/Blazor shells with no native
+WPF chrome, so their UI belongs to the web side, not this package.
 
 ## Building and consuming the .NET packages
 

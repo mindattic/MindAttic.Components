@@ -292,6 +292,13 @@ for (const scenario of site.scenarios.filter((x) => !only || x.name.startsWith(o
     const r = comparePng(file, c.shots[name], path.join(outDir, `${scenario.name}.${name}.DIFF.png`));
     if (r.diffPixels) problems.push(`pixels   ${name}: ${r.diffPixels === -1 ? r.note : r.diffPixels + ' px differ'}`);
   }
+  // Declared renames (e.g. a keyframes name a component namespaces): the original's computed styles
+  // are read through them, so only an undeclared difference fails.
+  for (const [name, cs] of Object.entries(o.computed)) {
+    let rs = cs;
+    for (const [from, to] of site.equivalent || []) rs = rs.replaceAll(from, to);
+    o.computed[name] = rs;
+  }
   for (const [name, cs] of Object.entries(o.computed)) {
     if (cs === c.computed[name]) continue;
     const lo = cs.split('\n');

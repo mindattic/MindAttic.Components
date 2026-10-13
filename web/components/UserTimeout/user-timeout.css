@@ -1,0 +1,41 @@
+/* UserTimeout — idle-warning modal. Scoped under .ut-overlay. Theming hook: --ut-accent. */
+
+.ut-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.ut-overlay.ut-show { display: flex; }
+
+.ut-modal {
+    background: #14171c;
+    color: #e7eaf0;
+    max-width: 24rem;
+    width: 90%;
+    padding: 1.5rem 1.75rem;
+    border-radius: 14px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .5);
+    text-align: center;
+}
+
+.ut-modal h2 { margin: 0 0 .5rem; font-size: 1.1rem; }
+
+.ut-count {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--ut-accent, #e2231a);
+    margin: .5rem 0;
+}
+
+.ut-actions { display: flex; gap: .6rem; justify-content: center; margin-top: 1rem; }
+
+.ut-btn { padding: .55rem 1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+
+.ut-stay { background: var(--ut-accent, #e2231a); color: #fff; }
+
+.ut-logout { background: #2a2f37; color: #e7eaf0; }

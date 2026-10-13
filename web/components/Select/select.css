@@ -1,0 +1,6 @@
+/* MindAttic.Components - Select/select.css
+   Themed by the shared tokens every web/themes palette defines (--bg, --bg2, --bg3, --border,
+   --accent, --text, --text2, --text3, --font-resume); a page sets anything it does differently in its
+   own CSS on top. */
+.ma-select{font-family:var(--font-resume);font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);cursor:pointer;outline:none;transition:all 0.15s;}
+.ma-select:hover{border-color:var(--accent);}

@@ -1,0 +1,76 @@
+/* ====================================================================
+ * MindAttic.Web.Shared -- Themes/Cyberspace/theme.css
+ * Dark cyberpunk landing-page chrome. Composes with the Cyberspace
+ * Component (effects engine), OutfitFont, AtticFont, BackHomeM.
+ * No current consumer; served on the CDN for any page that wants it.
+ * ==================================================================== */
+
+:root {
+    color-scheme: dark;
+    --bg:           #07090b;
+    --fg:           #d6dde2;
+    --muted:        #8a949c;
+    --accent:       #ff8c00;
+    --accent-fg:    #07090b;
+    --border:       rgba(214, 221, 226, 0.18);
+    --card-bg:      rgba(10, 14, 18, 0.78);
+    --content-bg:   rgba(10, 14, 18, 0.86);
+    --code-bg:      rgba(255, 255, 255, 0.04);
+    --code-border:  rgba(255, 255, 255, 0.10);
+    --link:         #ffb347;
+    --link-hover:   #ffd089;
+    --table-stripe: rgba(255, 255, 255, 0.03);
+    --table-border: rgba(214, 221, 226, 0.14);
+    --max-width:    920px;
+}
+* { box-sizing: border-box; }
+html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Outfit', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.55;
+}
+.page { position: relative; z-index: 1; }
+.hero { max-width: var(--max-width); margin: 0 auto; padding: 88px 24px 32px; text-align: center; }
+.project-name { margin: 0 0 14px; font-family: 'Attic', serif; font-size: clamp(2.6rem, 7vw, 4.4rem); line-height: 1; letter-spacing: 0.01em; color: var(--fg); }
+.tagline { margin: 0 auto 32px; max-width: 720px; font-size: clamp(1rem, 1.55vw, 1.18rem); color: var(--muted); font-weight: 400; }
+.btn-row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 160px; padding: 13px 24px; border-radius: 6px; font-family: inherit; font-size: 1rem; font-weight: 500; letter-spacing: 0.02em; text-decoration: none; transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, color 120ms ease; cursor: pointer; border: 1px solid var(--border); }
+.btn:hover, .btn:focus-visible { transform: translateY(-1px); }
+.btn-primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.btn-primary:hover { box-shadow: 0 8px 22px rgba(255, 140, 0, 0.32); }
+.btn-secondary { background: transparent; color: var(--fg); }
+.btn-secondary:hover { background: rgba(255, 255, 255, 0.06); }
+.btn svg { width: 18px; height: 18px; }
+.readme { max-width: var(--max-width); margin: 24px auto 96px; padding: 36px 44px 48px; background: var(--content-bg); border: 1px solid var(--border); border-radius: 10px; backdrop-filter: blur(6px); box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45); }
+.readme h1, .readme h2, .readme h3, .readme h4, .readme h5, .readme h6 { color: var(--fg); line-height: 1.25; margin: 1.8em 0 0.6em; }
+.readme h1 { font-size: 2.0rem; margin-top: 0; }
+.readme h2 { font-size: 1.55rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+.readme h3 { font-size: 1.25rem; }
+.readme h4 { font-size: 1.08rem; color: var(--muted); }
+.readme p, .readme li { font-size: 1rem; }
+.readme a { color: var(--link); text-decoration: none; border-bottom: 1px solid transparent; transition: color 120ms, border-color 120ms; }
+.readme a:hover { color: var(--link-hover); border-bottom-color: var(--link-hover); }
+.readme code { font-family: 'Fira Code', Consolas, 'SF Mono', Menlo, monospace; font-size: 0.92em; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 4px; padding: 0.12em 0.4em; }
+.readme pre { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 6px; padding: 14px 16px; overflow-x: auto; line-height: 1.5; }
+.readme pre code { background: transparent; border: 0; padding: 0; font-size: 0.9em; }
+.readme blockquote { margin: 1em 0; padding: 0.4em 1em; border-left: 3px solid var(--accent); background: rgba(255, 140, 0, 0.06); color: var(--muted); }
+.readme table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.95em; }
+.readme th, .readme td { border: 1px solid var(--table-border); padding: 8px 12px; text-align: left; }
+.readme th { background: rgba(255, 255, 255, 0.04); font-weight: 600; }
+.readme tr:nth-child(even) td { background: var(--table-stripe); }
+.readme img { max-width: 100%; height: auto; border-radius: 6px; }
+.readme hr { border: none; border-top: 1px solid var(--border); margin: 2em 0; }
+.readme ul, .readme ol { padding-left: 1.6em; }
+.readme li + li { margin-top: 0.25em; }
+.readme .heading-anchor { color: var(--muted); font-weight: 400; text-decoration: none; opacity: 0; transition: opacity 120ms; margin-left: 0.4em; border-bottom: none; }
+.readme h2:hover .heading-anchor, .readme h3:hover .heading-anchor, .readme h4:hover .heading-anchor { opacity: 1; }
+@media (max-width: 640px) {
+    .hero { padding-top: 64px; }
+    .readme { margin: 16px 14px 64px; padding: 22px 18px 30px; }
+    .btn { min-width: 132px; padding: 11px 18px; font-size: 0.95rem; }
+}

@@ -1,0 +1,58 @@
+/* UserCircle — upper-right avatar/initials circle + dropdown menu. Scoped under .uc-root.
+   Theming hooks: --uc-bg, --uc-size. */
+
+.uc-root { position: relative; display: inline-block; }
+
+.uc-btn {
+    width: var(--uc-size, 40px);
+    height: var(--uc-size, 40px);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #fff;
+    background: var(--uc-bg, #e2231a);
+    font-size: calc(var(--uc-size, 40px) * .4);
+    line-height: 1;
+}
+
+.uc-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.uc-btn .uc-icon { width: 60%; height: 60%; }
+
+.uc-menu {
+    position: absolute;
+    top: calc(var(--uc-size, 40px) + 8px);
+    right: 0;
+    min-width: 11rem;
+    background: #14171c;
+    border: 1px solid #2a2f37;
+    border-radius: 10px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .4);
+    padding: .4rem;
+    display: none;
+    z-index: 1000;
+}
+
+.uc-root.uc-open .uc-menu { display: block; }
+
+.uc-name { padding: .4rem .6rem; font-size: .8rem; color: #9aa3af; }
+
+.uc-menu form { margin: 0; }
+
+.uc-logout {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: #e7eaf0;
+    padding: .5rem .6rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+}
+
+.uc-logout:hover { background: #1d2128; }

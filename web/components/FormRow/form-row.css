@@ -1,0 +1,10 @@
+/* MindAttic.Components - FormRow/form-row.css
+   Themed by the shared tokens every web/themes palette defines; a page sets anything it does
+   differently in its own CSS on top. */
+/* A titled group of labelled controls: section > title + rows; row = label, control, optional value. */
+.ma-form-section__title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);border-bottom:1px solid var(--rule);padding-bottom:5px;margin-bottom:14px;}
+.ma-form-section__rows{display:flex;flex-direction:column;gap:12px;}
+.ma-form-row{display:flex;align-items:center;gap:12px;}
+.ma-form-row__label{min-width:200px;font-size:12px;color:var(--text2);}
+/* A live readout beside a slider. */
+.ma-form-row__value{min-width:56px;text-align:right;font-size:12px;color:var(--text);font-variant-numeric:tabular-nums;}

@@ -1,0 +1,5 @@
+/* MindAttic.Components - Avatar/avatar.css
+   Themed by the shared tokens every web/themes palette defines; a page sets anything it does
+   differently in its own CSS on top. */
+/* A round photo; size it with --ma-avatar-size. */
+.ma-avatar{width:var(--ma-avatar-size,28px);height:var(--ma-avatar-size,28px);border-radius:50%;object-fit:cover;flex-shrink:0;}

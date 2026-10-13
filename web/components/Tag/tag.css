@@ -1,0 +1,15 @@
+/* MindAttic.Components - Tag/tag.css
+   Themed by the shared tokens every web/themes palette defines; a page sets anything it does
+   differently in its own CSS on top. */
+/* A pill. With a .ma-tag__tip inside, hovering the pill shows the tip above it (or below, with
+   .ma-tag__tip--below, when there is no room above). --tt-arrow-x moves the arrow when the tip has
+   been shifted to stay on screen. The tip's content is the page's. */
+.ma-tag{display:inline-flex;align-items:center;font-family:var(--font-resume);font-size:11px;padding:2px 9px;background:var(--tag-bg);color:var(--tag-text);border:1px solid var(--tag-border);border-radius:20px;cursor:default;transition:all 0.12s;position:relative;white-space:nowrap;}
+/* Narrow screens: a long label wraps inside its pill instead of forcing a horizontal scrollbar. */
+@media(max-width:600px){.ma-tag{white-space:normal;max-width:100%;}}
+.ma-tag:hover{background:var(--tag-hover-bg);color:var(--tag-hover-text);border-color:var(--tag-hover-bg);transform:translateY(-1px);z-index:20;}
+.ma-tag__tip{display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);font-size:11px;padding:8px 12px;border-radius:6px;pointer-events:auto;z-index:999;font-family:var(--font-resume);width:280px;white-space:normal;line-height:1.5;box-shadow:0 4px 12px rgba(0,0,0,0.25);}
+.ma-tag__tip::after{content:'';position:absolute;top:100%;left:var(--tt-arrow-x,50%);transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--text);}
+.ma-tag__tip--below{bottom:auto;top:calc(100% + 8px);}
+.ma-tag__tip--below::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--text);}
+.ma-tag:hover .ma-tag__tip{display:block;}

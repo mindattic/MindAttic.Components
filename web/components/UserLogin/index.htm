@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<!--
+  UserLogin — style preview ONLY.
+  The real form is rendered by MindAttic.Authentication.Components.MaLogin (a static-SSR
+  Razor component that posts to /_ma-auth/login). This page hand-writes a facsimile of that
+  markup so user-login.css can be previewed standalone; it does not authenticate.
+-->
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UserLogin — preview</title>
+    <link rel="stylesheet" href="user-login.css" />
+    <style>body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #0a0c10; font-family: system-ui, sans-serif; }</style>
+</head>
+<body>
+    <div class="ul-card">
+        <form class="ma-auth ma-auth-login" onsubmit="return false">
+            <p class="ma-auth-error" role="alert">Your sign-in attempt was unsuccessful.</p>
+            <label class="ma-auth-field"><span>Username</span><input name="userName" /></label>
+            <label class="ma-auth-field"><span>Password</span><input type="password" name="password" /></label>
+            <button type="submit" class="ma-auth-submit">Sign in</button>
+        </form>
+    </div>
+    <script src="user-login.js"></script>
+</body>
+</html>

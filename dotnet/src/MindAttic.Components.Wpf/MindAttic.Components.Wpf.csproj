@@ -5,12 +5,18 @@
     <UseWPF>true</UseWPF>
     <PackageId>MindAttic.Components.Wpf</PackageId>
     <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
-    <Version>3.0.0</Version>
+    <Version>4.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
-      dropdown menu styles) and a DropdownMenu control: a themed, pinnable action menu that
-      closes its own popup before invoking an action, so it's never on screen for a screenshot
-      or the start of a recording.</Description>
+      dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
+      its own popup before invoking an action, so it's never on screen for a screenshot or the
+      start of a recording), and an AddressBar control: a themed Back/Forward/Reload(/Home) +
+      URL bar attachable to a CoreWebView2 that can change at runtime, with an optional
+      navigation guard a host can use to veto any action.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3179.45" />
+  </ItemGroup>
 
 </Project>

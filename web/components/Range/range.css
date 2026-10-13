@@ -1,0 +1,5 @@
+/* MindAttic.Components - Range/range.css
+   Themed by the shared tokens every web/themes palette defines; a page sets anything it does
+   differently in its own CSS on top. */
+/* A slider in the theme's accent colour that takes the rest of its row. */
+.ma-range{flex:1;accent-color:var(--accent);cursor:pointer;}

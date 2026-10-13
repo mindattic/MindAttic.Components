@@ -1,0 +1,31 @@
+<!-- ════════════════════════════════════════════════════════════════════════
+     MindAttic.Web.Shared - WebSnapshot/web-snapshot.html
+
+     Hosts size their own .web-snapshot container however they want. Mark any
+     container with class `.web-snapshot` and the JS will set its inner <img>
+     src to the captured data URI.
+
+     Markup form A (fetch the .b64.txt from disk):
+
+       <div class="web-snapshot" style="width:150px;height:225px"
+            data-src="previews/ryandebraal.b64.txt">
+         <img alt="ryandebraal.com">
+       </div>
+
+     Markup form B (inline data URI; no network):
+
+       <div class="web-snapshot" style="width:150px;height:225px">
+         <img src="data:image/png;base64,…">
+       </div>
+
+     Companion CSS: web-snapshot.css
+     Companion JS:  web-snapshot-viewer.js
+     ════════════════════════════════════════════════════════════════════════ -->
+
+<link rel="stylesheet" href="web-snapshot.css">
+<script src="web-snapshot-viewer.js" defer></script>
+
+<div class="web-snapshot" style="display:inline-block;width:150px;height:225px;line-height:0"
+     data-src="previews/ryandebraal.b64.txt">
+  <img alt="ryandebraal.com preview">
+</div>
