@@ -1,0 +1,10 @@
+[data-theme="spring"] {
+  --bg:#f0faf2; --bg2:#e6f7ea; --bg3:#d4f0da; --border:#b2d9bc;
+  --accent:#2e7d4f; --accent2:#3a9e63;
+  --text:#1a3325; --text2:#3d6b52; --text3:#6a9a7c;
+  --tag-bg:#d4f0da; --tag-text:#1e6b3a; --tag-border:#90c9a0;
+  --tag-hover-bg:#2e7d4f; --tag-hover-text:#fff;
+  --rule:#4caf70;
+}
+[data-theme="spring"] .r-contact a{border-bottom-color:rgba(46,125,79,0.2);}
+[data-theme="spring"] body{background:linear-gradient(180deg, #f0faf2 0%, #e6f7ea 30%, #d4f0da 70%, #c2e8cc 100%);}

@@ -1,0 +1,10 @@
+[data-theme="ocean"] {
+  --bg:#0a1628; --bg2:#0e1e34; --bg3:#132840; --border:#1e3a5c;
+  --accent:#00b4d8; --accent2:#48cae4;
+  --text:#caf0f8; --text2:#90e0ef; --text3:#4a8ca8;
+  --tag-bg:#0e1e34; --tag-text:#00b4d8; --tag-border:#1e3a5c;
+  --tag-hover-bg:#00b4d8; --tag-hover-text:#0a1628;
+  --rule:#0077b6;
+}
+[data-theme="ocean"] body{background:linear-gradient(180deg, #03111e 0%, #071a2e 30%, #0a1628 70%, #0e1e34 100%);}
+[data-theme="ocean"] .r-contact a{border-bottom-color:rgba(0,180,216,0.2);}

@@ -1,0 +1,10 @@
+[data-theme="autumn"] {
+  --bg:#1c1008; --bg2:#231408; --bg3:#2d1a0c; --border:#5c3010;
+  --accent:#e8762a; --accent2:#f0943c;
+  --text:#f5dfc0; --text2:#c4a070; --text3:#8a6040;
+  --tag-bg:#2d1a0c; --tag-text:#e8762a; --tag-border:#5c3010;
+  --tag-hover-bg:#e8762a; --tag-hover-text:#1c1008;
+  --rule:#c05c18;
+}
+[data-theme="autumn"] .r-contact a{border-bottom-color:rgba(232,118,42,0.25);}
+[data-theme="autumn"] body{background:linear-gradient(180deg, #4a2a0a 0%, #3d2008 20%, #2a1508 50%, #1c1008 100%);}

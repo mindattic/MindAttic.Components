@@ -1,0 +1,9 @@
+[data-theme="sand"] {
+  --bg:#faf4e8; --bg2:#f4ead8; --bg3:#ecddc4; --border:#d4c0a0;
+  --accent:#ff6b35; --accent2:#ff8c5a;
+  --text:#3a1810; --text2:#7a3820; --text3:#b07050;
+  --tag-bg:#ecddc4; --tag-text:#c44520; --tag-border:#d0b888;
+  --tag-hover-bg:#ff6b35; --tag-hover-text:#faf4e8;
+  --rule:#ff8c5a;
+}
+[data-theme="sand"] body{background:#faf4e8;}

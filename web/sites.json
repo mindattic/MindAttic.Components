@@ -1,6 +1,6 @@
 {
   "$comment": "Which MindAttic.Components web components each hand-made site splices in, and how. build/build-sites.mjs reads this. Each block replaces everything between its BEGIN/END MINDATTIC.COMPONENTS:<marker> comments in the target; nothing outside a marker pair is touched except the URL rewrites listed per site. Targets resolve against this folder.",
-  "cdnTag": "V1",
+  "cdnTag": "V2",
   "cdnBase": "https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@{tag}/web/components",
   "sites": {
     "mindattic.com": {
@@ -21,6 +21,53 @@
                  "SacredGeometry/sacred-geometry.js", "Hyperspace/hyperspace.js", "Hyperspace/hyperspace-reader.js",
                  "Cyberspace/console-bg.js"],
           "cdnJs": ["sacred-geometry.js", "hyperspace.js", "hyperspace-reader.js", "console-bg.js"] }
+      ]
+    },
+    "Hyperspace": {
+      "target": "../../MindAttic.Web/Hyperspace/index.htm",
+      "blocks": [
+        { "type": "style", "marker": "BUTTON", "id": "mindattic-components-button-css", "css": "Button/button.css" }
+      ]
+    },
+    "ryandebraal.com": {
+      "target": "../../MindAttic.Web/ryandebraal.com/index.htm",
+      "rewrites": [
+        ["https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V16/MindAttic.Web.Shared/fonts/outfit/", "{base}/OutfitFont/fonts/"]
+      ],
+      "blocks": [
+        { "type": "font-faces", "marker": "FONTS", "styleId": "mindattic-components-outfit-font-css", "faces": ["OutfitFont"] },
+        { "type": "raw", "marker": "THEMES-CSS", "syntax": "css",
+          "files": ["themes/Dark/dark.css",
+                    "themes/Light/light.css",
+                    "themes/Spring/spring.css",
+                    "themes/Summer/summer.css",
+                    "themes/Autumn/autumn.css",
+                    "themes/Winter/winter.css",
+                    "themes/Matrix/matrix.css",
+                    "themes/Neko/neko.css",
+                    "themes/Ocean/ocean.css",
+                    "themes/Sunset/sunset.css",
+                    "themes/Forest/forest.css",
+                    "themes/Cyberpunk/cyberpunk.css",
+                    "themes/Noir/noir.css",
+                    "themes/Sakura/sakura.css",
+                    "themes/Sand/sand.css",
+                    "themes/Synthwave/synthwave.css"] },
+        { "type": "raw", "marker": "THEMES-JS", "syntax": "js",
+          "files": ["components/ThemeFx/theme-fx.js",
+                    "themes/Spring/spring.js",
+                    "themes/Summer/summer.js",
+                    "themes/Sakura/sakura.js",
+                    "themes/Sunset/sunset.js",
+                    "themes/Autumn/autumn.js",
+                    "themes/Winter/winter.js",
+                    "themes/Neko/neko.js",
+                    "themes/Matrix/matrix.js",
+                    "themes/Forest/forest.js",
+                    "themes/Ocean/ocean.js",
+                    "themes/Cyberpunk/cyberpunk.js",
+                    "themes/Synthwave/synthwave.js",
+                    "themes/Sand/sand.js"] }
       ]
     },
     "mindatticcares.com": {

@@ -100,6 +100,9 @@ async function runVariant(browser, site, scenario, htmlFile, outDir, label) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e)));
   await page.addInitScript(SEED_SCRIPT);
+  // Site-specific setup before any page script, identical on both sides (e.g. a preference that
+  // turns a real-time crossfade off).
+  if (site.initScript) await page.addInitScript(site.initScript);
   // Installed but paused: time moves only when a step says so, never with however long loading took.
   const t0 = new Date('2026-01-01T12:00:00Z').getTime();
   await page.clock.install({ time: t0 });
@@ -129,7 +132,15 @@ async function runVariant(browser, site, scenario, htmlFile, outDir, label) {
     if (step.click) await page.mouse.click(step.click[0], step.click[1]);
     if (step.clickSel) await page.click(step.clickSel);
     if (step.press) await page.keyboard.press(step.press);
-    if (step.scrollTo !== undefined) await page.evaluate((y) => window.scrollTo(0, y), step.scrollTo);
+    if (step.eval) {
+      await page.evaluate(step.eval);
+      // Theme switches may run a View Transition, which animates in real time like CSS transitions.
+      await page.waitForTimeout(step.settleMs ?? 700);
+    }
+    if (step.scrollTo !== undefined) {
+      await page.evaluate((y) => window.scrollTo(0, y), step.scrollTo);
+      await page.waitForTimeout(400); // IntersectionObserver callbacks (reveal-on-scroll) run in real time
+    }
     if (step.hover) {
       await page.hover(step.hover);
       // CSS transitions run on the document timeline, not the faked JS clock: give them real time to end.
@@ -137,8 +148,17 @@ async function runVariant(browser, site, scenario, htmlFile, outDir, label) {
     }
     if (step.shot) {
       await imagesSettled();
+      // CSS animations and transitions run on the document timeline (real time), not the paused clock.
+      // As Playwright's animations:'disabled' does for screenshots: finite ones jump to their end state,
+      // infinite (decorative, looping) ones reset to their start. Applied to the live page so computed
+      // styles are read in the same settled state as the pixels.
+      await page.evaluate(() => {
+        for (const a of document.getAnimations()) {
+          if (a.effect && a.effect.getComputedTiming().endTime === Infinity) a.cancel(); else a.finish();
+        }
+      });
       const file = path.join(outDir, `${scenario.name}.${step.shot}.${label}.png`);
-      await page.screenshot({ path: file, fullPage: !!step.fullPage, animations: step.hover ? 'allow' : 'disabled', caret: 'hide' });
+      await page.screenshot({ path: file, fullPage: !!step.fullPage, animations: 'disabled', caret: 'hide' });
       shots[step.shot] = file;
       computed[step.shot] = normalizeDom(await page.evaluate(computedStyles, { mask, skipVars: refactor }));
     }
@@ -168,7 +188,16 @@ function computedStyles({ mask, skipVars }) {
   };
   // Custom properties are how a refactor themes a component (--ma-btn-u...), not what renders; in
   // --refactor mode only real properties are compared.
-  const ser = (cs) => { let s = ''; for (let i = 0; i < cs.length; i++) { if (skipVars && cs[i].startsWith('--')) continue; s += `${cs[i]}:${cs.getPropertyValue(cs[i])};`; } return s; };
+  // Sorted: the order getComputedStyle lists custom properties in follows when script set them,
+  // which is not a rendering difference.
+  const ser = (cs) => {
+    const parts = [];
+    for (let i = 0; i < cs.length; i++) {
+      if (skipVars && cs[i].startsWith('--')) continue;
+      parts.push(`${cs[i]}:${cs.getPropertyValue(cs[i])};`);
+    }
+    return parts.sort().join('');
+  };
   const lines = [];
   for (const el of document.querySelectorAll('body, body *')) {
     if (mask && el.closest(mask)) continue;
@@ -286,8 +315,10 @@ for (const scenario of site.scenarios) {
     fs.writeFileSync(path.join(outDir, `${scenario.name}.dom.candidate.html`), c.dom);
     problems.push(`dom      first difference at char ${d.at}\n           original : ${JSON.stringify(d.original)}\n           candidate: ${JSON.stringify(d.candidate)}`);
   }
-  for (const [label, v] of [['original', o], ['candidate', c]]) {
-    if (v.missing.length) problems.push(`missing  ${label} requested files not in the working tree: ${v.missing.join(', ')}`);
+  // Files neither working tree has (a third-party CDN package, e.g. three.js) are blocked identically
+  // on both sides; only a difference between the sides is a problem.
+  if (o.missing.join() !== c.missing.join()) {
+    problems.push(`missing  original: ${o.missing.join(', ') || '-'}; candidate: ${c.missing.join(', ') || '-'}`);
   }
   if (o.errors.join() !== c.errors.join()) problems.push(`errors   original ${JSON.stringify(o.errors)} vs candidate ${JSON.stringify(c.errors)}`);
   const shots = Object.keys(o.shots).length;

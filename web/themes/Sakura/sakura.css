@@ -1,0 +1,10 @@
+[data-theme="sakura"] {
+  --bg:#fff5f5; --bg2:#ffeef0; --bg3:#fde2e6; --border:#f5bfc8;
+  --accent:#ff6b35; --accent2:#ff8c5a;
+  --text:#3a1810; --text2:#7a3820; --text3:#b07050;
+  --tag-bg:#fde2e6; --tag-text:#c44520; --tag-border:#f0aab8;
+  --tag-hover-bg:#ff6b35; --tag-hover-text:#fff;
+  --rule:#ff8c5a;
+}
+[data-theme="sakura"] body{background:#fff5f5;}
+[data-theme="sakura"] body::before{content:"";position:fixed;inset:0;background-image:var(--sakura-bg, none);background-size:cover;background-position:center bottom;background-repeat:no-repeat;opacity:0.55;pointer-events:none;z-index:0;}@media print{[data-theme="sakura"] body::before{display:none;}}[data-theme="sakura"] body::after{content:"#"attr(data-sakura-bg);position:fixed;right:10px;bottom:8px;font-family:var(--font-resume);font-size:11px;color:transparent;pointer-events:none;z-index:1;user-select:text;}

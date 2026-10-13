@@ -1,0 +1,11 @@
+[data-theme="light"] {
+  --bg:#fff; --bg2:#f8f9fb; --bg3:#f0f2f5; --border:#e2e6ea;
+  --accent:#1b4f8c; --accent2:#2563b0;
+  --text:#1a1a2e; --text2:#4a5568; --text3:#718096;
+  --tag-bg:#eef2f8; --tag-text:#1b4f8c; --tag-border:#c5d5eb;
+  --tag-hover-bg:#1b4f8c; --tag-hover-text:#fff;
+  --rule:#2c5f8a;
+}
+[data-theme="light"] .r-contact a{border-bottom-color:rgba(27,79,140,0.2);}
+[data-theme="light"] .r-contact a:hover{border-bottom-color:#1b4f8c;}
+[data-theme="light"] body{background:#ffffff;}

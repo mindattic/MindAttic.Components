@@ -1,0 +1,10 @@
+[data-theme="forest"] {
+  --bg:#0a1a0a; --bg2:#102010; --bg3:#162816; --border:#2a4a2a;
+  --accent:#4caf50; --accent2:#66bb6a;
+  --text:#d0e8d0; --text2:#8ab88a; --text3:#5a7a5a;
+  --tag-bg:#102010; --tag-text:#4caf50; --tag-border:#2a4a2a;
+  --tag-hover-bg:#4caf50; --tag-hover-text:#0a1a0a;
+  --rule:#2e7d32;
+}
+[data-theme="forest"] body{background:linear-gradient(180deg, #060d1e 0%, #09111a 25%, #0a1410 55%, #0b1a0a 100%);}
+[data-theme="forest"] .r-contact a{border-bottom-color:rgba(76,175,80,0.2);}

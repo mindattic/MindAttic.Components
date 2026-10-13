@@ -1,0 +1,23 @@
+[data-theme="cyberpunk"] {
+  --bg:#0a0014; --bg2:#10001e; --bg3:#180028; --border:#3a0066;
+  --accent:#ff00ff; --accent2:#ff44ff;
+  --text:#e0f0ff; --text2:#00e5ff; --text3:#6a4a8a;
+  --tag-bg:#10001e; --tag-text:#ff00ff; --tag-border:#3a0066;
+  --tag-hover-bg:#ff00ff; --tag-hover-text:#0a0014;
+  --rule:#8800aa;
+}
+[data-theme="cyberpunk"] body{background:linear-gradient(180deg, #04000a 0%, #080012 30%, #0a0014 70%, #10001e 100%);}
+[data-theme="cyberpunk"] .r-contact a{border-bottom-color:rgba(255,0,255,0.3);}
+[data-theme="cyberpunk"] .tb-btn,[data-theme="cyberpunk"] select.tb-sel,[data-theme="cyberpunk"] #toolbar-name{font-family:'Courier New',monospace;}
+[data-theme="cyberpunk"] #resume{border-color:#ff00ff;box-shadow:0 0 6px rgba(255,0,255,0.15);}
+[data-theme="cyberpunk"] .r-name{text-shadow:0 0 10px #ff00ff,0 0 28px rgba(255,0,255,0.5);}
+[data-theme="cyberpunk"] .r-title{text-shadow:0 0 8px #00e5ff,0 0 20px rgba(0,229,255,0.4);}
+[data-theme="cyberpunk"] .tag{text-shadow:0 0 4px currentColor;box-shadow:0 0 3px rgba(255,0,255,0.2);transition:opacity 0.05s,filter 0.05s;}
+[data-theme="cyberpunk"] hr{box-shadow:0 0 6px var(--rule);}
+/* Neon tag flicker animations */
+@keyframes cp-flicker{0%,100%{opacity:1}8%{opacity:.15}10%{opacity:1}18%{opacity:.7}19%{opacity:.08}21%{opacity:1}55%{opacity:.9}56%{opacity:.2}58%{opacity:1}}
+@keyframes cp-out{0%{opacity:1}4%{opacity:.22}78%{opacity:.22}83%{opacity:.6}87%{opacity:.25}100%{opacity:1}}
+@keyframes cp-surge{0%{opacity:1;filter:brightness(1)}8%{opacity:1;filter:brightness(3.5)}13%{opacity:.25;filter:brightness(.25)}18%{opacity:1;filter:brightness(2.2)}28%{opacity:1;filter:brightness(1.4)}100%{opacity:1;filter:brightness(1)}}
+[data-theme="cyberpunk"] .tag.cp-flicker{animation:cp-flicker 1s ease both}
+[data-theme="cyberpunk"] .tag.cp-out{animation:cp-out 3.2s ease both}
+[data-theme="cyberpunk"] .tag.cp-surge{animation:cp-surge 1.4s ease both}

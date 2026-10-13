@@ -1,0 +1,14 @@
+[data-theme="matrix"] {
+  --bg:#000; --bg2:#000d00; --bg3:#001400; --border:#003800;
+  --accent:#00ff41; --accent2:#00cc33;
+  --text:#00ff41; --text2:#00cc33; --text3:#007a1e;
+  --tag-bg:#001400; --tag-text:#00ff41; --tag-border:#003800;
+  --tag-hover-bg:#00ff41; --tag-hover-text:#000;
+  --rule:#00aa2a;
+}
+/* Matrix font override */
+[data-theme="matrix"] .tb-btn,[data-theme="matrix"] select.tb-sel,[data-theme="matrix"] #toolbar-name{font-family:'Courier New',monospace;}
+[data-theme="matrix"] #resume{border-color:#00ff41;box-shadow:0 0 30px rgba(0,255,65,0.15);}
+[data-theme="matrix"] body{background:linear-gradient(180deg, #000800 0%, #000d00 30%, #001400 70%, #001a00 100%);}
+[data-theme="matrix"] .r-contact a{border-bottom-color:rgba(0,255,65,0.2);}
+[data-theme="matrix"] .tag{text-shadow:0 0 8px currentColor;}

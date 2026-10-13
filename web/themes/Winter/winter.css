@@ -1,0 +1,10 @@
+[data-theme="winter"] {
+  --bg:#e8f4fc; --bg2:#d8ecf8; --bg3:#c4e0f4; --border:#90c4e8;
+  --accent:#1a5a8c; --accent2:#2272b0;
+  --text:#0a1828; --text2:#2a4860; --text3:#507898;
+  --tag-bg:#c4e0f4; --tag-text:#1a5a8c; --tag-border:#90c4e8;
+  --tag-hover-bg:#1a5a8c; --tag-hover-text:#e8f4fc;
+  --rule:#3a80b0;
+}
+[data-theme="winter"] body{background:linear-gradient(180deg, #e8f4fc 0%, #d8ecf8 30%, #c4e0f4 70%, #b0d0ec 100%);}
+[data-theme="winter"] .r-contact a{border-bottom-color:rgba(26,90,140,0.2);}

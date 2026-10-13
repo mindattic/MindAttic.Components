@@ -1,0 +1,10 @@
+[data-theme="summer"] {
+  --bg:#fffdf0; --bg2:#fff9e0; --bg3:#fff3c4; --border:#fad97a;
+  --accent:#ff6b35; --accent2:#ff8c5a;
+  --text:#3a1810; --text2:#7a3820; --text3:#b07050;
+  --tag-bg:#fff3c4; --tag-text:#c44520; --tag-border:#fad97a;
+  --tag-hover-bg:#ff6b35; --tag-hover-text:#fff;
+  --rule:#ff8c5a;
+}
+[data-theme="summer"] .r-contact a{border-bottom-color:rgba(196,122,0,0.2);}
+[data-theme="summer"] body{background:linear-gradient(180deg, #fffdf0 0%, #fff9e0 30%, #fff3c4 70%, #f5e8a0 100%);}

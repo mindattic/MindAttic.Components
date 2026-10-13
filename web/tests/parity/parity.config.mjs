@@ -14,7 +14,46 @@ const cyberspace = (name, viewport, tap) => ({
   ],
 });
 
+const THEMES = ['light', 'dark', 'sakura', 'sand', 'spring', 'summer', 'autumn', 'winter', 'ocean', 'sunset',
+  'forest', 'matrix', 'neko', 'cyberpunk', 'synthwave', 'noir'];
+
 export const SITES = {
+  'Hyperspace': {
+    origin: 'https://hyperspace.mindattic.com/',
+    scenarios: [
+      ...[['article-desktop', desktop], ['article-phone', phone]].map(([name, viewport]) => ({
+        name, viewport,
+        steps: [
+          { runFor: 1500, shot: 'hero' },
+          { scrollTo: 900, runFor: 1500, shot: 'ladder' },
+          { scrollTo: 1900, runFor: 1500, shot: 'slice' },
+          { scrollTo: 2900, runFor: 1500, shot: 'projection' },
+          { scrollTo: 99999, runFor: 1500, shot: 'footer' },
+          { scrollTo: 0, hover: '#enterGalleryBtn', shot: 'enter-hover', unhover: true },
+          { press: 'Tab', hover: 'body', shot: 'enter-focus' },
+        ],
+      })),
+    ],
+  },
+  'ryandebraal.com': {
+    origin: 'https://ryandebraal.com/',
+    // Theme switches crossfade through a View Transition, which runs in real time; switch instantly
+    // instead (the page's own 'Theme Transition: None' setting) so every theme is captured settled.
+    initScript: `localStorage.setItem('resume-settings', JSON.stringify({ theme_transition: 'none' }));`,
+    // The theme-rotation progress bar's width is elapsed time since load; it differs by fractions of a
+    // millisecond run to run (and is site UI the themes never touch).
+    mask: '#rotate-bar',
+    scenarios: [
+      ...[['themes-desktop', desktop], ['themes-phone', phone]].map(([name, viewport]) => ({
+        name, viewport,
+        steps: [
+          { runFor: 1000, shot: 'initial' },
+          { eval: 'toggleThemeRotation()', runFor: 100 },
+          ...THEMES.flatMap((t) => [{ eval: `setTheme('${t}')`, runFor: 4000, shot: t }]),
+        ],
+      })),
+    ],
+  },
   'mindattic.com': {
     origin: 'https://mindattic.com/',
     // Everything Cyberspace draws is randomized beyond seeding (load-order and timing races), so it

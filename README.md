@@ -30,12 +30,14 @@ top of it (mindattic.com's link buttons are the base `Button` plus their own glo
 
 | Component | Used by | |
 |---|---|---|
-| Cyberspace (+ SacredGeometry, Hyperspace) | mindattic.com | The animated backdrop |
-| OutfitFont, AtticFont | mindattic.com, mindatticcares.com | `@font-face` by CDN URL (`*.cdn.css`) or base64 |
-| Button | mindattic.com | `.ma-btn` |
+| Cyberspace (+ SacredGeometry, Hyperspace) | mindattic.com (Hyperspace also the Hyperspace site) | The animated backdrop; Hyperspace is the n-dimensional shape library |
+| OutfitFont, AtticFont | mindattic.com, mindatticcares.com, ryandebraal.com | `@font-face` by CDN URL (`*.cdn.css`) or base64 |
+| Button | mindattic.com, Hyperspace | `.ma-btn` |
 | CaptureDemo | mindattic.com, mindatticcares.com | When to run a page's hands-free demo |
 | VideoEmbed | mindatticcares.com | Click-to-play YouTube |
 | HashPages | mindatticcares.com | Several pages in one document, hash-routed |
+| ThemeFx | ryandebraal.com | Canvas engine for the theme effects |
+| `web/themes/*` (16) | ryandebraal.com | Palettes, per-theme CSS and animated effects; see `web/themes/README.md` |
 
 The other `web/components` and `web/themes` folders are still placeholders: each README records where
 that component lives today (MindAttic.Web/MindAttic.Web.Shared is current; the copy in the local

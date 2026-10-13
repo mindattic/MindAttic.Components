@@ -24,11 +24,18 @@ if (!site) {
 }
 const tag = opt('--tag') || manifest.cdnTag;
 const base = manifest.cdnBase.replace('{tag}', tag);
+const themesBase = base.replace(/\/components$/, '/themes');
+const WEB_ROOT = WEB;
+const tokens = (text) => text.replaceAll('{{BASE}}', base).replaceAll('{{THEMES}}', themesBase);
 const read = (rel) => fs.readFileSync(path.join(COMPONENTS, rel), 'utf8');
 const json = (rel) => JSON.parse(read(rel));
 
 // Everything below is assembled with \n and converted to the target's line endings at the end.
 const builders = {
+  /** Component files inserted verbatim (tokens filled) into the page's own <style> or <script>:
+   *  for code written to live inside the host page, e.g. theme effects that share its scope. */
+  raw: (b) => b.files.map((rel) => tokens(fs.readFileSync(path.join(WEB_ROOT, rel), 'utf8'))).join('').trimEnd(),
+
   /** One component stylesheet, inline. Site CSS placed after it can override anything. */
   style: (b) => `<style id="${b.id}">\n${read(b.css).trimEnd()}\n</style>`,
 
@@ -97,8 +104,11 @@ for (const [from, to] of site.rewrites || []) page = page.replaceAll(from, to.re
 page = page.replace(/(cdn\.jsdelivr\.net\/gh\/mindattic\/MindAttic\.Components@)[^/]+\//g, `$1${tag}/`);
 
 for (const b of site.blocks) {
-  const begin = `<!-- BEGIN MINDATTIC.COMPONENTS:${b.marker} -->`;
-  const end = `<!-- END MINDATTIC.COMPONENTS:${b.marker} -->`;
+  // Markers use the comment syntax of where they sit: HTML by default, /* */ inside a <style>,
+  // // inside a <script>.
+  const [open, close] = { html: ['<!-- ', ' -->'], css: ['/* ', ' */'], js: ['// ', ''] }[b.syntax || 'html'];
+  const begin = `${open}BEGIN MINDATTIC.COMPONENTS:${b.marker}${close}`;
+  const end = `${open}END MINDATTIC.COMPONENTS:${b.marker}${close}`;
   const s = page.indexOf(begin);
   const e = page.indexOf(end, s);
   if (s < 0 || e < 0) throw new Error(`${siteName}: marker pair ${b.marker} not found. Add it to the page once, by hand, then re-run.`);

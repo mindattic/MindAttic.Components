@@ -1,0 +1,9 @@
+:root {
+  --bg:#0d0f12; --bg2:#13161b; --bg3:#1a1e25; --border:#2a2f3a;
+  --accent:#6ba3e8; --accent2:#90bbf0;
+  --text:#e8eaf0; --text2:#9aa0b0; --text3:#5c6275;
+  --tag-bg:#1a2030; --tag-text:#6ba3e8; --tag-border:#2a3a54;
+  --tag-hover-bg:#6ba3e8; --tag-hover-text:#0d0f12;
+  --rule:#3d6fa3; --font-resume:'Outfit',system-ui,sans-serif;
+}
+[data-theme="dark"] body{background:linear-gradient(180deg, #15181e 0%, #13161b 30%, #10131a 70%, #0b0e14 100%);}

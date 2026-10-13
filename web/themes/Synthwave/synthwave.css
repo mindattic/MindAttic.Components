@@ -1,0 +1,11 @@
+[data-theme="synthwave"] {
+  --bg:#1a0a2e; --bg2:#200e38; --bg3:#281242; --border:#4a2070;
+  --accent:#ff71ce; --accent2:#ff9de0;
+  --text:#e0f0ff; --text2:#01cdfe; --text3:#7a5090;
+  --tag-bg:#200e38; --tag-text:#ff71ce; --tag-border:#4a2070;
+  --tag-hover-bg:#ff71ce; --tag-hover-text:#1a0a2e;
+  --rule:#b967ff;
+}
+[data-theme="synthwave"] body{background:#0e0418;}
+[data-theme="synthwave"] .r-contact a{border-bottom-color:rgba(255,113,206,0.25);}
+[data-theme="synthwave"] .tag{text-shadow:0 0 6px currentColor;}
