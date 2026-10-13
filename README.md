@@ -15,12 +15,40 @@ dotnet/
                                           MindAttic.Components.Blazor.Theme.Cyberspace). Ideas'
                                           own projects become thin wrappers over these.
 web/
-  themes/<Name>/                         Plain CSS/HTML, no build step. File-synced (not npm) into
-  components/<Name>/                     static sites (mindattic.com, mindatticcares.com,
-                                          ryandebraal.com) the same way MindAttic.UiUx/
-                                          Web.Shared's sync-*.ps1 scripts already do, just sourced
-                                          from here instead.
+  themes/<Name>/                         Plain CSS/HTML/JS, no build step. PLACEHOLDERS ONLY for now:
+  components/<Name>/                     each folder's README records where the component lives today
+                                          (MindAttic.Web/MindAttic.Web.Shared is current; the copy in
+                                          the local MindAttic.UiUx repo is stale). The MindAttic.Web
+                                          sites are hand-made, so nothing is moved or wired up until a
+                                          shared version is shown to reproduce each page exactly.
 ```
+
+## MindAttic.Components.Wpf
+
+Merge the theme once, in `App.xaml`:
+
+```xml
+<ResourceDictionary Source="pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml" />
+```
+
+| Key | What |
+|---|---|
+| `McChrome`, `McChromeBorder`, `McSurface`, `McHover`, `McText`, `McMuted`, `McControlBorder`, `McFocus`, `McAccent`, `McRec`, `McStar` | Palette brushes |
+| `McToolButton` | 34x30 icon-font toolbar button |
+| `McButton` | Bordered command button |
+| `McPrimaryButton` | The one emphasized action; re-key `McAccentHover` / set `Background` for a brand colour |
+| `McTextButton` | Borderless dialog button |
+| `McTileButton` + `McTileSubtitle` | Launcher tile; re-key `McTileHover` for a brand colour |
+| `McTextBox` | Dark text box |
+| `McDropdownMenu`, `McDropdownMenuItem`, `McSeparator`, `McPinToggle` | Dropdown parts (used by `DropdownMenu`) |
+| *(implicit)* `ToolTip` | Every tooltip in the app |
+
+Every templated control restores a keyboard-focus outline (`McFocus`). `Controls.DropdownMenu` is a
+pinnable action menu driven by a trigger button; see its XML docs.
+
+Consumers so far: MindAttic.Browser, JobHunt, Prose.Launcher, Prose.Writer. Automata, KdpPublish,
+MediaButler, ProcessLogger and MindAttic.Log.Reader are WebView2/Blazor shells with no native WPF
+chrome, so their UI belongs to the web side, not this package.
 
 ## Building and consuming the .NET packages
 

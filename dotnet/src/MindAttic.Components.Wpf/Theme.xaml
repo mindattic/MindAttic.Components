@@ -10,6 +10,18 @@
     <SolidColorBrush x:Key="McRec" Color="#FFE5484D" />
     <SolidColorBrush x:Key="McStar" Color="#FFF5C542" />
     <SolidColorBrush x:Key="McAccent" Color="#FF3B5BDB" />
+    <SolidColorBrush x:Key="McAccentHover" Color="#FF2F4AB8" />
+    <!-- A raised surface (text boxes, bordered buttons) and the hover tint over chrome. -->
+    <SolidColorBrush x:Key="McSurface" Color="#FF2A2C33" />
+    <SolidColorBrush x:Key="McHover" Color="#FF2D2F37" />
+    <!-- Control outlines: 3.1:1 against McChrome, the WCAG 1.4.11 minimum for a component boundary. -->
+    <SolidColorBrush x:Key="McControlBorder" Color="#FF6A6C75" />
+    <!-- Keyboard focus. Every templated control below restores a focus visual, because replacing
+         the default template throws the system one away. -->
+    <SolidColorBrush x:Key="McFocus" Color="#FF7AB8FF" />
+    <!-- McTileButton's hover fill. An app can re-key this in its own resources (e.g. a brand
+         colour) without restyling the tile. -->
+    <SolidColorBrush x:Key="McTileHover" Color="#FF3B5BDB" />
 
     <!-- A 34x34 icon-font button (Segoe Fluent Icons / Segoe MDL2 Assets) with a flat hover highlight
          and a dimmed disabled state. Used for toolbar-style icon buttons. -->
@@ -25,12 +37,16 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4">
+                    <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4"
+                            BorderBrush="Transparent" BorderThickness="1">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="#FF2D2F37" />
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource McHover}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource McFocus}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.35" />
@@ -44,7 +60,7 @@
     <!-- A pill-shaped text button (dialog actions: Save / Cancel / Browse...). -->
     <Style x:Key="McTextButton" TargetType="{x:Type Button}">
         <Setter Property="Foreground" Value="{StaticResource McText}" />
-        <Setter Property="Background" Value="#FF2D2F37" />
+        <Setter Property="Background" Value="{StaticResource McHover}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="14,6" />
         <Setter Property="Margin" Value="6,0,0,0" />
@@ -52,12 +68,179 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}"
+                            BorderBrush="Transparent" BorderThickness="1">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bg" Property="Opacity" Value="0.85" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- A bordered dark button: the general-purpose command button (toolbars, command bars, a
+         splash screen's retry). -->
+    <Style x:Key="McButton" TargetType="{x:Type Button}">
+        <Setter Property="Foreground" Value="{StaticResource McText}" />
+        <Setter Property="Background" Value="{StaticResource McSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource McControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="16,7" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="5" Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center"
+                                          RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McHover}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McMuted}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                            <Setter TargetName="Bd" Property="BorderThickness" Value="2" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McChrome}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McChromeBorder}" />
+                            <Setter Property="Foreground" Value="#FF7A7C85" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- The one emphasized action on a screen. Background and McAccentHover can be re-keyed by an
+         app that needs a brand colour (e.g. a LinkedIn-blue Apply). -->
+    <Style x:Key="McPrimaryButton" TargetType="{x:Type Button}" BasedOn="{StaticResource McButton}">
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Background" Value="{StaticResource McAccent}" />
+        <Setter Property="BorderBrush" Value="#FF8FA3F0" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" RecognizesAccessKey="True" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource McAccentHover}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="White" />
+                            <Setter TargetName="Bd" Property="BorderThickness" Value="2" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Bd" Property="Background" Value="#FF3A4A5C" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#FF3A4A5C" />
+                            <Setter Property="Foreground" Value="#FF9AA7B4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- A large launcher-style tile: content (usually a title plus a McTileSubtitle) on a bordered
+         card that fills with McTileHover on hover. -->
+    <Style x:Key="McTileButton" TargetType="{x:Type Button}">
+        <Setter Property="Height" Value="64" />
+        <Setter Property="Margin" Value="0,0,0,10" />
+        <Setter Property="Background" Value="{StaticResource McSurface}" />
+        <Setter Property="Foreground" Value="{StaticResource McText}" />
+        <Setter Property="BorderBrush" Value="{StaticResource McControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="16,0,0,0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Shell" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Shell" Property="Background" Value="{DynamicResource McTileHover}" />
+                            <Setter TargetName="Shell" Property="BorderBrush" Value="{DynamicResource McTileHover}" />
+                            <Setter Property="Foreground" Value="White" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Shell" Property="Opacity" Value="0.85" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Shell" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                            <Setter TargetName="Shell" Property="BorderThickness" Value="2" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- A tile's second line. Muted at rest; follows the tile's hover up to white so it stays
+         readable on the hover fill. -->
+    <Style x:Key="McTileSubtitle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{StaticResource McMuted}" />
+        <Setter Property="FontSize" Value="11" />
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                <Setter Property="Foreground" Value="White" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- A dark single-line text box with hover and focus outlines. -->
+    <Style x:Key="McTextBox" TargetType="{x:Type TextBox}">
+        <Setter Property="Background" Value="{StaticResource McSurface}" />
+        <Setter Property="Foreground" Value="{StaticResource McText}" />
+        <Setter Property="BorderBrush" Value="{StaticResource McChromeBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CaretBrush" Value="{StaticResource McText}" />
+        <Setter Property="SelectionBrush" Value="{StaticResource McAccent}" />
+        <Setter Property="Padding" Value="6,4" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" SnapsToDevicePixels="True">
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" Focusable="False"
+                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McControlBorder}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -133,7 +316,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="#FF2D2F37" />
+                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource McHover}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
