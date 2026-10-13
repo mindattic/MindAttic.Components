@@ -11,3 +11,6 @@ node_modules/
 
 .claude/quicksave.md
 artifacts/
+
+# parity harness artifacts
+web/tests/parity/out/

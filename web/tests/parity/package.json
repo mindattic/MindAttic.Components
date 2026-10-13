@@ -1,0 +1,9 @@
+{
+  "name": "mindattic-components-web-parity",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Proves a page rebuilt from MindAttic.Components renders indistinguishably from its hand-made original.",
+  "type": "module",
+  "scripts": { "parity": "node parity.mjs" },
+  "dependencies": { "@playwright/test": "1.63.0", "pngjs": "7.0.0" }
+}

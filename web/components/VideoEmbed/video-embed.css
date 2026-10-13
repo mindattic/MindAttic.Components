@@ -1,0 +1,43 @@
+/* MindAttic.Components - VideoEmbed/video-embed.css
+   Click-to-play YouTube ("lite" embed): a 16:9 poster with a play button that is swapped for the
+   real player only when clicked, so the page loads no YouTube code until then. */
+.ma-video {
+  position:relative;
+  padding-bottom: 56.25%;
+  height:0;
+  overflow:hidden;
+  border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  background:#000;
+  cursor:pointer;
+}
+.ma-video img,
+.ma-video iframe {
+  position:absolute; top:0; left:0;
+  width:100%; height:100%;
+  border:0;
+  display:block;
+}
+.ma-video img { object-fit:cover; }
+.ma-video__play {
+  position:absolute;
+  top:50%; left:50%;
+  transform: translate(-50%, -50%);
+  width:72px; height:50px;
+  background: rgba(0,0,0,0.75);
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition: background 0.15s;
+}
+.ma-video:hover .ma-video__play { background:#ff0000; }
+.ma-video__play::after {
+  content:'';
+  display:block;
+  width:0; height:0;
+  border-left: 18px solid #fff;
+  border-top: 11px solid transparent;
+  border-bottom: 11px solid transparent;
+  margin-left: 4px;
+}

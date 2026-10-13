@@ -1,0 +1,4 @@
+/* MindAttic.Components - HashPages/hash-pages.css
+   Only the active .ma-page is shown. */
+.ma-page { display:none; }
+.ma-page.ma-page--active { display:block; }

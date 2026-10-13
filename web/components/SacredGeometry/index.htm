@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SacredGeometry — catalog</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #070b0e; color: #46d2aa; font: 13px/1.4 'Courier New', monospace; }
+  header { position: sticky; top: 0; z-index: 2; padding: 10px 14px; background: #070b0eee; border-bottom: 1px solid #163; backdrop-filter: blur(4px); }
+  header h1 { margin: 0 0 2px; font-size: 15px; letter-spacing: .04em; }
+  header p { margin: 0; opacity: .65; }
+  header input { width: 90px; background: #0a1014; color: #46d2aa; border: 1px solid #163; padding: 3px 6px; font: inherit; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(116px, 1fr)); gap: 10px; padding: 14px; }
+  .cell { background: #0a1014; border: 1px solid rgba(48,90,200,.30); border-radius: 4px; padding: 6px; text-align: center; }
+  .cell canvas { display: block; width: 104px; height: 104px; margin: 0 auto; }
+  .cell .idx { opacity: .55; font-size: 11px; }
+  .cell .lbl { font-size: 10px; opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+<header>
+  <h1>SacredGeometry — <span id="count">…</span> shapes</h1>
+  <p>Only on-screen tiles animate (IntersectionObserver-gated rAF — the pattern Legion uses).
+     Jump to index: <input id="jump" type="number" min="0" placeholder="0–1023"></p>
+</header>
+<div class="grid" id="grid"></div>
+
+<script src="sacred-geometry.js"></script>
+<script>
+(function () {
+  var SG = window.SacredGeometry;
+  document.getElementById('count').textContent = SG.count;
+  var grid = document.getElementById('grid');
+  var live = new Set();
+
+  for (var i = 0; i < SG.count; i++) {
+    var cell = document.createElement('div'); cell.className = 'cell';
+    var cv = document.createElement('canvas'); cv.width = 104; cv.height = 104; cv.dataset.idx = i; cv.phase = Math.random() * 6.28;
+    var idx = document.createElement('div'); idx.className = 'idx'; idx.textContent = '#' + i;
+    var lbl = document.createElement('div'); lbl.className = 'lbl'; lbl.textContent = SG.label(i); lbl.title = SG.label(i);
+    cell.appendChild(cv); cell.appendChild(idx); cell.appendChild(lbl); grid.appendChild(cell);
+  }
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      var cv = e.target;
+      if (e.isIntersecting) live.add(cv);
+      else { live.delete(cv); cv.getContext('2d').clearRect(0, 0, cv.width, cv.height); }
+    });
+  }, { rootMargin: '120px' });
+  grid.querySelectorAll('canvas').forEach(function (cv) { io.observe(cv); });
+
+  function tick() {
+    live.forEach(function (cv) {
+      var ctx = cv.getContext('2d');
+      ctx.clearRect(0, 0, cv.width, cv.height);
+      cv.phase += 0.012;
+      SG.draw(ctx, +cv.dataset.idx, cv.phase, { size: cv.width });
+    });
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  document.getElementById('jump').addEventListener('change', function () {
+    var n = Math.max(0, Math.min(SG.count - 1, +this.value || 0));
+    var cells = grid.children; if (cells[n]) cells[n].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+})();
+</script>
+</body>
+</html>

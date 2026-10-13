@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hyperspace — shapes and reader</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; background: #070b0e; color: #46d2aa; font: 13px/1.4 'Courier New', monospace; }
+  header { position: sticky; top: 0; z-index: 3; padding: 10px 14px; background: #070b0eee; border-bottom: 1px solid #163; backdrop-filter: blur(4px); }
+  header h1 { margin: 0 0 4px; font-size: 15px; letter-spacing: .04em; }
+  header p { margin: 0 0 6px; opacity: .65; }
+  .controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  select, button { background: #0a1014; color: #46d2aa; border: 1px solid #163; padding: 3px 8px; font: inherit; cursor: pointer; }
+  button:hover { border-color: #46d2aa; }
+  label { opacity: .8; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; padding: 14px; }
+  .cell { background: #0a1014; border: 1px solid rgba(48,90,200,.30); border-radius: 4px; padding: 6px; text-align: center; cursor: crosshair; }
+  .cell:hover { border-color: rgba(70,210,170,.6); }
+  .cell canvas { display: block; width: 110px; height: 110px; margin: 0 auto; }
+  .cell .idx { opacity: .55; font-size: 11px; }
+  .cell .lbl { font-size: 10px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Hyperspace — <span id="count">…</span> shapes</h1>
+  <p>Click a tile to point the Hyperspace Reader at it. Tiles animate only while on screen.</p>
+  <div class="controls">
+    <select id="pick" aria-label="Shape"></select>
+    <button id="spawn">Scan selected</button>
+    <button id="random">Scan random</button>
+    <button id="burst">Scan 3</button>
+    <button id="closeAll">Close all</button>
+    <label><input type="checkbox" id="auto"> auto (spawn every 4 s, 7 s each)</label>
+    <label><input type="checkbox" id="reduced"> reduced motion</label>
+  </div>
+</header>
+<div class="grid" id="grid"></div>
+
+<script src="hyperspace.js"></script>
+<script src="hyperspace-reader.js"></script>
+<script>
+(function () {
+  var H = window.Hyperspace, R = window.HyperspaceReader;
+  document.getElementById('count').textContent = H.count;
+  var grid = document.getElementById('grid'), pickEl = document.getElementById('pick');
+  var live = new Set();
+
+  H.shapes.forEach(function (s) {
+    var o = document.createElement('option'); o.value = s.id; o.textContent = s.index + ' ' + s.name; pickEl.appendChild(o);
+    var cell = document.createElement('div'); cell.className = 'cell'; cell.dataset.id = s.id;
+    var cv = document.createElement('canvas'); cv.width = 110; cv.height = 110; cv.dataset.id = s.id;
+    var idx = document.createElement('div'); idx.className = 'idx'; idx.textContent = '#' + s.index + ' · ' + s.dim + 'D · ' + s.id;
+    var lbl = document.createElement('div'); lbl.className = 'lbl'; lbl.textContent = s.name; lbl.title = s.name + ' — ' + s.tag;
+    cell.appendChild(cv); cell.appendChild(idx); cell.appendChild(lbl); grid.appendChild(cell);
+  });
+
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (e.isIntersecting) live.add(e.target);
+      else { live.delete(e.target); e.target.getContext('2d').clearRect(0, 0, 110, 110); }
+    });
+  }, { rootMargin: '120px' });
+  grid.querySelectorAll('canvas').forEach(function (cv) { io.observe(cv); });
+
+  var t0 = performance.now();
+  function tick() {
+    var t = (performance.now() - t0) / 1000;
+    live.forEach(function (cv) {
+      var ctx = cv.getContext('2d');
+      ctx.clearRect(0, 0, 110, 110);
+      H.draw(ctx, cv.dataset.id, t, { size: 110 });
+    });
+    requestAnimationFrame(tick);
+  }
+  tick();
+
+  function opts(extra) {
+    var o = { reducedMotion: document.getElementById('reduced').checked || undefined };
+    for (var k in extra) o[k] = extra[k];
+    return o;
+  }
+  function randomSpot() {
+    return { x: Math.round(Math.random() * Math.max(0, innerWidth - 300)), y: Math.round(90 + Math.random() * Math.max(0, innerHeight - 330)) };
+  }
+  window.__readers = [];
+  function scan(shape, at, ttl) {
+    var p = at || randomSpot();
+    var h = R.show(opts({ x: p.x, y: p.y, shape: shape, ttl: ttl }));
+    if (h) window.__readers.push(h);
+    return h;
+  }
+  window.__scan = scan;
+
+  grid.addEventListener('click', function (e) {
+    var cell = e.target.closest('.cell'); if (!cell) return;
+    var x = Math.min(e.clientX + 12, innerWidth - 296), y = Math.min(e.clientY + 12, innerHeight - 240);
+    scan(cell.dataset.id, { x: Math.max(4, x), y: Math.max(4, y) });
+  });
+  document.getElementById('spawn').onclick = function () { scan(pickEl.value); };
+  document.getElementById('random').onclick = function () { scan(); };
+  document.getElementById('burst').onclick = function () { scan(); scan(); scan(); };
+  document.getElementById('closeAll').onclick = function () { R.closeAll(); };
+  var autoTimer = 0;
+  document.getElementById('auto').onchange = function () {
+    clearInterval(autoTimer);
+    if (this.checked) { scan(undefined, null, 7000); autoTimer = setInterval(function () { scan(undefined, null, 7000); }, 4000); }
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "$comment": "Which MindAttic.Components web components each hand-made site splices in, and how. build/build-sites.mjs reads this. Each block replaces everything between its BEGIN/END MINDATTIC.COMPONENTS:<marker> comments in the target; nothing outside a marker pair is touched except the URL rewrites listed per site. Targets resolve against this folder.",
+  "cdnTag": "V1",
+  "cdnBase": "https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@{tag}/web/components",
+  "sites": {
+    "mindattic.com": {
+      "target": "../../MindAttic.Web/mindattic.com/index.htm",
+      "rewrites": [
+        ["https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V16/MindAttic.Web.Shared/fonts/outfit/", "{base}/OutfitFont/fonts/"],
+        ["https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V16/MindAttic.Web.Shared/fonts/attic/", "{base}/AtticFont/fonts/"]
+      ],
+      "blocks": [
+        { "type": "font-faces", "marker": "FONTS", "styleId": "mindattic-fonts-css",
+          "faces": ["OutfitFont", "AtticFont"], "variables": true,
+          "apply": [["html, body", "OutfitFont"], [".site-name", "AtticFont"]] },
+        { "type": "style", "marker": "BUTTON", "id": "mindattic-components-button-css", "css": "Button/button.css" },
+        { "type": "script", "marker": "CAPTUREDEMO", "id": "mindattic-components-capture-demo-js", "js": "CaptureDemo/capture-demo.js" },
+        { "type": "cyberspace", "marker": "CYBERSPACE",
+          "html": "Cyberspace/frontpage.html", "css": "Cyberspace/frontpage.css", "assets": "Cyberspace/assets",
+          "js": ["Cyberspace/loader.js", "Cyberspace/tv-static.js", "Cyberspace/home-bg.js",
+                 "SacredGeometry/sacred-geometry.js", "Hyperspace/hyperspace.js", "Hyperspace/hyperspace-reader.js",
+                 "Cyberspace/console-bg.js"],
+          "cdnJs": ["sacred-geometry.js", "hyperspace.js", "hyperspace-reader.js", "console-bg.js"] }
+      ]
+    },
+    "mindatticcares.com": {
+      "target": "../../MindAttic.Web/mindatticcares.com/index.htm",
+      "rewrites": [
+        ["https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V16/MindAttic.Web.Shared/fonts/outfit/", "{base}/OutfitFont/fonts/"]
+      ],
+      "blocks": [
+        { "type": "font-faces", "marker": "FONTS", "styleId": "mindattic-components-outfit-font-css", "faces": ["OutfitFont"] },
+        { "type": "style", "marker": "VIDEOEMBED-CSS", "id": "mindattic-components-video-embed-css", "css": "VideoEmbed/video-embed.css" },
+        { "type": "style", "marker": "HASHPAGES-CSS", "id": "mindattic-components-hash-pages-css", "css": "HashPages/hash-pages.css" },
+        { "type": "script", "marker": "CAPTUREDEMO", "id": "mindattic-components-capture-demo-js", "js": "CaptureDemo/capture-demo.js" },
+        { "type": "script", "marker": "HASHPAGES", "id": "mindattic-components-hash-pages-js", "js": "HashPages/hash-pages.js" },
+        { "type": "script", "marker": "VIDEOEMBED", "id": "mindattic-components-video-embed-js", "js": "VideoEmbed/video-embed.js" }
+      ]
+    }
+  }
+}

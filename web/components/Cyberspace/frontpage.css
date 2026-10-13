@@ -1,0 +1,735 @@
+/* ====================================================================
+ * MindAttic.Web.Shared - cyberspace/frontpage.css
+ * Cyberpunk console-background (CYBERSPACE) effects system.
+ * Lifted from Prose/wwwroot/app.css (lines 1079-1803).
+ * Canonical source. DO NOT EDIT downstream copies - edit here and re-sync.
+ * ==================================================================== */
+
+/* ── Home page — entity portrait as background corner image ─────────────── */
+.home-wrapper { position: relative; overflow: hidden; min-height: calc(100vh - var(--topnav-height, 48px)); }
+.home-content { position: relative; z-index: 1; }
+.home-bg-img {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: clamp(260px, 30vw, 480px);
+    height: auto;
+    max-height: 80vh;
+    object-fit: cover;
+    object-position: top center;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ── Console background windows (home / tile-board only) ───────────────── */
+.console-bg-host {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+.cyberspace-win {
+    position: absolute;
+    width: clamp(148px, 15vw, 228px);
+    background: rgba(10, 12, 9, 0.92);
+    border: 1px solid rgba(42, 52, 42, 0.52);
+    border-radius: 4px;
+    backdrop-filter: blur(3px);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.42);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.57rem;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transform: scaleY(0.06) scaleX(0.88);
+    transform-origin: top left;
+    animation: cyberspace-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.cyberspace-win--out { animation: cyberspace-out 0.14s cubic-bezier(0.5, 0, 1, 0.6) forwards !important; }
+/* ── Console color variants ─── */
+.cyberspace-win--blue { background: rgba(8, 12, 22, 0.92); border-color: rgba(40, 80, 180, 0.52); }
+.cyberspace-win--blue .cyberspace-title { background: rgba(10, 16, 30, 0.94); color: rgba(100, 140, 220, 0.62); border-bottom-color: rgba(40, 80, 180, 0.42); }
+.cyberspace-win--amber { background: rgba(18, 12, 4, 0.92); border-color: rgba(160, 100, 20, 0.52); }
+.cyberspace-win--amber .cyberspace-title { background: rgba(22, 15, 5, 0.94); color: rgba(200, 150, 60, 0.62); border-bottom-color: rgba(160, 100, 20, 0.42); }
+.cyberspace-cascade { animation: cyberspace-cascade-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+@keyframes cyberspace-cascade-in {
+    from { opacity: 0.08; transform: scale(0.97); }
+    to   { opacity: 0.44; transform: scale(1); }
+}
+@keyframes cyberspace-in {
+    to { opacity: 0.76; transform: scale(1); }
+}
+@keyframes cyberspace-out {
+    0%   { opacity: 0.44; transform: scale(1); }
+    40%  { opacity: 0.2;  transform: scaleX(0.86) scaleY(0.12) translateY(-4px); }
+    100% { opacity: 0;    transform: scaleX(0.6)  scaleY(0)    translateY(-9px); }
+}
+.cyberspace-title {
+    background: rgba(16, 18, 13, 0.94);
+    color: rgba(130, 148, 120, 0.62);
+    padding: 2px 7px;
+    font-size: 0.51rem;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid rgba(42, 52, 42, 0.42);
+    filter: blur(0.4px);
+}
+.cyberspace-body {
+    padding: 4px 7px 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 112px;
+    overflow: hidden;
+}
+.cyberspace-line {
+    color: rgba(255, 255, 255, 0.38);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    filter: blur(1.2px);
+    opacity: 0;
+    animation: cyberspace-line-in 0.1s ease forwards;
+}
+@keyframes cyberspace-line-in {
+    from { opacity: 0; transform: translateX(-3px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+.cyberspace-ok  { color: rgba(63,  185, 80,  0.6); filter: blur(1.2px); }
+.cyberspace-err { color: rgba(248,  81, 73,  0.6); filter: blur(1.2px); }
+
+/* Fatal error popup — scary red box, icon left, text right, no button */
+.cyberspace-err-popup {
+    position: absolute;
+    width: clamp(210px, 22vw, 310px);
+    background: rgba(40, 8, 8, 0.94);
+    border: 1px solid rgba(220, 53, 69, 0.75);
+    outline: 1px solid rgba(255, 80, 80, 0.18);
+    backdrop-filter: blur(3px);
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px rgba(220, 53, 69, 0.3),
+                0 6px 28px rgba(180, 20, 20, 0.5);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.57rem;
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    opacity: 0;
+    transform: scale(0.92);
+    animation: cyberspace-err-in 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes cyberspace-err-in {
+    to { opacity: 0.86; transform: scale(1); }
+}
+.cyberspace-err-popup-icon { display: none; }
+.cyberspace-err-popup-content {
+    flex: 1;
+    padding: 7px 9px 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+.cyberspace-err-popup-title {
+    color: rgba(255, 90, 90, 1);
+    font-size: 0.59rem;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    filter: blur(0.5px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cyberspace-err-popup-msg {
+    color: rgba(255, 140, 140, 0.88);
+    filter: blur(1px);
+    white-space: pre-line;
+    line-height: 1.45;
+}
+
+/* ── Scan lines — static, 90-95% transparent ────────────────────────────── */
+.cyberspace-sl-fine,
+.cyberspace-sl-coarse {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+.cyberspace-sl-fine {
+    /* #ff0033 = rgb(255, 0, 51) */
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 0, 51, 0.09) 0px,
+        rgba(255, 0, 51, 0.09) 1px,
+        transparent            1px,
+        transparent            3px
+    );
+    opacity: 0.08;
+}
+.cyberspace-sl-coarse {
+    /* #ff0033 + 15% green variance → rgb(255, 38, 51) */
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 38, 51, 0.06) 0px,
+        rgba(255, 38, 51, 0.06) 1px,
+        transparent             1px,
+        transparent             7px
+    );
+    opacity: 0.06;
+}
+
+/* ── Warning popup — amber box, less severe than error ──────────────────── */
+.cyberspace-warn-popup {
+    position: absolute;
+    width: clamp(190px, 20vw, 290px);
+    background: rgba(18, 14, 0, 0.94);
+    border: 1px solid rgba(200, 150, 20, 0.75);
+    outline: 1px solid rgba(255, 190, 0, 0.14);
+    backdrop-filter: blur(3px);
+    border-radius: 4px;
+    box-shadow: 0 0 0 1px rgba(200, 150, 20, 0.25),
+                0 6px 28px rgba(120, 80, 0, 0.35);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.57rem;
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: scale(0.92);
+    animation: cyberspace-warn-in 0.18s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes cyberspace-warn-in {
+    to { opacity: 0.82; transform: scale(1); }
+}
+.cyberspace-warn-popup-content {
+    flex: 1;
+    padding: 7px 9px 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+}
+.cyberspace-warn-popup-title {
+    color: rgba(255, 200, 50, 1);
+    font-size: 0.59rem;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    filter: blur(0.5px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cyberspace-warn-popup-msg {
+    color: rgba(255, 200, 100, 0.85);
+    filter: blur(1px);
+    white-space: pre-line;
+    line-height: 1.45;
+}
+
+/* ── Floating code fragments ────────────────────────────────────────────── */
+.cyberspace-frag {
+    position: absolute;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.42rem;
+    color: rgba(110, 210, 130, 0.75);
+    white-space: pre;
+    line-height: 1.38;
+    pointer-events: none;
+    filter: blur(2.4px);
+    opacity: 0;
+    animation: cyberspace-frag-in 0.06s ease forwards;
+}
+@keyframes cyberspace-frag-in {
+    to { opacity: 1; }
+}
+/* Fragment color variants — additive over the base .cyberspace-frag green. */
+.cyberspace-frag--cyan    { color: rgba(110, 220, 230, 0.75); }
+.cyberspace-frag--amber   { color: rgba(220, 180,  90, 0.75); }
+.cyberspace-frag--magenta { color: rgba(220, 110, 200, 0.75); }
+.cyberspace-frag--white   { color: rgba(220, 225, 230, 0.65); }
+
+.cyberspace-frag--out {
+    animation: cyberspace-frag-blink 0.34s steps(1) forwards !important;
+}
+@keyframes cyberspace-frag-blink {
+    0%   { opacity: 1; }
+    16%  { opacity: 0; }
+    33%  { opacity: 0.8; }
+    50%  { opacity: 0; }
+    66%  { opacity: 0.4; }
+    83%  { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+/* ── Geometry schematic windows ───────────────────────────────────────── */
+.cyberspace-geo-win {
+    width: fit-content;
+    padding: 6px;
+    border-color: rgba(48, 90, 200, 0.42);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.42), 0 0 10px rgba(48, 120, 255, 0.07);
+    animation: cyberspace-geo-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes cyberspace-geo-in {
+    from { opacity: 0; transform: scaleY(0.06) scaleX(0.88); }
+    to   { opacity: 0.32; transform: scale(1); }
+}
+.cyberspace-geo-body {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 6px;
+}
+.cyberspace-geo-canvas { display: block; background: transparent; flex-shrink: 0; }
+.cyberspace-geo-report {
+    width: 144px;
+    height: 110px;
+    overflow: hidden;
+    position: relative;
+    border-left: 1px solid rgba(70, 200, 160, 0.15);
+    padding-left: 5px;
+    flex-shrink: 0;
+}
+.cyberspace-geo-report-inner {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.33rem;
+    color: rgba(70, 210, 160, 0.55);
+    line-height: 1.45;
+    white-space: pre;
+    pointer-events: none;
+    will-change: transform;
+}
+@media (max-width: 480px) {
+    .cyberspace-geo-win { width: 120px; }
+    .cyberspace-geo-report { display: none; }
+}
+
+/* ── Floating artifacts — blurry glyph clusters that drift and fade ─────── */
+.cyberspace-artifact {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+    width: 0;
+    height: 0;
+}
+/* Predator wasps use #ff2244. ARTIFACT cells stay off that hue so the consume-and-
+   convert flash is visually unambiguous: spawnArtifact picks only white, blue or
+   amber (see ART_PALETTES in console-bg.js). */
+.cyberspace-artifact--white { color: rgba(220, 225, 230, 0.37); }
+.cyberspace-artifact--blue  { color: rgba(60,  130, 255, 0.37); }
+.cyberspace-artifact--amber { color: rgba(255, 185, 60,  0.37); }
+.cyberspace-artifact-char {
+    position: absolute;
+    font-family: 'Courier New', Courier, monospace;
+    line-height: 1;
+    pointer-events: none;
+    animation: cyberspace-art-flicker 0.7s steps(1) infinite;
+}
+/* Quake-style stepped flicker — rapid strobing like a bad CRT contact */
+@keyframes cyberspace-art-flicker {
+    0%   { opacity: 1.00; }
+    7%   { opacity: 0.00; }
+    14%  { opacity: 0.85; }
+    21%  { opacity: 0.00; }
+    28%  { opacity: 1.00; }
+    35%  { opacity: 0.20; }
+    42%  { opacity: 0.90; }
+    49%  { opacity: 0.00; }
+    56%  { opacity: 0.75; }
+    63%  { opacity: 0.00; }
+    70%  { opacity: 1.00; }
+    77%  { opacity: 0.10; }
+    84%  { opacity: 0.95; }
+    91%  { opacity: 0.00; }
+    100% { opacity: 1.00; }
+}
+/* Each artifact body segment — its own grid container, offset behind the leader so segments
+   overlap. The seg-wave animation sways the whole segment perpendicular to the travel axis,
+   with each segment phase-shifted so the chain moves like a peristaltic wave. */
+.cyberspace-artifact-seg {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+@keyframes cyberspace-art-seg-wave {
+    0%, 100% { transform: translate(0, 0); }
+    50%      { transform: translate(var(--swx, 0px), var(--swy, 0px)); }
+}
+
+/* Slug-crawl on the artifact container — translates the whole structure across the screen
+   while it lives, fades in at the start, disintegrates (fade out + slight scale collapse) at the end. */
+@keyframes cyberspace-artifact-crawl {
+    0%   { transform: translate(0, 0) scale(0.92); opacity: 0; }
+    8%   { transform: translate(calc(var(--cdx, 0px) * 0.03), calc(var(--cdy, 0px) * 0.03)) scale(1.0); opacity: 1; }
+    78%  { transform: translate(calc(var(--cdx, 0px) * 0.78), calc(var(--cdy, 0px) * 0.78)) scale(1.0); opacity: 1; }
+    92%  { transform: translate(calc(var(--cdx, 0px) * 0.94), calc(var(--cdy, 0px) * 0.94)) scale(1.06); opacity: 0.45; }
+    100% { transform: translate(var(--cdx, 0px), var(--cdy, 0px)) scale(0.7); opacity: 0; }
+}
+
+/* Per-cell undulation — each cell slides through a small loop on its own random phase.
+   Neighbors out of phase = the lattice deforms/breathes like an amoeba's body. */
+@keyframes cyberspace-art-undulate {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25%      { transform: translate(var(--ux, 0px), var(--uy, 0px)) scale(1.03); }
+    50%      { transform: translate(0, calc(var(--uy, 0px) * 0.5)) scale(0.97); }
+    75%      { transform: translate(calc(var(--ux, 0px) * -0.7), 0) scale(1.02); }
+}
+
+/* Heartbeat — radial outward push twice in quick succession (lub-dub), then a long rest.
+   Each cell's --px/--py is its own outward direction, magnitude scaled per ring. */
+@keyframes cyberspace-art-heartbeat {
+    0%   { transform: translate(0, 0); }
+    /* lub */
+    8%   { transform: translate(var(--px, 0px), var(--py, 0px)); }
+    18%  { transform: translate(0, 0); }
+    /* dub — slightly weaker */
+    26%  { transform: translate(calc(var(--px, 0px) * 0.7), calc(var(--py, 0px) * 0.7)); }
+    36%  { transform: translate(0, 0); }
+    /* rest — diastole */
+    100% { transform: translate(0, 0); }
+}
+
+/* Purposeful one-way drift — each char travels toward --adx1/--ady1 (a shared
+   cluster direction with per-glyph spread). The further it gets, the more it
+   blurs and fades. Plays once with forwards fill so it vanishes at its destination. */
+@keyframes cyberspace-art-drift {
+    0%   { transform: translate(0, 0);
+           filter: blur(var(--abl)) opacity(0.88); }
+    40%  { transform: translate(calc(var(--adx1) * 0.4), calc(var(--ady1) * 0.4));
+           filter: blur(calc(var(--abl) * 1.3)) opacity(0.80); }
+    75%  { transform: translate(calc(var(--adx1) * 0.75), calc(var(--ady1) * 0.75));
+           filter: blur(calc(var(--abl) * 2.6)) opacity(0.38); }
+    92%  { transform: translate(var(--adx1), var(--ady1));
+           filter: blur(calc(var(--abl) * 4.0)) opacity(0.08); }
+    100% { transform: translate(var(--adx1), var(--ady1));
+           filter: blur(calc(var(--abl) * 4.5)) opacity(0); }
+}
+
+/* ── Entity tab neon flicker — broken-neon-sign effect on entity load ─────────
+   Cyberpunk urban-decay vibe. Irregular opacity drops, brief saturation shifts,
+   then a clean settle. Lives ~1.6s, applied to ~25% of tabs by JS at entity load. */
+.entity-tab-flicker {
+    animation: cyberspace-tab-neon-flicker 1.6s linear forwards;
+}
+/* ── List-item neon flicker — same animation, but LOOPED so it keeps misbehaving
+   until the user clicks the item. Clicking removes the class and the item
+   "fixes itself" on selection. Nothing applies the class at present; a host
+   enables it by adding the class to list items from JS. */
+.neon-flicker-loop {
+    animation: cyberspace-tab-neon-flicker 2.4s linear infinite;
+}
+@keyframes cyberspace-tab-neon-flicker {
+    0%   { opacity: 1; filter: none; text-shadow: 0 0 6px currentColor; }
+    3%   { opacity: 0.10; filter: brightness(0.5) saturate(0.6); }
+    6%   { opacity: 1;    filter: brightness(1.3) saturate(1.4); text-shadow: 0 0 9px currentColor, 0 0 16px currentColor; }
+    9%   { opacity: 0.05; filter: brightness(0.4); }
+    13%  { opacity: 1;    filter: brightness(1.2); }
+    17%  { opacity: 0.35; }
+    21%  { opacity: 1; }
+    28%  { opacity: 0.06; filter: brightness(0.3) saturate(0.4); }
+    33%  { opacity: 1;    filter: brightness(1.4) saturate(1.5); text-shadow: 0 0 12px currentColor; }
+    40%  { opacity: 0.50; }
+    47%  { opacity: 1; }
+    56%  { opacity: 0.12; filter: brightness(0.5); }
+    62%  { opacity: 1; }
+    74%  { opacity: 0.7;  filter: brightness(1.1); }
+    85%  { opacity: 1;    filter: none; text-shadow: 0 0 4px currentColor; }
+    100% { opacity: 1;    filter: none; text-shadow: none; }
+}
+
+/* ── HEIST — semi-transparent file browser, solid color (no scan lines) ─────── */
+.cyberspace-folder-win {
+    position: absolute;
+    width: 220px;
+    background: rgba(8, 9, 14, 0.32);   /* more transparent — what's underneath shows through clearly */
+    border: 1px solid rgba(120, 130, 150, 0.32);
+    color: rgba(200, 210, 220, 0.88);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.55rem;
+    padding: 8px 10px 10px;
+    pointer-events: none;
+    z-index: 4;
+    overflow: visible;                  /* let ripped folders slide outside the window */
+    /* Override cyberspace-in's 0.76 endpoint — heist window sits 15% more transparent overall (0.61). */
+    animation: cyberspace-folder-win-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes cyberspace-folder-win-in {
+    to { opacity: 0.61; transform: scale(1); }
+}
+.cyberspace-folder-win .cyberspace-title {
+    position: relative;
+    z-index: 1;
+    font-size: 0.55rem;
+    color: rgba(180, 195, 210, 0.85);
+    border-bottom: 1px solid rgba(120, 130, 150, 0.30);
+    padding-bottom: 3px;
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cyberspace-folder-list {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: visible;                  /* folders escape the list bounds during the rip */
+}
+/* Folder rectangle with the upper-RIGHT corner cut at 45° (manila-folder tab silhouette).
+   Background is OPAQUE so the semi-transparent heist window's see-through backdrop cannot
+   bleed through the rows — only the empty parts of the window stay see-through. */
+.cyberspace-folder {
+    position: relative;
+    background: rgb(20, 26, 36);
+    border: 1px solid rgba(140, 160, 180, 0.18);
+    color: rgba(210, 220, 235, 0.75);
+    font-size: 0.6rem;
+    padding: 3px 14px 3px 8px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+    transition: background 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+    will-change: transform, opacity;
+}
+.cyberspace-folder.cyberspace-folder-highlight {
+    background: rgb(28, 58, 78);
+    border-color: rgba(140, 220, 255, 0.75);
+    color: rgba(230, 245, 255, 0.9);
+    box-shadow: 0 0 9px rgba(80, 200, 255, 0.45);
+}
+/* The ripping folder must lift above its siblings AND the window so it visibly slides
+   past the right edge instead of getting clipped underneath. */
+.cyberspace-folder.cyberspace-folder-ripping {
+    z-index: 5;
+}
+/* Sleek single-motion extraction. The transform interpolates ONLY between 0% and 100%, so
+   the slide is one continuous easing curve with no velocity changes. Opacity shimmer lives on
+   intermediate keyframes that omit transform — they don't perturb the motion. */
+@keyframes cyberspace-folder-rip {
+    0%   { transform: translate(0, 0); opacity: 1; filter: blur(0); }
+    24%  { opacity: 0.55; }
+    40%  { opacity: 0.95; }
+    100% { transform: translate(var(--rx, 240px), 0); opacity: 0; filter: blur(1.2px); }
+}
+/* Window dissolve after the steal completes. Driven by a keyframe rather than
+   an inline opacity transition because the window still has cyberspace-in's
+   animation-fill-mode:forwards asserting opacity 0.76 — a transition can lose
+   the race against that fill-state. A fresh animation overrides the prior
+   forwards fill cleanly so the fade resolves every time. */
+@keyframes cyberspace-folder-win-fade {
+    0%   { opacity: 0.61; }
+    100% { opacity: 0;    }
+}
+.cyberspace-folder-win--fade {
+    animation: cyberspace-folder-win-fade 0.55s ease forwards !important;
+}
+
+/* ── Morse-code glowing dot — pulses or shifts at cheat-code speed, with blur ─ */
+/* Outer "orbit" container — drifts very slowly across the sky like a satellite.
+   The dot inside is positioned at 0,0 so its shift-mode transform composes with the drift. */
+.cyberspace-morse-orbit {
+    position: absolute;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    z-index: 3;
+    will-change: transform;
+}
+@keyframes cyberspace-morse-orbit-drift {
+    from { transform: translate(0, 0); }
+    to   { transform: translate(var(--ox, 0), var(--oy, 0)); }
+}
+.cyberspace-morse-dot {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 3;
+    background: rgba(var(--mc, 255, 255, 255), 0.18);
+    box-shadow: 0 0 2px rgba(var(--mc, 255, 255, 255), 0.25);
+    transform: translate(0, 0);
+    /* Soft halo blur — the dot is fuzzy at the edges so fast shifts smear like motion blur */
+    filter: blur(0.5px);
+    will-change: transform, background, box-shadow, filter;
+}
+.cyberspace-morse-dot.cyberspace-morse-on {
+    background: rgba(var(--mc, 255, 255, 255), 1);
+    box-shadow:
+        0 0 5px  rgba(var(--mc, 255, 255, 255), 1),
+        0 0 12px rgba(var(--mc, 255, 255, 255), 0.85),
+        0 0 24px rgba(var(--mc, 255, 255, 255), 0.50);
+    /* Stronger blur when lit so fast keystrokes look like a glowing trail */
+    filter: blur(0.9px);
+}
+
+/* ── Network connection attempts ───────────────────────────────────────── */
+.cyberspace-net-node {
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+    font-family: 'Courier New', monospace;
+    font-size: 0.55rem;
+    padding: 2px 5px;
+    border: 1px solid;
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+    animation: cyberspace-net-in 0.18s ease forwards;
+}
+@keyframes cyberspace-net-in {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.7); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+/* Three-blink success signal — wire canvas + both nodes pulse in lock-step before fading.
+   Six opacity flips over the duration: dim, restore, dim, restore, dim, restore. */
+@keyframes cyberspace-net-success-blink {
+    0%, 100% { opacity: 1; }
+    16.66%   { opacity: 0.08; }
+    33.33%   { opacity: 1; }
+    50%      { opacity: 0.08; }
+    66.66%   { opacity: 1; }
+    83.33%   { opacity: 0.08; }
+}
+.cyberspace-net-fail {
+    position: absolute;
+    pointer-events: none;
+    z-index: 3;
+    font-family: 'Courier New', monospace;
+    font-size: 0.60rem;
+    font-weight: bold;
+    white-space: nowrap;
+    transform: translate(-50%, -50%);
+    animation: cyberspace-net-fail-flash 0.13s steps(1) 7, cyberspace-net-fail-out 0.35s ease 0.95s forwards;
+}
+@keyframes cyberspace-net-fail-flash {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0; }
+}
+@keyframes cyberspace-net-fail-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+}
+
+.cyberspace-net-ping {
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+    width: 12px; height: 12px;
+    border: 1px solid;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: cyberspace-net-ping-out 0.7s ease-out forwards;
+}
+@keyframes cyberspace-net-ping-out {
+    0%   { transform: translate(-50%, -50%) scale(0); opacity: 0.9; }
+    100% { transform: translate(-50%, -50%) scale(3.5); opacity: 0; }
+}
+.cyberspace-net-tracer {
+    position: absolute;
+    pointer-events: none;
+    z-index: 2;
+    font-family: 'Courier New', monospace;
+    font-size: 0.55rem;
+    transform: translate(-50%, -50%);
+    opacity: 0.9;
+}
+
+/* Network interception — mean character swarms at every successful corner / arrival.
+   Each wasp glyph cycles through 4 random waypoints so the cluster looks chaotic, not synchronized. */
+.cyberspace-net-wasp {
+    position: absolute;
+    pointer-events: none;
+    z-index: 4;
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: 700;
+    line-height: 1;
+    text-shadow: 0 0 4px currentColor, 0 0 9px currentColor;
+    transform: translate(-50%, -50%);
+    animation: cyberspace-net-wasp-buzz var(--bd, 130ms) ease-in-out infinite;
+}
+@keyframes cyberspace-net-wasp-buzz {
+    0%   { transform: translate(-50%, -50%); }
+    20%  { transform: translate(calc(-50% + var(--bx1)), calc(-50% + var(--by1))); }
+    40%  { transform: translate(calc(-50% + var(--bx2)), calc(-50% + var(--by2))); }
+    60%  { transform: translate(calc(-50% + var(--bx3)), calc(-50% + var(--by3))); }
+    80%  { transform: translate(calc(-50% + var(--bx4)), calc(-50% + var(--by4))); }
+    100% { transform: translate(-50%, -50%); }
+}
+
+/* Sharp-turn spark — short bright particle that flies off the corner and fades */
+.cyberspace-net-spark {
+    position: absolute;
+    pointer-events: none;
+    z-index: 4;
+    width: 2px;
+    height: 2px;
+    background: currentColor;
+    border-radius: 50%;
+    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor;
+    transform: translate(-50%, -50%);
+    animation: cyberspace-net-spark-fly 320ms ease-out forwards;
+}
+@keyframes cyberspace-net-spark-fly {
+    0%   { transform: translate(-50%, -50%);
+           opacity: 1; }
+    70%  { opacity: 0.85; }
+    100% { transform: translate(calc(-50% + var(--sx)), calc(-50% + var(--sy)));
+           opacity: 0; }
+}
+
+/* ── Corporate memo intercept ──────────────────────────────────────────── */
+.cyberspace-memo {
+    position: absolute;
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    line-height: 1.45;
+    color: rgba(255, 185, 60, 0.82);
+    background: rgba(13, 10, 2, 0.90);
+    border: 1px solid rgba(180, 130, 20, 0.30);
+    border-radius: 2px;
+    padding: 8px 10px;
+    white-space: pre;
+    z-index: 2;
+    pointer-events: none;
+    animation: cyberspace-memo-in 0.18s ease forwards;
+    backdrop-filter: blur(3px);
+    box-shadow: 0 0 10px rgba(255, 140, 0, 0.08), 0 0 8px rgba(40, 80, 240, 0.05);
+    outline: 1px solid rgba(60, 100, 255, 0.06);
+}
+@keyframes cyberspace-memo-in {
+    from { opacity: 0; transform: translateY(-4px); }
+    to   { opacity: 0.55; transform: translateY(0); }
+}
+.cyberspace-memo--collapse {
+    transform-origin: center center;
+    animation: cyberspace-memo-collapse 0.34s cubic-bezier(0.65, 0, 0.85, 0.35) forwards;
+}
+@keyframes cyberspace-memo-collapse {
+    0%   { opacity: 0.55; transform: scale(1, 1);     filter: blur(0); }
+    55%  { opacity: 0.50; transform: scale(1, 0.04);  filter: blur(0.4px); }
+    100% { opacity: 0;    transform: scale(0, 0.04);  filter: blur(1.6px); }
+}
+/* memo exit: JS clears characters, then triggers cyberspace-memo--collapse */
+
+/* ── Console prompt cursor ─────────────────────────────────────────────── */
+.cyberspace-cursor {
+    display: inline-block;
+    animation: cyberspace-cursor-blink 1.1s steps(1) infinite;
+}
+@keyframes cyberspace-cursor-blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+}
+hr {
+    border: 0;
+    border-top: 1px solid #30363d;
+    margin: 20px 0;
+}

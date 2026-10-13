@@ -1,0 +1,10 @@
+{
+  "name": "sacred-geometry",
+  "version": "1.0.0",
+  "description": "A catalog of 1024 unique, animatable line-art shapes (polyhedra, parametric curves, fractals). Pure, dependency-free; renders to canvas or SVG.",
+  "private": true,
+  "scripts": {
+    "build:previews": "node build-previews.mjs",
+    "check": "node build-previews.mjs --check"
+  }
+}

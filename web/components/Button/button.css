@@ -1,0 +1,44 @@
+/* MindAttic.Components - Button/button.css
+   The base MindAttic button. Opt in with class="ma-btn" on an <a> or <button>; everything scales
+   off one unit, --ma-btn-u, so a site sizes it with a single variable. Theme it by setting the
+   --ma-btn-* variables, and add anything site-specific (a lift, a glow, a grid order) in the
+   site's own CSS on top of this. */
+.ma-btn {
+  --ma-btn-u: 1rem;
+  --ma-btn-fg: #fff;
+  --ma-btn-bg: #13161b;
+  --ma-btn-border: #e5484d;
+  --ma-btn-hover-bg: #e5484d;
+  --ma-btn-hover-border: #ff6b70;
+  display: inline-block;
+  padding: calc(var(--ma-btn-u) * 0.3) calc(var(--ma-btn-u) * 0.6);
+  border: max(0.0625rem, calc(var(--ma-btn-u) * 0.12)) solid var(--ma-btn-border);
+  border-radius: calc(var(--ma-btn-u) * 0.5);
+  background: var(--ma-btn-bg);
+  color: var(--ma-btn-fg);
+  font-family: 'Outfit', system-ui, sans-serif;
+  font-size: var(--ma-btn-u);
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  /* Smooth in/out interpolation between rest and hover states. */
+  transition: background-color 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* The label stays --ma-btn-fg in every link state (a page's global a:hover would otherwise recolor it). */
+.ma-btn:link,
+.ma-btn:visited,
+.ma-btn:hover,
+.ma-btn:focus,
+.ma-btn:active { color: var(--ma-btn-fg); }
+
+.ma-btn:hover,
+.ma-btn:focus-visible {
+  background: var(--ma-btn-hover-bg);
+  border-color: var(--ma-btn-hover-border);
+}

@@ -1,0 +1,3 @@
+# web/ is served byte-for-byte from jsDelivr and verified byte-for-byte by web/tests/parity:
+# never let git rewrite line endings there.
+web/** -text

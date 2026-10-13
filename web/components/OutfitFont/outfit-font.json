@@ -1,0 +1,5 @@
+{
+    "applyToSelector": "html, body",
+    "fontFamily": "Outfit",
+    "fallback": "system-ui, sans-serif"
+}
