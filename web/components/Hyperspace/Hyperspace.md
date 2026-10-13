@@ -23,13 +23,13 @@ Hyperspace/
 No build step and no CSS file: load the scripts from jsDelivr like SacredGeometry.
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/Hyperspace/hyperspace.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/Hyperspace/hyperspace-reader.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/Hyperspace/hyperspace.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/Hyperspace/hyperspace-reader.js"></script>
 ```
 
 `hyperspace.js` must load before anything that uses `window.Hyperspace`. The Reader looks the library
 up when `show()` is called and returns `null` if it is missing. The Hyperspace page loads the library
-first from the CDN, with a fallback to `../MindAttic.Web.Shared/` (the same MindAttic.Web checkout) for local development.
+first from the CDN, with a fallback to `../../MindAttic.Components/web/` (a MindAttic.Components checkout next to MindAttic.Web) for local development.
 
 ---
 
@@ -204,6 +204,6 @@ Hyperspace page.
 
 Adding shapes: append records to `RAW` under a `// ===== ROW n` comment (declaration order is gallery
 order; the hall grows a row per ten shapes on its own). Then update `COUNT` in `hyperspace.spec.mjs`, and
-the count in the Hyperspace page's gallery intro, `Hyperspace/README.md`, the MindAttic.Web.Shared README,
+the count in the Hyperspace page's gallery intro, `Hyperspace/README.md`, the MindAttic.Components README,
 `docs/BIBLE.md`, `docs/USER_STORIES.md`, `docs/data/components.json` and the repo README. A new family
 needs a colour that keeps the Palette guarantees; the spec checks them.

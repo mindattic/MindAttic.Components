@@ -14,3 +14,8 @@ artifacts/
 
 # parity harness artifacts
 web/tests/parity/out/
+
+# web/tools/vendor.ps1 output; Playwright suite output
+web/dist/
+web/tests/package/test-results/
+web/tests/package/playwright-report/

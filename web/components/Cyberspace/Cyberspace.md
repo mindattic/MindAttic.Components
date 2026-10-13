@@ -62,11 +62,11 @@ absent, schematic windows simply don't spawn — everything else is unaffected.
 Production hosts pull the same files from jsDelivr instead of inlining:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/SacredGeometry/sacred-geometry.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/Hyperspace/hyperspace.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/Hyperspace/hyperspace-reader.js" defer></script>
-<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/Cyberspace/console-bg.js" defer></script>
-<link  rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/Cyberspace/frontpage.css">
+<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/SacredGeometry/sacred-geometry.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/Hyperspace/hyperspace.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/Hyperspace/hyperspace-reader.js" defer></script>
+<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/Cyberspace/console-bg.js" defer></script>
+<link  rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/Cyberspace/frontpage.css">
 ```
 
 ---

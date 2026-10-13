@@ -4,8 +4,8 @@
 //   node parity.mjs <site> <original.htm> <candidate.htm> [--out <dir>]
 //
 // Both pages are served at the site's real origin, with every jsDelivr request answered from the
-// local working trees (MindAttic.Web/MindAttic.Web.Shared for @MindAttic.Web, this repo for
-// @MindAttic.Components) and every other host blocked. Math.random is seeded and the clock is
+// sources jsDelivr would serve (@MindAttic.Web from that release tag in the sibling MindAttic.Web
+// repo, where the retired MindAttic.Web.Shared package lived; @MindAttic.Components from this working tree) and every other host blocked. Math.random is seeded and the clock is
 // frozen and advanced by hand, so animated canvases replay frame-for-frame. Each scenario then
 // compares three things, and any difference fails the run:
 //
@@ -18,13 +18,14 @@ import { PNG } from 'pngjs';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { SITES } from './parity.config.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const COMPONENTS_ROOT = path.resolve(here, '../../..');                       // MindAttic.Components
-const SHARED_ROOT = path.resolve(COMPONENTS_ROOT, '../MindAttic.Web/MindAttic.Web.Shared');
-const CDN_RE = /https:\/\/cdn\.jsdelivr\.net\/gh\/mindattic\/(MindAttic\.Web|MindAttic\.Components)@[^/'"\s)]+\/([^'"\s)]+)/g;
+const WEB_REPO = path.resolve(COMPONENTS_ROOT, '../MindAttic.Web');
+const CDN_RE = /https:\/\/cdn\.jsdelivr\.net\/gh\/mindattic\/(MindAttic\.Web|MindAttic\.Components)@([^/'"\s)]+)\/([^'"\s)]+)/g;
 
 const TYPES = {
   '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json',
@@ -34,13 +35,24 @@ const TYPES = {
 
 const sha = (buf) => crypto.createHash('sha256').update(buf).digest('hex');
 
-/** The local file a jsDelivr URL resolves to, or null. */
-function cdnFile(repo, rel) {
+/** The bytes a jsDelivr URL resolves to, or null: a MindAttic.Web file as committed at that tag (the
+ *  originals pin published releases), a MindAttic.Components file from this working tree (the candidate
+ *  pins a tag that may not be cut yet). */
+const gitCache = new Map();
+function cdnBytes(repo, tag, rel) {
   rel = decodeURIComponent(rel.split(/[?#]/)[0]);
-  const root = repo === 'MindAttic.Web' ? path.dirname(SHARED_ROOT) : COMPONENTS_ROOT;
-  const abs = path.resolve(root, rel);
-  if (!abs.startsWith(root + path.sep)) return null;
-  return fs.existsSync(abs) && fs.statSync(abs).isFile() ? abs : null;
+  if (repo === 'MindAttic.Web') {
+    const key = `${tag}:${rel}`;
+    if (!gitCache.has(key)) {
+      let body = null;
+      try { body = execFileSync('git', ['-C', WEB_REPO, 'show', key], { stdio: ['ignore', 'pipe', 'ignore'], maxBuffer: 64 << 20 }); } catch {}
+      gitCache.set(key, body);
+    }
+    return gitCache.get(key);
+  }
+  const abs = path.resolve(COMPONENTS_ROOT, rel);
+  if (!abs.startsWith(COMPONENTS_ROOT + path.sep)) return null;
+  return fs.existsSync(abs) && fs.statSync(abs).isFile() ? fs.readFileSync(abs) : null;
 }
 
 function normalizeDom(html) {
@@ -50,9 +62,9 @@ function normalizeDom(html) {
     // renamed or moved markers don't register as whitespace differences.
     .replace(/^[ \t]*<!--[\s\S]*?-->[ \t]*\n/gm, '')
     .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(CDN_RE, (url, repo, rel) => {
-      const abs = cdnFile(repo, rel);
-      return abs ? `cdn:${sha(fs.readFileSync(abs)).slice(0, 16)}` : `cdn:MISSING:${rel}`;
+    .replace(CDN_RE, (url, repo, tag, rel) => {
+      const body = cdnBytes(repo, tag, rel);
+      return body ? `cdn:${sha(body).slice(0, 16)}` : `cdn:MISSING:${rel}`;
     })
     // Release-tag mentions left in code comments (e.g. "jsDelivr URLs @V16").
     .replace(/@V\d+\b/g, '@V#');
@@ -81,17 +93,16 @@ async function runVariant(browser, site, scenario, htmlFile, outDir, label) {
       return route.fulfill({ status: 200, contentType: 'text/html; charset=utf-8', body: html });
     }
     if (url.host === 'cdn.jsdelivr.net') {
-      const m = url.pathname.match(/^\/gh\/mindattic\/(MindAttic\.Web|MindAttic\.Components)@[^/]+\/(.+)$/);
-      const abs = m && cdnFile(m[1], m[2]);
-      if (abs) {
-        const body = fs.readFileSync(abs);
+      const m = url.pathname.match(/^\/gh\/mindattic\/(MindAttic\.Web|MindAttic\.Components)@([^/]+)\/(.+)$/);
+      const body = m && cdnBytes(m[1], m[2], m[3]);
+      if (body) {
         resources.push(`${req.resourceType()} ${sha(body)}`);
         return route.fulfill({ status: 200, body, headers: {
-          'content-type': TYPES[path.extname(abs).toLowerCase()] || 'application/octet-stream',
+          'content-type': TYPES[path.extname(m[3].split(/[?#]/)[0]).toLowerCase()] || 'application/octet-stream',
           'access-control-allow-origin': '*' } });
       }
       missing.push(url.pathname);
-      return route.fulfill({ status: 404, body: 'not in working tree' });
+      return route.fulfill({ status: 404, body: 'not in the working tree or at that tag' });
     }
     return route.abort('blockedbyclient');
   });

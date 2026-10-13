@@ -1,4 +1,4 @@
-/* MindAttic.Web.Shared Components/Textbox — an Angular-Material-style OUTLINED text field.
+/* MindAttic.Components components/Textbox — an Angular-Material-style OUTLINED text field.
    The label sits centered in the box at rest and floats up to OVERLAP the top border on focus or when
    filled (Material "outline" notch effect), knocking out the border behind it. Theme-able via CSS vars;
    uses the OutfitFont plugin's --font-outfit token when present. Multi-target source: this same css is

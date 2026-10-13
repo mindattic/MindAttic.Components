@@ -1,4 +1,4 @@
-/* MindAttic.Web.Shared — Tooltip
+/* MindAttic.Components — Tooltip
  * A standalone, dependency-free tooltip. One floating element is reused for
  * every trigger; triggers opt in with the `data-tooltip` attribute. All visual
  * tokens are CSS variables, so a host theme can restyle without touching JS.

@@ -48,7 +48,7 @@ page's own CSS, not by this component.
 Or via jsDelivr:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/AtticFont/attic-font.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/AtticFont/attic-font.css">
 ```
 
 ---
@@ -71,6 +71,6 @@ Edit here only. Downstream copies are derived artifacts.
 
 Sites that are not enrolled for splicing (for example `mindattic.com` and `ryandebraal.com`) load the same
 font as a plain woff2 file from the shared asset package, which is smaller than inlining it and is cached
-across sites: `https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@<tag>/MindAttic.Web.Shared/fonts/attic/` (files and rules in
+across sites: `https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@<tag>/web/components/AtticFont/fonts/` (files and rules in
 [`docs/ASSETS.md`](../../docs/ASSETS.md)). Preload the file from `<head>` with `crossorigin`. The original
 TTF is kept in `archive/fonts/attic/` (in the repo, not served).

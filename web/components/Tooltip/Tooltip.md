@@ -35,8 +35,8 @@ Tooltip/
 Via jsDelivr:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@<tag>/MindAttic.Web.Shared/Components/Tooltip/tooltip.css">
-<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@<tag>/MindAttic.Web.Shared/Components/Tooltip/tooltip.js" defer></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@<tag>/web/components/Tooltip/tooltip.css">
+<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@<tag>/web/components/Tooltip/tooltip.js" defer></script>
 ```
 
 ### Trigger attributes

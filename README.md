@@ -14,12 +14,18 @@ dotnet/
                                           MindAttic.Ideas's existing granularity (e.g.
                                           MindAttic.Components.Blazor.Theme.Cyberspace). Ideas'
                                           own projects become thin wrappers over these.
-web/
-  components/<Name>/                     Plain CSS/HTML/JS, no build step, served from jsDelivr
-                                          (cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V#/web/...).
-  themes/<Name>/                         Same, for whole-page themes.
-  sites.json + build/build-sites.mjs     Splice components into the hand-made MindAttic.Web pages.
+web/                                     Served as is from jsDelivr:
+                                          cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V#/web/...
+  components/<Name>/                     Plain CSS/HTML/JS, no build step (fonts keep their woff2 here).
+  themes/<Name>/                         Same, for whole-page themes (and their artwork).
+  assets/<domain>/                       Each site's own logos, icons and images.
+  assets/archive/                        Kept but never served (font TTF sources, brand masters).
+  assets-manifest.json                   Path, bytes, SHA-256 and pixel size of every served asset.
+  sites.json + build/build-sites.mjs     Splice components into the hand-made pages and apps that use them.
+  tests/package/                         Playwright suite for the package and the sites; Pester for tools.
   tests/parity/                          Proves a rebuilt page is indistinguishable from its original.
+  tools/                                 vendor.ps1, build-asset-manifest.ps1, codex.ps1.
+docs/web/                                The web package's bible, stories, asset and pipeline docs.
 ```
 
 ## Web components and the MindAttic.Web sites
@@ -54,23 +60,53 @@ The UI components above read the same tokens the themes define (`--bg`, `--bg2`,
 `--accent`, `--text`, `--text2`, `--text3`, `--rule`, `--tag-*`, `--font-resume`), so a page re-skins
 them by switching theme, and a site keeps only what is unique to it as local CSS.
 
-The other `web/components` and `web/themes` folders are still placeholders: each README records where
-that component lives today (MindAttic.Web/MindAttic.Web.Shared; the MindAttic.UiUx repo it
-came from is archived).
+The rest of the catalog came over from MindAttic.Web.Shared (formerly the MindAttic.UiUx repo, now
+archived), byte for byte: PageScrollbar, Textbox, Tooltip, PinFooter, BackHomeM, WebSnapshot and the
+auth visuals UserLogin, UserCircle and UserTimeout (spliced into Tutor), plus the Cyberspace theme. The
+full catalog is in `docs/web/data/components.json`; the rules the package keeps are in
+`docs/web/BIBLE.md` ([assets](docs/web/ASSETS.md), [pipelines](docs/web/PIPELINES.md)).
 
 ### Building a site
 
-`web/sites.json` lists, per site, the target page, the marker blocks to fill and any URL rewrites.
-Each block replaces whatever sits between `<!-- BEGIN MINDATTIC.COMPONENTS:<marker> -->` and its END
-marker; nothing else in the page is touched.
+`web/sites.json` lists, per entry, the target file(s), the marker blocks to fill and any URL rewrites.
+Each block replaces whatever sits between `BEGIN MINDATTIC.COMPONENTS:<marker>` and its END marker
+(an HTML, CSS or JS comment, by where it sits); nothing else in the file is touched, and a rerun with
+unchanged sources writes identical bytes.
+
+| Entry | Target (next to this checkout) |
+|---|---|
+| `mindattic.com`, `ryandebraal.com`, `mindatticcares.com`, `Hyperspace` | `../MindAttic.Web/<site>/index.htm` |
+| `MindAttic.Psst` | `../MindAttic.Psst/privacy.htm` and `terms.htm`: the Outfit font inline as base64 |
+| `Tutor` | `../Tutor/Tutor.Blazor/wwwroot/app.css` (UserLogin, UserCircle, UserTimeout CSS); their scripts copied to `wwwroot/js/` |
 
 ```
 node web/build/build-sites.mjs mindattic.com            # rewrites ../MindAttic.Web/mindattic.com/index.htm
-powershell -File web/build/build-sites.ps1 -Site mindattic.com   # same, for MindAttic.Deploy's preDeploy hook
+powershell -File web/build/build-sites.ps1 -Site mindattic.com [-Tag V4]   # same, for MindAttic.Deploy's preDeploy hook
 ```
 
-The pages pin `cdnTag` from `sites.json`. Ship a component change by tagging a new release (`V2`,
-...), bumping `cdnTag`, and rebuilding.
+The pages pin `cdnTag` from `sites.json` (or `-Tag`). MindAttic.Deploy's linked deploy
+(`npm run deploy -- --uiux`) releases a change: it tags this repo with the next whole-number tag, runs
+the four sites' builds with that tag, commits "Pin MindAttic.Components V<n>" in MindAttic.Web, pushes
+both, checks every asset on jsDelivr byte for byte and uploads the sites. After an OutfitFont change run
+the `MindAttic.Psst` entry by hand; after a change to the auth visuals, the `Tutor` entry.
+
+### Testing the package and the sites
+
+```
+cd web/tests/package && npm ci
+npm run test:local                       # package + sites + components; the CDN is answered from this tree
+Invoke-Pester -Path web/tests/package/pester    # tools/vendor.ps1 (from the repo root; Pester 5+)
+```
+
+`web/tests/package/README.md` describes what each group guards, live mode and the CDN checks.
+
+### Tools
+
+```
+powershell -File web/tools/build-asset-manifest.ps1 [-Verify]   # regenerate (or check) assets-manifest.json
+powershell -File web/tools/vendor.ps1 -Build OutfitFont         # copy one component or theme to web/dist/
+powershell -File web/tools/codex.ps1 doctor|digest              # check docs/web, regenerate its digest
+```
 
 ### Proving parity
 

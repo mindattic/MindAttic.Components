@@ -17,8 +17,8 @@
  * Why inline these when the bigger art comes from the CDN?  Each frame is only
  * ~1 KB, so 32 separate requests would cost far more than the ~32 KB they add
  * to the stylesheet, and the cat has to animate instantly with no loading
- * flicker.  (The same frames are also available as .ico files in MindAttic.Web.Shared
- * under ryandebraal.com/icons/neko/.)
+ * flicker.  (The same frames are also available as .ico files in MindAttic.Components
+ * under web/assets/archive/ryandebraal.com/icons/neko/.)
  *
  * The frames are 32×32px ICO-format pixel art from the 1998 Macintosh/Windows
  * desktop pet. The sepia+saturate+hue-rotate filter chain in .neko-sprite

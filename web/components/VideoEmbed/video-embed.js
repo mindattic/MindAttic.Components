@@ -1,7 +1,6 @@
 /* MindAttic.Components - VideoEmbed/video-embed.js
-   <div class="ma-video" data-yt="VIDEO_ID" role="button" tabindex="0" aria-label="Play: ...">
-     <img alt="" src="poster.jpg"><span class="ma-video__play" aria-hidden="true"></span>
-   </div>
+   Markup: a div.ma-video with data-yt="VIDEO_ID", role="button", tabindex="0" and an aria-label,
+   holding the poster image (with width/height) and an empty span.ma-video__play (aria-hidden).
    Click (or Enter/Space) swaps the poster for the youtube-nocookie player; from file:// (where
    the embed is blocked) it opens the video on YouTube instead. */
 (function () {

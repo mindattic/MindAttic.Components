@@ -1,0 +1,97 @@
+# Example GitHub Actions workflow for the MindAttic.Components web/ test suite.
+#
+# NOT active: it lives under web/tests/package/ on purpose. To enable it, copy it to
+# .github/workflows/web-tests.yml at the MindAttic.Components root after reviewing the secrets/permissions below.
+#
+#  * push / pull_request  -> LOCAL mode: assets + sites. The sites come from a MindAttic.Web checkout beside this one
+#                            (SITES_ROOT), and the CDN is answered from this web/ working tree, so no tag has
+#                            to exist and no live site is touched.
+#  * schedule / release   -> LIVE mode: the real sites + the real jsDelivr tag (cdn + sites + assets).
+name: web-tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  release:
+    types: [published]
+  schedule:
+    - cron: '17 6 * * *'     # daily, after the CDN edge has had time to settle
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  local:
+    name: Local (assets + sites)
+    runs-on: ubuntu-latest
+    steps:
+      # The package (this repo, full history + tags) and, in sites/, the MindAttic.Web repo that holds every site.
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/checkout@v4
+        with: { repository: mindattic/MindAttic.Web, path: sites }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/tests/package/package-lock.json
+      - name: Install
+        working-directory: web/tests/package
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Assets
+        working-directory: web/tests/package
+        run: npm run test:assets
+      - name: Sites (local)
+        working-directory: web/tests/package
+        env: { TEST_MODE: local, PW_CHANNEL: chromium, CI: 'true', SITES_ROOT: '${{ github.workspace }}/sites' }
+        run: npm run test:sites
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-local
+          path: |
+            web/tests/package/playwright-report
+            web/tests/package/test-results
+          if-no-files-found: ignore
+
+  live:
+    name: Live (real sites + real CDN)
+    if: github.event_name == 'schedule' || github.event_name == 'release' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/checkout@v4
+        with: { repository: mindattic/MindAttic.Web, path: sites }
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/tests/package/package-lock.json
+      - name: Install
+        working-directory: web/tests/package
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Live (assets + cdn + sites)
+        working-directory: web/tests/package
+        env:
+          TEST_MODE: live
+          PW_CHANNEL: chromium
+          CI: 'true'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # only raises the GitHub API rate limit for the tag test
+          SITES_ROOT: ${{ github.workspace }}/sites
+          # SHARED_TAG: V3                              # set to override the expected tag
+        run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-live
+          path: |
+            web/tests/package/playwright-report
+            web/tests/package/test-results
+          if-no-files-found: ignore

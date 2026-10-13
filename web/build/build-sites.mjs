@@ -42,6 +42,23 @@ const builders = {
   /** One component script, inline (runs where it is placed, before any later page script). */
   script: (b) => `<script id="${b.id}">\n${read(b.js).trimEnd()}\n</script>`,
 
+  /** A font whose woff2 ships inline as base64 (no network request): the component's comment
+   *  banner, then a <style> with its @font-face rules, plus a font-family rule for the selector its
+   *  descriptor names (applyToSelector, e.g. 'html, body'). */
+  'font-inline'(b) {
+    const dir = path.join(COMPONENTS, b.component);
+    const pick = (ext) => fs.readdirSync(dir).find((f) => f.endsWith(ext) && !f.endsWith('.cdn.css'));
+    const d = json(`${b.component}/${pick('.json')}`);
+    let css = read(`${b.component}/${pick('.css')}`);
+    if (d.applyToSelector) {
+      css += `\n/* applyToSelector for this subscriber */\n${d.applyToSelector} { font-family: '${d.fontFamily}', ${d.fallback}; }\n`;
+    }
+    return `${read(`${b.component}/${pick('.html')}`)}\n<style id="${b.id}">\n${css}\n</style>`;
+  },
+
+  /** One component stylesheet spliced into an existing stylesheet (e.g. a Blazor app's app.css). */
+  'css-file': (b) => read(b.css).trimEnd(),
+
   /** @font-face rules for each face (CDN-URL variant), optional --font-* variables, optional apply rules. */
   'font-faces'(b) {
     const meta = Object.fromEntries(b.faces.map((name) => {
@@ -92,18 +109,31 @@ const builders = {
   },
 };
 
-const targetPath = path.resolve(WEB, site.target);
+const assetsBase = base.replace(/\/components$/, '/assets');
+
+// A site is one target file (target + blocks) or several (files: [{ target, blocks }]). copies
+// ([componentFile, targetFile]) are plain file copies, e.g. a component's scripts into an app's wwwroot.
+for (const [from, to] of site.copies || []) {
+  const dest = path.resolve(WEB, to);
+  fs.mkdirSync(path.dirname(dest), { recursive: true });
+  fs.copyFileSync(path.join(COMPONENTS, from), dest);
+  console.log(`  copy         ${from} -> ${path.relative(WEB, dest)}`);
+}
+for (const file of site.files || [site]) buildFile(file, site.files ? null : opt('--out'));
+
+function buildFile(file, outFile) {
+const targetPath = path.resolve(WEB, file.target);
 let page = fs.readFileSync(targetPath, 'utf8');
 const crlf = (page.match(/\r\n/g) || []).length;
 const lf = (page.match(/(?<!\r)\n/g) || []).length;
 const eol = crlf >= lf ? '\r\n' : '\n';
 page = page.replace(/\r\n/g, '\n');
 
-for (const [from, to] of site.rewrites || []) page = page.replaceAll(from, to.replace('{base}', base));
+for (const [from, to] of site.rewrites || []) page = page.replaceAll(from, to.replace('{base}', base).replace('{assets}', assetsBase));
 // Any Components URL already in the page follows the pinned tag.
 page = page.replace(/(cdn\.jsdelivr\.net\/gh\/mindattic\/MindAttic\.Components@)[^/]+\//g, `$1${tag}/`);
 
-for (const b of site.blocks) {
+for (const b of file.blocks) {
   // Markers use the comment syntax of where they sit: HTML by default, /* */ inside a <style>,
   // // inside a <script>.
   const [open, close] = { html: ['<!-- ', ' -->'], css: ['/* ', ' */'], js: ['// ', ''] }[b.syntax || 'html'];
@@ -117,6 +147,7 @@ for (const b of site.blocks) {
   console.log(`  ${b.marker.padEnd(12)} ${b.type} (${(block.length / 1024).toFixed(1)} KB)`);
 }
 
-const outPath = opt('--out') ? path.resolve(opt('--out')) : targetPath;
+const outPath = outFile ? path.resolve(outFile) : targetPath;
 fs.writeFileSync(outPath, eol === '\n' ? page : page.replace(/\n/g, '\r\n'));
 console.log(`Built ${siteName} -> ${outPath} (@${tag})`);
+}

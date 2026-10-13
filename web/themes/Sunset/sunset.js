@@ -1,6 +1,6 @@
 // 20 sunset background variations — #1 is the original geometric render,
 // the rest are pointillist (Seurat-style) variations with dot rasterization.
-// Each is a 1024×720 JPEG hosted in MindAttic.Web.Shared and served by jsDelivr.
+// Each is a 1024×720 JPEG hosted in MindAttic.Components and served by jsDelivr.
 const SUNSET_BGS = bgSet('sunset', 20);
 const sunsetSeen = [];
 

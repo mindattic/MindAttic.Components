@@ -38,7 +38,7 @@ falls back to a serif if the font hasn't loaded yet.
 Or via jsDelivr:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/BackHomeM/back-home-m.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/BackHomeM/back-home-m.css">
 ```
 
 ---

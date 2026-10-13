@@ -1,4 +1,4 @@
-/* MindAttic.Web.Shared — PageScrollbar
+/* MindAttic.Components — PageScrollbar
  * Replaces the browser's native page scrollbar with a themed overlay scrollbar.
  * The native scrollbar is hidden only once JS adds `.ma-sb-active` to <html>, so
  * a no-JS client keeps its normal scrollbar (progressive enhancement).

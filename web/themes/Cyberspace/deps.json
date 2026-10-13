@@ -1,5 +1,5 @@
 {
-  "$comment": "MindAttic.Web.Shared Themes/Cyberspace -- declares which Components this theme transitively loads. Paths are relative to the repo root and resolved as /Components/<name>/<file>; the catalog build emits <link> and <script> tags for each. `circuitboard` lists the three parallax texture PNGs that console-bg.js paints into the .console-bg-host layer; the catalog build emits an inline `window.__cyberspaceCircuitboardSrcs` setter (jsDelivr URLs) BEFORE the deferred scripts so console-bg.js loads them instead of falling back to /api/media/* (which 404s on the static host). This mirrors what sync-mindattic-com.ps1 does for the home page.",
+  "$comment": "MindAttic.Components themes/Cyberspace -- declares which Components this theme transitively loads. Paths are relative to the repo root and resolved as /Components/<name>/<file>; the catalog build emits <link> and <script> tags for each. `circuitboard` lists the three parallax texture PNGs that console-bg.js paints into the .console-bg-host layer; the catalog build emits an inline `window.__cyberspaceCircuitboardSrcs` setter (jsDelivr URLs) BEFORE the deferred scripts so console-bg.js loads them instead of falling back to /api/media/* (which 404s on the static host). This mirrors what sync-mindattic-com.ps1 does for the home page.",
 
   "css": [
     "Components/OutfitFont/outfit-font.css",

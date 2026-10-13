@@ -29,7 +29,7 @@ CSS custom properties: `--ul-accent` (default `#e2231a`), `--ul-bg` (default `#1
 
 ## jsDelivr (pinned tag)
 ```
-https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/UserLogin/user-login.css
+https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/UserLogin/user-login.css
 ```
 
 ---

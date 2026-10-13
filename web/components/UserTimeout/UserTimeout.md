@@ -26,8 +26,8 @@ Place **once** in the app shell/`MainLayout` (inside auth context). Requires `us
 
 ## jsDelivr (pinned tag)
 ```
-https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/UserTimeout/user-timeout.css
-https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/UserTimeout/user-timeout.js
+https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/UserTimeout/user-timeout.css
+https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/UserTimeout/user-timeout.js
 ```
 
 ---

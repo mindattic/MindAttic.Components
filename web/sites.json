@@ -1,14 +1,10 @@
 {
   "$comment": "Which MindAttic.Components web components each hand-made site splices in, and how. build/build-sites.mjs reads this. Each block replaces everything between its BEGIN/END MINDATTIC.COMPONENTS:<marker> comments in the target; nothing outside a marker pair is touched except the URL rewrites listed per site. Targets resolve against this folder.",
-  "cdnTag": "V2",
+  "cdnTag": "V3",
   "cdnBase": "https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@{tag}/web/components",
   "sites": {
     "mindattic.com": {
       "target": "../../MindAttic.Web/mindattic.com/index.htm",
-      "rewrites": [
-        ["https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V16/MindAttic.Web.Shared/fonts/outfit/", "{base}/OutfitFont/fonts/"],
-        ["https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V16/MindAttic.Web.Shared/fonts/attic/", "{base}/AtticFont/fonts/"]
-      ],
       "blocks": [
         { "type": "font-faces", "marker": "FONTS", "styleId": "mindattic-fonts-css",
           "faces": ["OutfitFont", "AtticFont"], "variables": true,
@@ -31,9 +27,6 @@
     },
     "ryandebraal.com": {
       "target": "../../MindAttic.Web/ryandebraal.com/index.htm",
-      "rewrites": [
-        ["https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V16/MindAttic.Web.Shared/fonts/outfit/", "{base}/OutfitFont/fonts/"]
-      ],
       "blocks": [
         { "type": "font-faces", "marker": "FONTS", "styleId": "mindattic-components-outfit-font-css", "faces": ["OutfitFont"] },
         { "type": "style", "marker": "SKIPLINK", "id": "mindattic-components-skip-link-css", "css": "SkipLink/skip-link.css" },
@@ -85,11 +78,30 @@
                     "themes/Sand/sand.js"] }
       ]
     },
+    "MindAttic.Psst": {
+      "$comment": "Psst's legal pages carry the Outfit font inline (base64), so they render with no network request.",
+      "files": [
+        { "target": "../../MindAttic.Psst/privacy.htm", "blocks": [ { "type": "font-inline", "marker": "OUTFITFONT", "component": "OutfitFont", "id": "mindattic-components-outfit-font-css" } ] },
+        { "target": "../../MindAttic.Psst/terms.htm",   "blocks": [ { "type": "font-inline", "marker": "OUTFITFONT", "component": "OutfitFont", "id": "mindattic-components-outfit-font-css" } ] }
+      ]
+    },
+    "Tutor": {
+      "$comment": "Tutor (Blazor) carries the auth visuals: their CSS spliced into wwwroot/app.css, their scripts copied to wwwroot/js.",
+      "copies": [
+        ["UserLogin/user-login.js",     "../../Tutor/Tutor.Blazor/wwwroot/js/user-login.js"],
+        ["UserCircle/user-circle.js",   "../../Tutor/Tutor.Blazor/wwwroot/js/user-circle.js"],
+        ["UserTimeout/user-timeout.js", "../../Tutor/Tutor.Blazor/wwwroot/js/user-timeout.js"]
+      ],
+      "files": [
+        { "target": "../../Tutor/Tutor.Blazor/wwwroot/app.css", "blocks": [
+          { "type": "css-file", "marker": "USERLOGIN",   "syntax": "css", "css": "UserLogin/user-login.css" },
+          { "type": "css-file", "marker": "USERCIRCLE",  "syntax": "css", "css": "UserCircle/user-circle.css" },
+          { "type": "css-file", "marker": "USERTIMEOUT", "syntax": "css", "css": "UserTimeout/user-timeout.css" }
+        ] }
+      ]
+    },
     "mindatticcares.com": {
       "target": "../../MindAttic.Web/mindatticcares.com/index.htm",
-      "rewrites": [
-        ["https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V16/MindAttic.Web.Shared/fonts/outfit/", "{base}/OutfitFont/fonts/"]
-      ],
       "blocks": [
         { "type": "font-faces", "marker": "FONTS", "styleId": "mindattic-components-outfit-font-css", "faces": ["OutfitFont"] },
         { "type": "style", "marker": "VIDEOEMBED-CSS", "id": "mindattic-components-video-embed-css", "css": "VideoEmbed/video-embed.css" },

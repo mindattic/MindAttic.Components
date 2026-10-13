@@ -1,0 +1,21 @@
+{
+  "name": "mindattic-web-shared-tests",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Test suite for the MindAttic.Components web/ jsDelivr asset package and the sites that consume it (mindattic.com, ryandebraal.com, mindatticcares.com, Hyperspace).",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:local": "cross-env TEST_MODE=local playwright test",
+    "test:live": "cross-env TEST_MODE=live playwright test",
+    "test:assets": "playwright test --project=assets",
+    "test:sites": "playwright test --project=sites",
+    "test:cdn": "cross-env TEST_MODE=live playwright test --project=cdn",
+    "baseline:update": "node lib/update-baselines.mjs",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "cross-env": "^7.0.3"
+  }
+}

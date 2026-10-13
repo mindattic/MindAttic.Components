@@ -24,8 +24,8 @@ submits it via `requestSubmit()` — **never** `fetch` — so antiforgery + the 
 
 ## jsDelivr (pinned tag)
 ```
-https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/UserCircle/user-circle.css
-https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/UserCircle/user-circle.js
+https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/UserCircle/user-circle.css
+https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/UserCircle/user-circle.js
 ```
 
 ---

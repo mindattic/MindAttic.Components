@@ -1,4 +1,4 @@
-/* MindAttic.Web.Shared — Tooltip
+/* MindAttic.Components — Tooltip
  *
  * A standalone, dependency-free, accessible tooltip. Zero per-element wiring:
  * any element with a `data-tooltip="..."` attribute (added at any time, even

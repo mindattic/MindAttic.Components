@@ -68,11 +68,11 @@ function frame() {
 ### Mounting from the CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Web@V12/MindAttic.Web.Shared/Components/SacredGeometry/sacred-geometry.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V3/web/components/SacredGeometry/sacred-geometry.js"></script>
 ```
 
 Static posters are reachable the same way:
-`…@V12/MindAttic.Web.Shared/Components/SacredGeometry/previews/shape-0000.svg`.
+`…@V3/web/components/SacredGeometry/previews/shape-0000.svg`.
 
 ---
 
