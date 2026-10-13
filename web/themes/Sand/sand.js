@@ -25,13 +25,13 @@
 // ║  smooth bezier polyline with a sandy fill gradient.                           ║
 // ╚═══════════════════════════════════════════════════════════════════════════════╝
 // Particles are pre-warmed (physics run before first frame) so the scene is
-// already chaotic on load.  Dunes grow continuously at SAND_PILE = 1 unit/frame
+// already chaotic on load.  Dunes grow continuously at SAND_PILE = 0.15 units/frame
 // per column, smoothed each frame for flowing bezier silhouettes.  Wind drifts
 // the dune profile sideways over time, carving natural crescent shapes.
 function startSand() {
   const W = () => canvas.width, H = () => canvas.height;
   const GRIT_N    = 1800;
-  const SAND_PILE = 1.5;
+  const SAND_PILE = 0.15;   // was 1.5: dunes build 90% slower
   const DUNE_COLS = 90;   // horizontal sample columns for dune profile
   let t = 0;
 
