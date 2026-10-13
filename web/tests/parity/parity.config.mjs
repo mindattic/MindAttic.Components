@@ -44,6 +44,33 @@ export const SITES = {
     // millisecond run to run (and is site UI the themes never touch).
     mask: '#rotate-bar',
     scenarios: [
+      // Every piece of chrome in its open/hovered/focused states, on a light and a dark theme.
+      ...[['light', desktop], ['dark', desktop], ['light', phone], ['dark', phone]].map(([theme, viewport]) => ({
+        name: `ui-${theme}-${viewport.width}`, viewport,
+        steps: [
+          { eval: `toggleThemeRotation(); setTheme('${theme}')`, runFor: 500, shot: 'page' },
+          { hover: '#transport button', shot: 'transport-hover', unhover: true },
+          { clickSel: '#theme-swatch', runFor: 200, shot: 'theme-menu' },
+          { hover: '#theme-swatch-menu [data-theme="sakura"]', shot: 'theme-menu-hover' },
+          { press: 'Escape', runFor: 200 },
+          { clickSel: '#more-btn', runFor: 200, shot: 'more-menu' },
+          { hover: '#more-menu button', shot: 'more-menu-hover' },
+          { press: 'Escape', runFor: 200 },
+          { clickSel: '#resume-nav-btn', runFor: 200, shot: 'nav-menu' },
+          { hover: '#resume-nav-menu a', shot: 'nav-menu-hover' },
+          { press: 'Escape', runFor: 200 },
+          { hover: '.r-skill-tags > *', settleMs: 300, shot: 'tag-tooltip', unhover: true },
+          { eval: 'openSettings()', runFor: 200, shot: 'settings' },
+          { press: 'Escape', runFor: 200 },
+          { eval: 'openAttributions()', runFor: 200, shot: 'attributions' },
+          { press: 'Escape', runFor: 200 },
+          { eval: 'openAvatarLightbox()', runFor: 400, shot: 'lightbox' },
+          { press: 'Escape', runFor: 200 },
+          { press: 'Tab', shot: 'focus-1' },
+          { press: 'Tab', shot: 'focus-2' },
+          { press: 'Tab', shot: 'focus-3' },
+        ],
+      })),
       ...[['themes-desktop', desktop], ['themes-phone', phone]].map(([name, viewport]) => ({
         name, viewport,
         steps: [

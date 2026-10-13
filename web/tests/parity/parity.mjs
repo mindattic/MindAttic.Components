@@ -59,7 +59,7 @@ function normalizeDom(html) {
 }
 
 // Deterministic Math.random (mulberry32). Same seed on both sides, so "random" effects match.
-const SEED_SCRIPT = `(() => { let a = 0x9E3779B9; Math.random = function () {
+const SEED_SCRIPT = `(() => { let a = 0x9E3779B9; window.__parityReseed = () => { a = 0x9E3779B9; }; Math.random = function () {
   a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a);
   t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; })();`;
 
@@ -133,6 +133,9 @@ async function runVariant(browser, site, scenario, htmlFile, outDir, label) {
     if (step.clickSel) await page.click(step.clickSel);
     if (step.press) await page.keyboard.press(step.press);
     if (step.eval) {
+      // Each scripted change starts from the same random state, so what it generates (e.g. a theme's
+      // terrain) does not depend on how many random numbers earlier steps happened to draw.
+      await page.evaluate(() => window.__parityReseed && window.__parityReseed());
       await page.evaluate(step.eval);
       // Theme switches may run a View Transition, which animates in real time like CSS transitions.
       await page.waitForTimeout(step.settleMs ?? 700);
@@ -254,6 +257,9 @@ const outDir = path.resolve(outIdx >= 0 ? rest[outIdx + 1] : path.join(here, 'ou
 // --refactor: the candidate restructures markup/CSS (base component + local overrides), so its source
 // text and DOM may legitimately differ. Pixels and computed styles must still match exactly.
 const refactor = rest.includes('--refactor');
+// --only <prefix>: run just the scenarios whose name starts with it (e.g. --only ui-).
+const onlyIdx = rest.indexOf('--only');
+const only = onlyIdx >= 0 ? rest[onlyIdx + 1] : null;
 fs.rmSync(outDir, { recursive: true, force: true });
 fs.mkdirSync(outDir, { recursive: true });
 
@@ -278,7 +284,7 @@ let failed = false;
 // frozen clock. Disabling it in the engine keeps scroll positions deterministic while the page's own
 // scroll-behavior value is still part of the computed-style comparison.
 const browser = await chromium.launch({ args: ['--disable-smooth-scrolling'] });
-for (const scenario of site.scenarios) {
+for (const scenario of site.scenarios.filter((x) => !only || x.name.startsWith(only))) {
   const o = await runVariant(browser, site, scenario, originalFile, outDir, 'original');
   const c = await runVariant(browser, site, scenario, candidateFile, outDir, 'candidate');
   const problems = [];
