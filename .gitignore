@@ -1,0 +1,13 @@
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.idea/
+*.snupkg
+*.nupkg
+TestResults/
+node_modules/
+
+.claude/quicksave.md
+artifacts/

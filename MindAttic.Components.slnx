@@ -1,0 +1,5 @@
+<Solution>
+  <Folder Name="/dotnet/">
+    <Project Path="dotnet/src/MindAttic.Components.Wpf/MindAttic.Components.Wpf.csproj" />
+  </Folder>
+</Solution>
