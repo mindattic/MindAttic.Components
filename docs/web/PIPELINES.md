@@ -52,7 +52,7 @@ Paths are case-sensitive on GitHub: the `web/` prefix and its lowercase folders 
 
 When `HEAD` already carries the latest tag and the pins match it, that tag is reused. Runtime assets (fonts, logos, theme art) are documented in [`ASSETS.md`](ASSETS.md).
 
-To tag by hand (from the MindAttic.Components root), then bump `cdnTag` in `web/sites.json` and rebuild the sites:
+To tag by hand (from the MindAttic.Components root), then rebuild the sites (the build pins the newest tag):
 
 ```bash
 git tag -a V<n> -m "..."     # whole numbers only, never SemVer; never move a published tag

@@ -86,7 +86,7 @@ are validated before commit ([ASSETS.md](ASSETS.md)).
 - **Marker block** — `BEGIN/END MINDATTIC.COMPONENTS:<MARKER>` region the build regenerates.
 - **Splice-in-place** — delivery mode that rewrites only the marker blocks in a target file.
 - **jsDelivr CDN** — `cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@<ref>/web/<path>`, the runtime delivery.
-- **`sites.json`** — canonical map of targets, blocks and URL rewrites, plus the pinned `cdnTag`.
+- **`sites.json`** — canonical map of targets, blocks and URL rewrites. The pinned tag is not stored: it is the newest `V<n>` tag of the repo.
 - **`Vn` tag** — a whole-number release tag of MindAttic.Components; immutable once published
   ([MAU-LAW-6](#MAU-LAW-6)).
 - **Linked deploy** — `MindAttic.Deploy`'s release flow that tags MindAttic.Components and pins that tag in

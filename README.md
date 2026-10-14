@@ -84,7 +84,7 @@ node web/build/build-sites.mjs mindattic.com            # rewrites ../MindAttic.
 powershell -File web/build/build-sites.ps1 -Site mindattic.com [-Tag V4]   # same, for MindAttic.Deploy's preDeploy hook
 ```
 
-The pages pin `cdnTag` from `sites.json` (or `-Tag`). MindAttic.Deploy's linked deploy
+The pages pin the newest `V<n>` tag of this repo (or `-Tag`), so there is no tag to keep in sync by hand. MindAttic.Deploy's linked deploy
 (`npm run deploy -- --uiux`) releases a change: it tags this repo with the next whole-number tag, runs
 the four sites' builds with that tag, commits "Pin MindAttic.Components V<n>" in MindAttic.Web, pushes
 both, checks every asset on jsDelivr byte for byte and uploads the sites. After an OutfitFont change run

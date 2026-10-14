@@ -39,8 +39,8 @@ Optional: `pip install fonttools brotli` enables the deep font check (the struct
 Environment variables:
 
 - `TEST_MODE=live` — test the real sites and the real CDN instead of local copies.
-- `SHARED_TAG=V3` — the tag every site must pin. Default: `cdnTag` in `web/sites.json` (the tag the site build pins
-  into every page); without one, the highest whole-number `V<n>` tag of this repo, else `V1`.
+- `SHARED_TAG=V3` — the tag every site must pin. Default: the highest whole-number `V<n>` tag of this repo (the tag the site
+  build pins into every page by default), else `V1`.
 - `SITES_ROOT=<dir>` — where the site folders live (default: a MindAttic.Web checkout next to this MindAttic.Components
   checkout). Point it at a folder of older page copies to prove a check catches a regression.
 - `PW_CHANNEL` — `chrome` (default), `msedge` or `chromium`.

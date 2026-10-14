@@ -202,7 +202,7 @@ Status legend: ✅ done (verified) · 🟡 partial · ⬜ planned · living.
   naming, layout, `assets/archive/` kept out).
 - ✅ **Sites consume the package at the pinned tag.** `tests/package/specs/sites/common.spec.mjs` and the
   per-site specs check mindattic.com, ryandebraal.com and mindatticcares.com for clean loads, allowed hosts,
-  the expected tag (`sites.json` `cdnTag`, override `SHARED_TAG`), no overflow at every viewport and view,
+  the expected tag (the newest `V<n>` tag, override `SHARED_TAG`), no overflow at every viewport and view,
   and CDN-loaded fonts. Verified 2026-10-13: `npm run test:local` in `web/tests/package` — 183 passed,
   6 skipped (the live-only CDN specs).
 - ✅ **Cyberspace origins and the tap sonic pulse.** Every spawn function takes an optional origin
@@ -259,7 +259,7 @@ A feature is **done** (✅) only when:
 - **Marker block** — `BEGIN/END MINDATTIC.COMPONENTS:<MARKER>` region the build regenerates.
 - **Splice-in-place** — delivery mode that rewrites only the marker blocks in a target file.
 - **jsDelivr CDN** — `cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@<ref>/web/<path>`, the runtime delivery.
-- **`sites.json`** — canonical map of targets, blocks and URL rewrites, plus the pinned `cdnTag`.
+- **`sites.json`** — canonical map of targets, blocks and URL rewrites. The pinned tag is not stored: it is the newest `V<n>` tag of the repo.
 - **`Vn` tag** — a whole-number release tag of MindAttic.Components; immutable once published
   ([MAU-LAW-6](#MAU-LAW-6)).
 - **Linked deploy** — `MindAttic.Deploy`'s release flow that tags MindAttic.Components and pins that tag in

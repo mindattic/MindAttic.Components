@@ -15,12 +15,9 @@ export const SITES_ROOT = process.env.SITES_ROOT ? path.resolve(process.env.SITE
 
 export const TEST_MODE = process.env.TEST_MODE === 'live' ? 'live' : 'local';
 /**
- * The release tag every site is expected to pin: SHARED_TAG if set, otherwise web/sites.json's cdnTag (the tag
- * build-sites.mjs pins into every page), falling back to the highest whole-number V<n> tag in this repo.
+ * The release tag every site is expected to pin: SHARED_TAG if set, otherwise the highest whole-number V<n> tag
+ * in this repo (the tag build-sites.mjs pins by default and the linked deploy pins when it cuts a release).
  */
-function sitesJsonTag() {
-  try { return JSON.parse(fs.readFileSync(path.join(SHARED_ROOT, 'sites.json'), 'utf8')).cdnTag || null; } catch { return null; }
-}
 function latestWholeNumberTag() {
   try {
     const out = execFileSync('git', ['-C', SHARED_ROOT, 'tag', '--list', 'V*'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
@@ -28,7 +25,7 @@ function latestWholeNumberTag() {
     return nums.length ? `V${Math.max(...nums)}` : null;
   } catch { return null; }
 }
-export const EXPECTED_TAG = process.env.SHARED_TAG || sitesJsonTag() || latestWholeNumberTag() || 'V1';
+export const EXPECTED_TAG = process.env.SHARED_TAG || latestWholeNumberTag() || 'V1';
 
 export const CDN_HOST = 'cdn.jsdelivr.net';
 export const CDN_BASE = (tag) => `https://${CDN_HOST}/gh/mindattic/MindAttic.Components@${tag}/web/`;

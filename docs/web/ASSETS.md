@@ -13,8 +13,8 @@ https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@<tag>/web/<path>
 
 `<tag>` is a whole-number release tag of MindAttic.Components (`V1`, `V2`, …) and **tags are immutable**
 ([MAU-LAW-6](BIBLE.md#MAU-LAW-6)), so a pinned URL returns the same bytes forever and is cached by browsers
-and by the CDN edge indefinitely. Never point a production page at `@main`. The pages pin the tag named by
-`cdnTag` in `web/sites.json`.
+and by the CDN edge indefinitely. Never point a production page at `@main`. The pages pin the newest
+whole-number `V<n>` tag of this repo (or the tag the linked deploy passes as `-Tag`).
 
 ## Layout
 
@@ -107,6 +107,6 @@ its `README.md`): the manifest matches the tree, fonts and images decode, lossy 
 resolution and bytes, size budgets hold, every MindAttic.Components URL a site references exists, and each
 site loads with no failed requests, no console errors and the right layout at every viewport — in every view
 a visitor can reach (hash pages, themes), with desktop-style scrollbars so overflow a Windows visitor would
-see is caught. The expected tag is `cdnTag` from `web/sites.json` (override with `SHARED_TAG`).
+see is caught. The expected tag is the newest `V<n>` tag of this repo (override with `SHARED_TAG`).
 `npm run test:local` runs it against the working tree before a tag is published; `npm run test:live` /
 `npm run test:cdn` verify what jsDelivr actually serves.

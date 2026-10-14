@@ -22,3 +22,4 @@ _Nothing recorded yet._
 |---|---|---|---|---|---|
 | COM-T1 | 2026-10-13 | docs | closed | Start the permanent ticket log in USER_STORIES.md | — |
 | COM-T2 | 2026-10-13 | feature | closed | Sand theme dunes build 90% slower (SAND_PILE 1.5 -> 0.15) so the scene stays open longer | web/themes/Sand/sand.js |
+| COM-T3 | 2026-10-13 | fix | closed | Site build pins the newest V<n> tag of the repo by default; sites.json cdnTag removed so a hand rebuild can't repin a stale tag | web/build/build-sites.mjs; web/tests/package (183 passed) |

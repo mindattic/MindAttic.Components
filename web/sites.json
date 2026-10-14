@@ -1,6 +1,5 @@
 {
   "$comment": "Which MindAttic.Components web components each hand-made site splices in, and how. build/build-sites.mjs reads this. Each block replaces everything between its BEGIN/END MINDATTIC.COMPONENTS:<marker> comments in the target; nothing outside a marker pair is touched except the URL rewrites listed per site. Targets resolve against this folder.",
-  "cdnTag": "V3",
   "cdnBase": "https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@{tag}/web/components",
   "sites": {
     "mindattic.com": {

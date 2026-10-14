@@ -4,7 +4,7 @@
 #   powershell -File build-sites.ps1 -Site mindattic.com
 param(
     [Parameter(Mandatory)][string]$Site,
-    # Overrides sites.json's cdnTag (the MindAttic.Components release the page pins).
+    # The MindAttic.Components release the page pins. Default: the newest V<n> tag of the repo.
     [string]$Tag
 )
 $ErrorActionPreference = 'Stop'
