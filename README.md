@@ -2,7 +2,7 @@
 
 The shared design system behind every MindAttic site and desktop app: plain CSS/JS web components and themes served from jsDelivr, and a WPF theme and controls package for the .NET apps.
 
-[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-7.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
+[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-8.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
 
 ![The Cyberspace backdrop component as it renders on mindattic.com: dim circuit-board panels, terminal readouts and a file browser over a dark grid](docs/web/images/cyberspace-backdrop.png)
 
@@ -38,7 +38,7 @@ node web/build/build-sites.mjs mindattic.com                       # rewrite ../
 dotnet pack dotnet/src/MindAttic.Components.Wpf -c Release -o C:\LocalNuGet
 ```
 
-The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second drops `MindAttic.Components.Wpf.7.0.0.nupkg` into the local NuGet feed.
+The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second drops `MindAttic.Components.Wpf.8.0.0.nupkg` into the local NuGet feed.
 
 ## Web components and the MindAttic.Web sites
 
@@ -108,7 +108,7 @@ Merge the theme once, in `App.xaml`:
 | `McToolButton` | 34x30 icon-font toolbar button |
 | `McButton` | Bordered command button |
 | `McPrimaryButton` | The one emphasized action; re-key `McAccentHover` / set `Background` for a brand colour |
-| `McTextButton` | Borderless dialog button |
+| `McTextButton` | Borderless dialog button; content is centred unless you set `HorizontalContentAlignment` / `VerticalContentAlignment` (e.g. `Left` for a fill-width link) |
 | `McTileButton` + `McTileSubtitle` | Launcher tile; re-key `McTileHover` for a brand colour |
 | `McTextBox` | Dark text box |
 | `McDropdownMenu`, `McDropdownMenuItem`, `McSeparator`, `McPinToggle` | Dropdown parts (used by `DropdownMenu`) |
@@ -210,7 +210,7 @@ docs/web/                                The web package's bible, stories, asset
 ## Current state
 
 - The web package is live: the four MindAttic.Web sites, MindAttic.Psst and Tutor are built from it.
-- `MindAttic.Components.Wpf` is at 7.0.0 and used by six desktop apps; `McModal` is its newest control and the first one with tests.
+- `MindAttic.Components.Wpf` is at 8.0.0 (`McTextButton` honours `HorizontalContentAlignment`) and used by six desktop apps; `McModal` is its newest control and the first one with tests.
 
 ## Roadmap
 
