@@ -2,7 +2,7 @@
 
 The shared design system behind every MindAttic site and desktop app: plain CSS/JS web components and themes served from jsDelivr, and a WPF theme and controls package for the .NET apps.
 
-[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-10.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
+[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-11.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
 
 ![The Cyberspace backdrop component as it renders on mindattic.com: dim circuit-board panels, terminal readouts and a file browser over a dark grid](docs/web/images/cyberspace-backdrop.png)
 
@@ -25,7 +25,7 @@ The repo is organized by toolchain rather than by visual category: a JS bundle a
 - **Site build** (`web/build/`): splices components into the hand-made pages and apps listed in `web/sites.json`, touching nothing outside their marker blocks.
 - **Parity proof** (`web/tests/parity/`): shows a rebuilt page is indistinguishable from its original.
 - **Site assets** (`web/assets/`): each site's logos, icons and images, with a manifest of every served file.
-- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme (palette brushes, button, text box, progress bar and menu styles, tooltips) and the `AddressBar`, `DropdownMenu`, `McBadge`, `McModal` and `McWindow` controls.
+- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme (palette brushes, button, text box, progress bar and menu styles, tooltips), building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles) and the `AddressBar`, `DropdownMenu`, `McBadge`, `McLineChart`, `McModal` and `McWindow` controls.
 
 ## Quick start
 
@@ -38,7 +38,7 @@ node web/build/build-sites.mjs mindattic.com                       # rewrite ../
 dotnet pack dotnet/src/MindAttic.Components.Wpf -c Release -o C:\LocalNuGet
 ```
 
-The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second drops `MindAttic.Components.Wpf.10.0.0.nupkg` into the local NuGet feed.
+The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second drops `MindAttic.Components.Wpf.11.0.0.nupkg` into the local NuGet feed.
 
 ## Web components and the MindAttic.Web sites
 
@@ -105,6 +105,13 @@ Merge the theme once, in `App.xaml`:
 | Key | What |
 |---|---|
 | `McChrome`, `McChromeBorder`, `McSurface`, `McHover`, `McText`, `McMuted`, `McControlBorder`, `McFocus`, `McAccent`, `McRec`, `McStar` | Palette brushes |
+| `McGood`, `McWarn`, `McBad`, `McChartGrid` | Status colours for data, and chart gridlines |
+| `McFocusRing` | 2px `McFocus` outline just outside a control; set it as `FocusVisualStyle` |
+| `McHeading`, `McSectionLabel`, `McMutedText` | Text styles: a level-2 heading, a muted level-3 section label, trimmed muted text |
+| `McCard` | A raised, bordered `Border` that groups content |
+| `McPillChoice` | A `ListBox` as a wrapping row of single-choice pills; the chosen one fills with `McAccent` |
+| `McPillToggle` | A `ToggleButton` pill, filled with `McAccent` while on |
+| `McStatCard`, `McSmallStat` | Stat tiles on `McTileButton` (value over caption); the small one has no size of its own and reads its tooltip as help text |
 | `McToolButton` | 34x30 icon-font toolbar button |
 | `McButton` | Bordered command button |
 | `McPrimaryButton` | The one emphasized action; re-key `McAccentHover` / set `Background` for a brand colour |
@@ -117,6 +124,7 @@ Merge the theme once, in `App.xaml`:
 | `Controls.AddressBar` | Back/Forward/Reload(/Home) + URL textbox for a WebView2 pane |
 | `Controls.DropdownMenu` | Pinnable action menu driven by a trigger button |
 | `Controls.McBadge` (+ `McTag`) | Outlined state pill: optional icon-font glyph and a word in a state colour; `McTag` is the plain type/category tag |
+| `Controls.McLineChart` | Percent-over-time line chart: time and percent axes, reference lines, per-point segment colours, a dotted projection |
 | `Controls.McModal` (+ `McBackdrop`) | In-window modal dialog: dimmed backdrop, themed card, heading, close button, footer |
 | `Controls.McWindow.DarkTitleBar` | Attached property: asks Windows to draw the window's title bar dark |
 
@@ -157,6 +165,12 @@ It is 6px tall; set `Height` for a thicker bar.
 <ctl:McBadge Style="{StaticResource McTag}" Content="{Binding Type}" />
 ```
 
+`Controls.McLineChart` draws a `McLineChartData`: the time span (`StartUtc`..`EndUtc`), the `Points` (each `McChartPoint` carries the brush of the segment ending at it, `McAccent` by default), an `EndLabel` for the last point's dot, an optional `Projection` drawn dotted from the last point and labelled at its end, and `ReferenceLines` (`McChartReferenceLine.Level` for a target, `.Curve` for a pace line). Without a projection it draws the line as it ended; with no points, just the axes. The percent axis has a gridline every 25% and headroom over the highest point; the time axis labels both ends and every whole local hour between (stepped in UTC, so a clock change never stacks or drops a mark), and the last point's label moves aside rather than run into the projection's. Its brushes are the theme's (`McText`, `McMuted`, `McChartGrid`, `McAccent`); pair it with a caption that says the same in words.
+
+```xml
+<ctl:McLineChart Data="{Binding Utilization}" Height="260" />
+```
+
 Consumers so far: MindAttic.Browser, JobHunt, Prose.Launcher, Prose.Writer, Automata, KdpPublish. MediaButler, ProcessLogger and MindAttic.Log.Reader are still WebView2/Blazor shells with no native WPF chrome, so their UI belongs to the web side, not this package.
 
 ## Building and consuming the .NET package
@@ -181,7 +195,7 @@ Invoke-Pester -Path web/tests/package/pester    # tools/vendor.ps1 (from the rep
 
 `web/tests/package/README.md` describes what each group guards, live mode and the CDN checks.
 
-The WPF package (xUnit, covering `McBadge`, `McModal`, `McProgressBar` and `DropdownMenu`):
+The WPF package (xUnit, covering `McBadge`, `McModal`, `McProgressBar`, `DropdownMenu`, `McTextButton`, `McLineChart` and the building-block styles):
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
@@ -229,7 +243,7 @@ docs/web/                                The web package's bible, stories, asset
 ## Current state
 
 - The web package is live: the four MindAttic.Web sites, MindAttic.Psst and Tutor are built from it.
-- `MindAttic.Components.Wpf` is at 10.0.0 and used by six desktop apps; `McBadge` is its newest control (for the Orchestrator agent board's state pills and subagent type tags).
+- `MindAttic.Components.Wpf` is at 11.0.0 (the Orchestrator's own building blocks and its utilization chart, `McLineChart`, moved into the library) and used by six desktop apps.
 
 ## Roadmap
 
