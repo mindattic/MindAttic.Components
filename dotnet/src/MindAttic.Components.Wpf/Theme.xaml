@@ -3,20 +3,30 @@
                     xmlns:ctl="clr-namespace:MindAttic.Components.Wpf.Controls">
 
     <!-- The MindAttic dark chrome palette. Merge this dictionary into Application.Resources (or a
-         Window's) to pick up every style below, plus an implicit dark ToolTip for the whole app. -->
+         Window's) to pick up every style below, plus an implicit dark ToolTip for the whole app.
+         Every style references these brushes as DynamicResource, so an app can re-key one in its own
+         resources (which win over a merged dictionary) and every library control follows, live; that
+         is how ctl:McHighContrast swaps in the Windows high-contrast colours (M.COMP-T11). -->
     <SolidColorBrush x:Key="McChrome" Color="#FF1E1F24" />
     <SolidColorBrush x:Key="McChromeBorder" Color="#FF34363E" />
     <SolidColorBrush x:Key="McText" Color="#FFE6E6EA" />
     <SolidColorBrush x:Key="McMuted" Color="#FF9A9CA6" />
-    <SolidColorBrush x:Key="McRec" Color="#FFE5484D" />
+    <!-- Recording/alert red, as text or a mark: 4.9:1 or better on every surface here (WCAG 1.4.3;
+         it was #E5484D, 3.6:1 on a card, which every app had to override, M.COMP-T11). The same red as McBad. -->
+    <SolidColorBrush x:Key="McRec" Color="#FFFF7A7D" />
     <SolidColorBrush x:Key="McStar" Color="#FFF5C542" />
     <SolidColorBrush x:Key="McAccent" Color="#FF3B5BDB" />
     <SolidColorBrush x:Key="McAccentHover" Color="#FF2F4AB8" />
+    <!-- Text and marks drawn on an McAccent fill (a primary button, a chosen pill, a hovered tile). -->
+    <SolidColorBrush x:Key="McOnAccent" Color="#FFFFFFFF" />
     <!-- A raised surface (text boxes, bordered buttons) and the hover tint over chrome. -->
     <SolidColorBrush x:Key="McSurface" Color="#FF2A2C33" />
     <SolidColorBrush x:Key="McHover" Color="#FF2D2F37" />
     <!-- Control outlines: 3.1:1 against McChrome, the WCAG 1.4.11 minimum for a component boundary. -->
     <SolidColorBrush x:Key="McControlBorder" Color="#FF6A6C75" />
+    <!-- A text field's outline, which shows where to type: 4.9:1 on McChrome and 4.2:1 on McSurface
+         (WCAG 1.4.11 asks 3:1). McChromeBorder, its old outline, is a decorative 1.2:1 (M.COMP-T11). -->
+    <SolidColorBrush x:Key="McFieldBorder" Color="#FF8A8C96" />
     <!-- Keyboard focus. Every templated control below restores a focus visual, because replacing
          the default template throws the system one away. -->
     <SolidColorBrush x:Key="McFocus" Color="#FF7AB8FF" />
@@ -24,7 +34,7 @@
          colour) without restyling the tile. -->
     <SolidColorBrush x:Key="McTileHover" Color="#FF3B5BDB" />
     <!-- Status colours for data (chart segments, state dots): good, warning and bad. McBad is
-         4.9:1 or better on every surface here, where McRec's #E5484D is 3.6:1 on a card. -->
+         4.9:1 or better on every surface here (McRec is now the same red). -->
     <SolidColorBrush x:Key="McGood" Color="#FF2FBF71" />
     <SolidColorBrush x:Key="McWarn" Color="#FFF5A524" />
     <SolidColorBrush x:Key="McBad" Color="#FFFF7A7D" />
@@ -39,7 +49,7 @@
     <Style x:Key="McToolButton" TargetType="{x:Type Button}">
         <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
         <Setter Property="FontSize" Value="14" />
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Width" Value="34" />
@@ -54,10 +64,10 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource McHover}" />
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource McHover}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="{DynamicResource McFocus}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.35" />
@@ -70,8 +80,8 @@
 
     <!-- A pill-shaped text button (dialog actions: Save / Cancel / Browse...). -->
     <Style x:Key="McTextButton" TargetType="{x:Type Button}">
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
-        <Setter Property="Background" Value="{StaticResource McHover}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
+        <Setter Property="Background" Value="{DynamicResource McHover}" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Padding" Value="14,6" />
         <Setter Property="Margin" Value="6,0,0,0" />
@@ -91,7 +101,7 @@
                             <Setter TargetName="Bg" Property="Opacity" Value="0.85" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bg" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                            <Setter TargetName="Bg" Property="BorderBrush" Value="{DynamicResource McFocus}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.45" />
@@ -105,9 +115,9 @@
     <!-- A bordered dark button: the general-purpose command button (toolbars, command bars, a
          splash screen's retry). -->
     <Style x:Key="McButton" TargetType="{x:Type Button}">
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
-        <Setter Property="Background" Value="{StaticResource McSurface}" />
-        <Setter Property="BorderBrush" Value="{StaticResource McControlBorder}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
+        <Setter Property="Background" Value="{DynamicResource McSurface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource McControlBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="16,7" />
         <Setter Property="FontSize" Value="13" />
@@ -123,16 +133,16 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McHover}" />
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McMuted}" />
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource McHover}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource McMuted}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource McFocus}" />
                             <Setter TargetName="Bd" Property="BorderThickness" Value="2" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McChrome}" />
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McChromeBorder}" />
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource McChrome}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource McChromeBorder}" />
                             <Setter Property="Foreground" Value="#FF7A7C85" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -144,8 +154,8 @@
     <!-- The one emphasized action on a screen. Background and McAccentHover can be re-keyed by an
          app that needs a brand colour (e.g. a LinkedIn-blue Apply). -->
     <Style x:Key="McPrimaryButton" TargetType="{x:Type Button}" BasedOn="{StaticResource McButton}">
-        <Setter Property="Foreground" Value="White" />
-        <Setter Property="Background" Value="{StaticResource McAccent}" />
+        <Setter Property="Foreground" Value="{DynamicResource McOnAccent}" />
+        <Setter Property="Background" Value="{DynamicResource McAccent}" />
         <Setter Property="BorderBrush" Value="#FF8FA3F0" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Template">
@@ -161,7 +171,7 @@
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource McAccentHover}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="White" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource McOnAccent}" />
                             <Setter TargetName="Bd" Property="BorderThickness" Value="2" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
@@ -180,9 +190,9 @@
     <Style x:Key="McTileButton" TargetType="{x:Type Button}">
         <Setter Property="Height" Value="64" />
         <Setter Property="Margin" Value="0,0,0,10" />
-        <Setter Property="Background" Value="{StaticResource McSurface}" />
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
-        <Setter Property="BorderBrush" Value="{StaticResource McControlBorder}" />
+        <Setter Property="Background" Value="{DynamicResource McSurface}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource McControlBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -200,13 +210,13 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Shell" Property="Background" Value="{DynamicResource McTileHover}" />
                             <Setter TargetName="Shell" Property="BorderBrush" Value="{DynamicResource McTileHover}" />
-                            <Setter Property="Foreground" Value="White" />
+                            <Setter Property="Foreground" Value="{DynamicResource McOnAccent}" />
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="Shell" Property="Opacity" Value="0.85" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Shell" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                            <Setter TargetName="Shell" Property="BorderBrush" Value="{DynamicResource McFocus}" />
                             <Setter TargetName="Shell" Property="BorderThickness" Value="2" />
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -218,11 +228,11 @@
     <!-- A tile's second line. Muted at rest; follows the tile's hover up to white so it stays
          readable on the hover fill. -->
     <Style x:Key="McTileSubtitle" TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="{StaticResource McMuted}" />
+        <Setter Property="Foreground" Value="{DynamicResource McMuted}" />
         <Setter Property="FontSize" Value="11" />
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                <Setter Property="Foreground" Value="White" />
+                <Setter Property="Foreground" Value="{DynamicResource McOnAccent}" />
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -234,7 +244,7 @@
         <Setter Property="Control.Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <Border Margin="-3" BorderBrush="{StaticResource McFocus}" BorderThickness="2" CornerRadius="7" SnapsToDevicePixels="True" />
+                    <Border Margin="-3" BorderBrush="{DynamicResource McFocus}" BorderThickness="2" CornerRadius="7" SnapsToDevicePixels="True" />
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -250,14 +260,14 @@
 
     <Style x:Key="McSectionLabel" TargetType="{x:Type TextBlock}">
         <Setter Property="AutomationProperties.HeadingLevel" Value="Level3" />
-        <Setter Property="Foreground" Value="{StaticResource McMuted}" />
+        <Setter Property="Foreground" Value="{DynamicResource McMuted}" />
         <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Margin" Value="0,18,0,8" />
     </Style>
 
     <Style x:Key="McMutedText" TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="{StaticResource McMuted}" />
+        <Setter Property="Foreground" Value="{DynamicResource McMuted}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
@@ -267,7 +277,7 @@
          alone (WCAG 1.4.1 / 2.4.7). Set Command/CommandParameter or NavigateUri per use; a
          BasedOn style can add them, e.g. the Orchestrator's ticket links (M.COMP-T35). -->
     <Style x:Key="McHyperlink" TargetType="{x:Type Hyperlink}">
-        <Setter Property="Foreground" Value="{StaticResource McLink}" />
+        <Setter Property="Foreground" Value="{DynamicResource McLink}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="TextDecorations" Value="{x:Null}" />
         <Style.Triggers>
@@ -278,15 +288,15 @@
                 <Setter Property="TextDecorations" Value="Underline" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
-                <Setter Property="Foreground" Value="{StaticResource McMuted}" />
+                <Setter Property="Foreground" Value="{DynamicResource McMuted}" />
             </Trigger>
         </Style.Triggers>
     </Style>
 
     <!-- A card: a raised, bordered surface that groups related content. -->
     <Style x:Key="McCard" TargetType="{x:Type Border}">
-        <Setter Property="Background" Value="{StaticResource McSurface}" />
-        <Setter Property="BorderBrush" Value="{StaticResource McChromeBorder}" />
+        <Setter Property="Background" Value="{DynamicResource McSurface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource McChromeBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="CornerRadius" Value="6" />
         <Setter Property="Padding" Value="12,10" />
@@ -329,28 +339,28 @@
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
                 <Style TargetType="{x:Type ListBoxItem}">
-                    <Setter Property="Foreground" Value="{StaticResource McText}" />
+                    <Setter Property="Foreground" Value="{DynamicResource McText}" />
                     <Setter Property="Cursor" Value="Hand" />
                     <Setter Property="FocusVisualStyle" Value="{StaticResource McFocusRing}" />
                     <Setter Property="MinHeight" Value="32" />
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                <Border x:Name="Bd" Background="{StaticResource McChrome}" BorderBrush="{StaticResource McControlBorder}"
+                                <Border x:Name="Bd" Background="{DynamicResource McChrome}" BorderBrush="{DynamicResource McControlBorder}"
                                         BorderThickness="1" CornerRadius="14" Padding="14,5" Margin="0,0,6,6">
                                     <ContentPresenter />
                                 </Border>
                                 <ControlTemplate.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter TargetName="Bd" Property="Background" Value="{StaticResource McHover}" />
+                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource McHover}" />
                                     </Trigger>
                                     <Trigger Property="IsKeyboardFocused" Value="True">
-                                        <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                                        <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource McFocus}" />
                                     </Trigger>
                                     <Trigger Property="IsSelected" Value="True">
-                                        <Setter TargetName="Bd" Property="Background" Value="{StaticResource McAccent}" />
-                                        <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McAccent}" />
-                                        <Setter Property="Foreground" Value="White" />
+                                        <Setter TargetName="Bd" Property="Background" Value="{DynamicResource McAccent}" />
+                                        <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource McAccent}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource McOnAccent}" />
                                     </Trigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -362,28 +372,28 @@
     </Style>
 
     <Style x:Key="McPillToggle" TargetType="{x:Type ToggleButton}">
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
         <Setter Property="FocusVisualStyle" Value="{StaticResource McFocusRing}" />
         <Setter Property="MinHeight" Value="32" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Border x:Name="Bd" Background="{StaticResource McSurface}" BorderBrush="{StaticResource McControlBorder}"
+                    <Border x:Name="Bd" Background="{DynamicResource McSurface}" BorderBrush="{DynamicResource McControlBorder}"
                             BorderThickness="1" CornerRadius="14" Padding="14,5">
                         <ContentPresenter VerticalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McHover}" />
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource McHover}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource McFocus}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McAccent}" />
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McAccent}" />
-                            <Setter Property="Foreground" Value="White" />
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource McAccent}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource McAccent}" />
+                            <Setter Property="Foreground" Value="{DynamicResource McOnAccent}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -400,13 +410,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border x:Name="Bd" Background="{StaticResource McControlBorder}" CornerRadius="3" />
+                    <Border x:Name="Bd" Background="{DynamicResource McControlBorder}" CornerRadius="3" />
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McMuted}" />
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource McMuted}" />
                         </Trigger>
                         <Trigger Property="IsDragging" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McText}" />
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource McText}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -483,12 +493,12 @@
          scroll bars follow the box's own HorizontalScrollBarVisibility/VerticalScrollBarVisibility
          (Hidden here), so setting either on a box shows a thin McScrollBar. -->
     <Style x:Key="McTextBox" TargetType="{x:Type TextBox}">
-        <Setter Property="Background" Value="{StaticResource McSurface}" />
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
-        <Setter Property="BorderBrush" Value="{StaticResource McChromeBorder}" />
+        <Setter Property="Background" Value="{DynamicResource McSurface}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource McFieldBorder}" />
         <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="CaretBrush" Value="{StaticResource McText}" />
-        <Setter Property="SelectionBrush" Value="{StaticResource McAccent}" />
+        <Setter Property="CaretBrush" Value="{DynamicResource McText}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource McAccent}" />
         <Setter Property="Padding" Value="6,4" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="HorizontalScrollBarVisibility" Value="Hidden" />
@@ -503,7 +513,7 @@
                         </Border.Resources>
                         <Grid Margin="{TemplateBinding Padding}">
                             <TextBlock x:Name="Placeholder" Text="{TemplateBinding ctl:McTextBox.Placeholder}"
-                                       Foreground="{StaticResource McMuted}" Margin="2,0" IsHitTestVisible="False"
+                                       Foreground="{DynamicResource McMuted}" Margin="2,0" IsHitTestVisible="False"
                                        Visibility="Collapsed" TextWrapping="{TemplateBinding TextWrapping}"
                                        TextTrimming="CharacterEllipsis" TextAlignment="{TemplateBinding TextAlignment}"
                                        VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
@@ -518,10 +528,10 @@
                             <Setter TargetName="Placeholder" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McControlBorder}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource McText}" />
                         </Trigger>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource McFocus}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.5" />
@@ -571,9 +581,9 @@
 
     <!-- A dark, bordered dropdown shell. Pair with McDropdownMenuItem for the items inside it. -->
     <Style x:Key="McDropdownMenu" TargetType="{x:Type ContextMenu}">
-        <Setter Property="Background" Value="{StaticResource McChrome}" />
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
-        <Setter Property="BorderBrush" Value="{StaticResource McChromeBorder}" />
+        <Setter Property="Background" Value="{DynamicResource McChrome}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource McChromeBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="4" />
         <Setter Property="Template">
@@ -592,7 +602,7 @@
          label length) plus a muted InputGestureText column, dimmed when disabled. -->
     <Style x:Key="McDropdownMenuItem" TargetType="{x:Type MenuItem}">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
         <Setter Property="Padding" Value="8,6" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="Template">
@@ -605,13 +615,13 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ContentPresenter Grid.Column="0" ContentSource="Header" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
-                            <TextBlock Grid.Column="1" Text="{TemplateBinding InputGestureText}" Foreground="{StaticResource McMuted}"
+                            <TextBlock Grid.Column="1" Text="{TemplateBinding InputGestureText}" Foreground="{DynamicResource McMuted}"
                                        Margin="16,0,0,0" VerticalAlignment="Center" />
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource McHover}" />
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource McHover}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -625,7 +635,7 @@
     </Style>
 
     <Style x:Key="McSeparator" TargetType="{x:Type Separator}">
-        <Setter Property="Background" Value="{StaticResource McChromeBorder}" />
+        <Setter Property="Background" Value="{DynamicResource McChromeBorder}" />
         <Setter Property="Height" Value="1" />
         <Setter Property="Margin" Value="4,4" />
     </Style>
@@ -636,9 +646,9 @@
          IsIndeterminate sweeps a segment across the track instead, for work with no known end.
          6px tall by default; set Height for a thicker bar. -->
     <Style x:Key="McProgressBar" TargetType="{x:Type ProgressBar}">
-        <Setter Property="Foreground" Value="{StaticResource McAccent}" />
-        <Setter Property="Background" Value="{StaticResource McSurface}" />
-        <Setter Property="BorderBrush" Value="{StaticResource McControlBorder}" />
+        <Setter Property="Foreground" Value="{DynamicResource McAccent}" />
+        <Setter Property="Background" Value="{DynamicResource McSurface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource McControlBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Height" Value="6" />
         <Setter Property="Minimum" Value="0" />
@@ -706,9 +716,9 @@
          close button (PART_CloseButton) sits in the header but comes last in the tree, so tab order
          runs content, footer, close. -->
     <Style TargetType="{x:Type ctl:McModal}">
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
-        <Setter Property="Background" Value="{StaticResource McChrome}" />
-        <Setter Property="BorderBrush" Value="{StaticResource McChromeBorder}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
+        <Setter Property="Background" Value="{DynamicResource McChrome}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource McChromeBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="20,4,20,20" />
         <Setter Property="FontSize" Value="13" />
@@ -773,7 +783,7 @@
          control's automation peer) then the content, all in Foreground, the state colour. The
          outline follows Foreground unless BorderBrush is set. -->
     <Style TargetType="{x:Type ctl:McBadge}">
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
         <Setter Property="BorderBrush" Value="{Binding Foreground, RelativeSource={RelativeSource Self}}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="1" />
@@ -813,13 +823,13 @@
     <!-- Implicit: every Controls.McSpinner (the busy ring that turns on its own thread, so it keeps
          turning while the UI thread is blocked) draws in McAccent unless the host sets Stroke. -->
     <Style TargetType="{x:Type ctl:McSpinner}">
-        <Setter Property="Stroke" Value="{StaticResource McAccent}" />
+        <Setter Property="Stroke" Value="{DynamicResource McAccent}" />
     </Style>
 
     <!-- McBadge's plain tag variant: a squarer, quieter label (a type or category) with a neutral
          outline and normal-weight 11px text, e.g. a subagent's type. -->
     <Style x:Key="McTag" TargetType="{x:Type ctl:McBadge}" BasedOn="{StaticResource {x:Type ctl:McBadge}}">
-        <Setter Property="BorderBrush" Value="{StaticResource McControlBorder}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource McControlBorder}" />
         <Setter Property="CornerRadius" Value="3" />
         <Setter Property="Padding" Value="5,0" />
         <Setter Property="FontSize" Value="11" />
@@ -832,9 +842,9 @@
          (PART_OpenButton, focus ring in McFocus), and a McToolButton (x) on the right dismisses it
          (PART_DismissButton, named "Dismiss: {Title}"). -->
     <Style TargetType="{x:Type ctl:McToast}">
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
-        <Setter Property="Background" Value="{StaticResource McSurface}" />
-        <Setter Property="Accent" Value="{StaticResource McAccent}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
+        <Setter Property="Background" Value="{DynamicResource McSurface}" />
+        <Setter Property="Accent" Value="{DynamicResource McAccent}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FontSize" Value="13" />
         <Setter Property="Width" Value="340" />
@@ -861,7 +871,7 @@
                                         </Border>
                                         <ControlTemplate.Triggers>
                                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                                <Setter TargetName="Ring" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                                                <Setter TargetName="Ring" Property="BorderBrush" Value="{DynamicResource McFocus}" />
                                             </Trigger>
                                         </ControlTemplate.Triggers>
                                     </ControlTemplate>
@@ -870,7 +880,7 @@
                                     <TextBlock x:Name="TitleText" Text="{TemplateBinding Title}" FontWeight="SemiBold"
                                                Foreground="{TemplateBinding Foreground}" TextTrimming="CharacterEllipsis" />
                                     <!-- Exactly two 16px lines, then clipped with an ellipsis. -->
-                                    <TextBlock x:Name="BodyText" Text="{TemplateBinding Body}" Foreground="{StaticResource McMuted}"
+                                    <TextBlock x:Name="BodyText" Text="{TemplateBinding Body}" Foreground="{DynamicResource McMuted}"
                                                FontSize="12" Margin="0,2,0,0" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
                                                LineHeight="16" LineStackingStrategy="BlockLineHeight" MaxHeight="32" />
                                 </StackPanel>
@@ -916,7 +926,7 @@
          scroll viewers, McModal's body) is dark instead of the light system bar. McTextBox and
          McTextArea keep McScrollBar's clear track over their own McSurface. -->
     <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource McScrollBar}">
-        <Setter Property="Background" Value="{StaticResource McChrome}" />
+        <Setter Property="Background" Value="{DynamicResource McChrome}" />
         <Style.Triggers>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.5" />
@@ -939,7 +949,7 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <Rectangle x:Name="Corner" Grid.Column="1" Grid.Row="1" Fill="{StaticResource McChrome}" />
+                        <Rectangle x:Name="Corner" Grid.Column="1" Grid.Row="1" Fill="{DynamicResource McChrome}" />
                         <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Column="0" Grid.Row="0"
                                                 Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}"
                                                 ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -964,9 +974,9 @@
     <!-- Implicit: every ToolTip in an app that merges this dictionary gets the dark chrome look
          automatically, with no per-ToolTip Style reference needed. -->
     <Style TargetType="{x:Type ToolTip}">
-        <Setter Property="Background" Value="{StaticResource McChrome}" />
-        <Setter Property="Foreground" Value="{StaticResource McText}" />
-        <Setter Property="BorderBrush" Value="{StaticResource McChromeBorder}" />
+        <Setter Property="Background" Value="{DynamicResource McChrome}" />
+        <Setter Property="Foreground" Value="{DynamicResource McText}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource McChromeBorder}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Padding" Value="8,5" />
         <Setter Property="HasDropShadow" Value="False" />

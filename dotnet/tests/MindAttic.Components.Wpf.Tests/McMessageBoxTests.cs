@@ -147,8 +147,8 @@ public sealed class McMessageBoxTests
     });
 
     [Fact]
-    public void The_package_is_version_17() =>
-        Assert.Equal(17, typeof(McMessageBox).Assembly.GetName().Version!.Major);
+    public void The_package_is_version_18() =>
+        Assert.Equal(18, typeof(McMessageBox).Assembly.GetName().Version!.Major);
 
     // ---- harness ----
 

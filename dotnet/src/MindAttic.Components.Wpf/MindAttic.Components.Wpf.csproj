@@ -5,7 +5,7 @@
     <UseWPF>true</UseWPF>
     <PackageId>MindAttic.Components.Wpf</PackageId>
     <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
-    <Version>17.0.0</Version>
+    <Version>18.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the
@@ -33,7 +33,12 @@
       the message and OK / OK-Cancel / Yes-No / Yes-No-Cancel buttons, returning MessageBoxResult)
       for prompts when no app window is open to host an McModal.
       McSpinner is a busy ring in McAccent that turns on its own thread, so it keeps turning while
-      the UI thread is blocked.</Description>
+      the UI thread is blocked.
+      MindAttic.Components.Wpf.Mvvm: ObservableObject, RelayCommand, CollectionSync (in-place
+      ReorderTo/SyncBy) and ZoomLevel (80-200% with Ctrl+Plus/Minus/0). McToolTips.KeepOpen makes
+      tooltips stay up until dismissed, and McHighContrast swaps the Windows high-contrast colours
+      into every theme brush live. The palette meets WCAG 2.2 AA by itself: McRec text is 4.5:1 and
+      a text field's McFieldBorder outline 3:1 on every surface.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

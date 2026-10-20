@@ -52,11 +52,12 @@ public sealed class McScrollBarTests
         var viewer = Tall(window);
         var thumb = ((ScrollBar)viewer.Template.FindName("PART_VerticalScrollBar", viewer)).Track.Thumb;
 
-        Brush? Setter(DependencyProperty trigger) => thumb.Template.Triggers.OfType<Trigger>()
+        // The theme refers to its brushes dynamically (M.COMP-T11), so a setter holds the reference; resolve it here.
+        object? Setter(DependencyProperty trigger) => thumb.Template.Triggers.OfType<Trigger>()
             .Where(t => t.Property == trigger && Equals(t.Value, true))
             .SelectMany(t => t.Setters.OfType<Setter>())
             .Where(s => s.TargetName == "Bd" &&s.Property == Border.BackgroundProperty)
-            .Select(s => (Brush)s.Value).SingleOrDefault();
+            .Select(s => s.Value is DynamicResourceExtension d ? window.FindResource(d.ResourceKey) : s.Value).SingleOrDefault();
 
         Assert.Equal(window.FindResource("McMuted"), Setter(UIElement.IsMouseOverProperty));
         Assert.Equal(window.FindResource("McText"), Setter(Thumb.IsDraggingProperty));

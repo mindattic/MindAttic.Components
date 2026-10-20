@@ -2,7 +2,7 @@
 
 The shared design system behind every MindAttic site and desktop app: plain CSS/JS web components and themes served from jsDelivr, and a WPF theme and controls package for the .NET apps.
 
-[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-17.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
+[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-18.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
 
 ![The Cyberspace backdrop component as it renders on mindattic.com: dim circuit-board panels, terminal readouts and a file browser over a dark grid](docs/web/images/cyberspace-backdrop.png)
 
@@ -25,7 +25,7 @@ The repo is organized by toolchain rather than by visual category: a JS bundle a
 - **Site build** (`web/build/`): splices components into the hand-made pages and apps listed in `web/sites.json`, touching nothing outside their marker blocks.
 - **Parity proof** (`web/tests/parity/`): shows a rebuilt page is indistinguishable from its original.
 - **Site assets** (`web/assets/`): each site's logos, icons and images, with a manifest of every served file.
-- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme (palette brushes, button, text box, progress bar and menu styles, tooltips, scroll bars), building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles) and the `AddressBar`, `DropdownMenu`, `McBadge`, `McLineChart`, `McMessageBox`, `McModal`, `McSpinner`, `McToast` / `McToastHost` and `McWindow` controls.
+- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme that meets WCAG 2.2 AA by itself (palette brushes, button, text box, progress bar and menu styles, tooltips, scroll bars) with persistent tooltips and a live high-contrast swap, building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles), MVVM helpers (`ObservableObject`, `RelayCommand`, `CollectionSync`, `ZoomLevel`) and the `AddressBar`, `DropdownMenu`, `McBadge`, `McLineChart`, `McMessageBox`, `McModal`, `McSpinner`, `McToast` / `McToastHost` and `McWindow` controls.
 
 ## Quick start
 
@@ -38,7 +38,7 @@ node web/build/build-sites.mjs mindattic.com                       # rewrite ../
 powershell -File dotnet/tools/publish-wpf.ps1                     # only after the version bump has landed on main
 ```
 
-The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.17.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
+The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.18.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
 
 ## Web components and the MindAttic.Web sites
 
@@ -104,7 +104,8 @@ Merge the theme once, in `App.xaml`:
 
 | Key | What |
 |---|---|
-| `McChrome`, `McChromeBorder`, `McSurface`, `McHover`, `McText`, `McMuted`, `McControlBorder`, `McFocus`, `McAccent`, `McRec`, `McStar` | Palette brushes |
+| `McChrome`, `McChromeBorder`, `McSurface`, `McHover`, `McText`, `McMuted`, `McControlBorder`, `McFocus`, `McAccent`, `McOnAccent`, `McRec`, `McStar` | Palette brushes. `McRec` (red text) is 4.5:1 or better on every surface; `McOnAccent` is text on an `McAccent` fill |
+| `McFieldBorder` | A text field's outline, 3:1 or better on every surface (WCAG 1.4.11; `McTextBox` / `McTextArea` use it), so no app needs a `FieldBorder` override |
 | `McGood`, `McWarn`, `McBad`, `McChartGrid` | Status colours for data, and chart gridlines |
 | `McLink` | Link text: the accent hue lightened to 5.6:1 on `McChrome` (`McAccent` is a fill colour) |
 | `McFocusRing` | 2px `McFocus` outline just outside a control; set it as `FocusVisualStyle` |
@@ -133,10 +134,14 @@ Merge the theme once, in `App.xaml`:
 | `Controls.McModal` (+ `McBackdrop`) | In-window modal dialog: dimmed backdrop, themed card, heading, close button, footer |
 | `Controls.McMessageBox` | Themed `MessageBox.Show` stand-in for prompts with no app window to host an `McModal` |
 | `Controls.McSpinner` | Busy ring in `McAccent` that turns on its own thread, so it keeps turning while the UI thread is blocked |
+| `Controls.McToolTips.KeepOpen()` | Every tooltip stays up until the pointer or focus leaves or Esc is pressed (WCAG 1.4.13) |
+| `Controls.McHighContrast` | Swaps the Windows high-contrast colours into every theme brush, live, and back |
+| `Mvvm.ObservableObject`, `Mvvm.RelayCommand`, `Mvvm.CollectionSync` | View model base (`Set` / `Raise`), delegate command, and in-place `ReorderTo` / `SyncBy` for bound collections |
+| `Mvvm.ZoomLevel` | A window's 80-200% zoom with Ctrl+Plus / Ctrl+Minus / Ctrl+0 (WCAG 1.4.4) |
 | `Controls.McToast`, `Controls.McToastHost` | Notification card (accent stripe, clickable title + two-line body, dismiss button) and the row that stacks and announces them |
 | `Controls.McWindow.DarkTitleBar` | Attached property: asks Windows to draw the window's title bar dark |
 
-Every templated control restores a keyboard-focus outline (`McFocus`). `Controls.DropdownMenu` closes its own popup before invoking an action, so it is never on screen for a screenshot or the start of a recording; see its XML docs.
+Every templated control restores a keyboard-focus outline (`McFocus`). Every style refers to the palette as `DynamicResource`, so re-keying a brush in your own `Application.Resources` (which win over the merged theme) restyles every library control, live. `Controls.DropdownMenu` closes its own popup before invoking an action, so it is never on screen for a screenshot or the start of a recording; see its XML docs.
 
 `Controls.AddressBar` is a themed WPF address bar for a WebView2 pane: `Attach(CoreWebView2?)` binds (or rebinds) it to a live core, Enter navigates with an optional `{query}` search-template fallback, and an optional `NavigationGuard` lets a host veto Back/Forward/Reload/Navigate/Home (e.g. while recording or mid-run) with a reason string surfaced via `NavigationBlocked`.
 
@@ -164,6 +169,35 @@ Esc, the close button and a backdrop click close it (through `CloseCommand` when
 <TextBox Style="{StaticResource McTextArea}" Height="64" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}"
          ctl:McTextBox.Placeholder="Opening prompt (optional)" AutomationProperties.Name="Opening prompt (optional)" />
 <TextBox Style="{StaticResource McTextArea}" IsReadOnly="True" TextWrapping="NoWrap" FontFamily="Consolas" />
+```
+
+The accessibility and MVVM pieces every app used to copy (M.COMP-T11) are one call each in `App`:
+
+```csharp
+public partial class App : Application
+{
+    static App() => McToolTips.KeepOpen(); // tooltips stay until dismissed (1.4.13)
+
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        base.OnStartup(e);
+        // Follow Windows' high-contrast setting live (--high-contrast to check it without changing Windows). Name any
+        // brush keys of the app's own to swap too: backgrounds, text/lines, accents.
+        McHighContrast.Track(this, force: e.Args.Contains("--high-contrast"), foregrounds: ["StateOpen", "StateClosed"]);
+        ...
+    }
+}
+```
+
+`Mvvm.ObservableObject` (`Set(ref field, value)` raises only on a change, `Raise(nameof(Other))` for a computed property), `Mvvm.RelayCommand` (with or without a parameter; `CanExecute` re-asked on `CommandManager.RequerySuggested`) and `Mvvm.CollectionSync` (`ReorderTo` moves rather than re-adds, `SyncBy` reuses rows by key, so focus and selection survive a refresh) replace each app's `Mvvm.cs`. `Mvvm.ZoomLevel` is the window zoom: expose one from the view model, attach it to the window's root and bind its `Text` in the status bar:
+
+```csharp
+public ZoomLevel Zoom { get; } = new(settings.Zoom, z => { settings.Zoom = z; settings.Save(); });
+// MainWindow: vm.Zoom.Attach(RootGrid, this);   scales RootGrid and binds Ctrl+Plus / Ctrl+Minus / Ctrl+0 on the window
+```
+
+```xml
+<TextBlock Text="{Binding Zoom.Text}" ToolTip="Ctrl+0 resets the zoom" />
 ```
 
 `Controls.McMessageBox.Show` is a drop-in for `MessageBox.Show` when there is no app window to put an `McModal` in (startup, setup, an installer step): a small `McChrome` window with a dark title bar, an icon, the message and McButtons, returning a `MessageBoxResult`:
@@ -242,7 +276,7 @@ Invoke-Pester -Path web/tests/package/pester    # tools/vendor.ps1 (from the rep
 
 `web/tests/package/README.md` describes what each group guards, live mode and the CDN checks.
 
-The WPF package (xUnit, covering `McBadge`, `McHyperlink`, `McModal`, `McProgressBar`, `McTextBox` / `McTextArea`, the scroll bars, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost`, `McMessageBox`, `McSpinner` and the building-block styles):
+The WPF package (xUnit, covering the Mvvm helpers, `ZoomLevel`, `McToolTips`, `McHighContrast`, the palette's contrast, `McBadge`, `McHyperlink`, `McModal`, `McProgressBar`, `McTextBox` / `McTextArea`, the scroll bars, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost`, `McMessageBox`, `McSpinner` and the building-block styles):
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
@@ -298,7 +332,7 @@ docs/web/                                The web package's bible, stories, asset
 ## Current state
 
 - The web package is live: the four MindAttic.Web sites, MindAttic.Psst and Tutor are built from it.
-- `MindAttic.Components.Wpf` is at 17.0.0 (adds `McSpinner`, a busy ring in `McAccent` that turns on its own thread so it keeps turning while the UI thread is blocked; 16.0.0 themed every scroll bar: an implicit dark `ScrollBar` based on `McScrollBar` and a `ScrollViewer` with a `McChrome` corner; 15.0.0 added `McMessageBox`, a themed `MessageBox.Show` for prompts with no app window; 14.0.0 added `McTextBox.Placeholder`, the multi-line `McTextArea` and `McScrollBar`; 13.0.0 added the `McHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
+- `MindAttic.Components.Wpf` is at 18.0.0 (adds the shared `Mvvm` helpers and `ZoomLevel`, `McToolTips.KeepOpen`, `McHighContrast`, a WCAG AA palette (`McRec` 4.5:1, `McFieldBorder` 3:1, `McOnAccent`) and dynamic palette references throughout; 17.0.0 added `McSpinner`, a busy ring in `McAccent` that turns on its own thread so it keeps turning while the UI thread is blocked; 16.0.0 themed every scroll bar: an implicit dark `ScrollBar` based on `McScrollBar` and a `ScrollViewer` with a `McChrome` corner; 15.0.0 added `McMessageBox`, a themed `MessageBox.Show` for prompts with no app window; 14.0.0 added `McTextBox.Placeholder`, the multi-line `McTextArea` and `McScrollBar`; 13.0.0 added the `McHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
 
 ## Roadmap
 

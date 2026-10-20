@@ -88,10 +88,14 @@ public sealed class BuildingBlockStyleTests
         try
         {
             Assert.Equal(AutomationHeadingLevel.Level2, AutomationProperties.GetHeadingLevel(heading));
+            // In the window, as in an app: the theme's brushes are dynamic and resolve from the tree (M.COMP-T11).
             var label = new TextBlock { Style = (Style)window.FindResource("McSectionLabel") };
+            var muted = new TextBlock { Style = (Style)window.FindResource("McMutedText") };
+            ((Grid)window.Content).Children.Add(label);
+            ((Grid)window.Content).Children.Add(muted);
+            Pump();
             Assert.Equal(AutomationHeadingLevel.Level3, AutomationProperties.GetHeadingLevel(label));
             Assert.Equal(window.FindResource("McMuted"), label.Foreground);
-            var muted = new TextBlock { Style = (Style)window.FindResource("McMutedText") };
             Assert.Equal(window.FindResource("McMuted"), muted.Foreground);
             Assert.Equal(TextTrimming.CharacterEllipsis, muted.TextTrimming);
         }
@@ -107,6 +111,8 @@ public sealed class BuildingBlockStyleTests
             var ring = (Style)window.FindResource("McFocusRing");
             var template = (ControlTemplate)((Setter)ring.Setters.Single()).Value;
             var outline = (Border)template.LoadContent();
+            ((Grid)window.Content).Children.Add(outline); // its McFocus is dynamic and resolves from the tree (M.COMP-T11)
+            Pump();
             Assert.Equal(new Thickness(2), outline.BorderThickness);
             Assert.Equal(new Thickness(-3), outline.Margin);
             Assert.Equal(((SolidColorBrush)window.FindResource("McFocus")).Color, ((SolidColorBrush)outline.BorderBrush).Color);
