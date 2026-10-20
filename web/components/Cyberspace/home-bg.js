@@ -345,6 +345,10 @@ window.homeBg = (function () {
 
     // ── Public entry point ───────────────────────────────────────────────────
 
+    // Bumped by every apply(), so an image still loading from an earlier call can't finish after a
+    // newer one and overwrite it (or restart the flicker and scan lines on the wrong image).
+    var applyGen = 0;
+
     function apply(imgId, imageUrl) {
         var imgEl = document.getElementById(imgId);
         if (!imgEl) return;
@@ -352,8 +356,10 @@ window.homeBg = (function () {
         stopScanlineAnim();
         stopLightFlicker();
 
+        var gen = ++applyGen;
         var src = new Image();
         src.onload = function () {
+            if (gen !== applyGen) return;
             var dataUrl = renderTorn(src);
             if (dataUrl) { imgEl.src = dataUrl; }
             imgEl.style.opacity = '1';
@@ -365,7 +371,7 @@ window.homeBg = (function () {
                 startScanlineAnim(imgEl);
             });
         };
-        src.onerror = function () { imgEl.style.opacity = '1'; };
+        src.onerror = function () { if (gen === applyGen) imgEl.style.opacity = '1'; };
         src.src = imageUrl;
     }
 
