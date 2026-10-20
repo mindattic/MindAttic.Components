@@ -19,10 +19,19 @@
       box.innerHTML = '';
       box.appendChild(iframe);
       box.style.cursor = 'default';
+      // Once playing the box is no longer a button: another Enter/Space on it (focus stays there
+      // after a keyboard start) would rebuild the iframe and restart the video. Hand focus to the
+      // player instead.
+      box.removeEventListener('click', play);
+      box.removeEventListener('keydown', onKey);
+      box.removeAttribute('role');
+      box.removeAttribute('tabindex');
+      iframe.focus();
+    }
+    function onKey(e){
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); play(); }
     }
     box.addEventListener('click', play);
-    box.addEventListener('keydown', function(e){
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); play(); }
-    });
+    box.addEventListener('keydown', onKey);
   });
 })();
