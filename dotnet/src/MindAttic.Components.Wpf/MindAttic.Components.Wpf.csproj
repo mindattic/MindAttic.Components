@@ -5,7 +5,7 @@
     <UseWPF>true</UseWPF>
     <PackageId>MindAttic.Components.Wpf</PackageId>
     <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
-    <Version>14.0.0</Version>
+    <Version>15.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the
@@ -28,7 +28,10 @@
       McHyperlink styles a Hyperlink in text: the McLink accent, SemiBold, underlined only on hover
       and keyboard focus.
       McTextBox.Placeholder shows muted placeholder text in an empty McTextBox, and McTextArea is
-      the multi-line text box whose thin themed scroll bars show when its text overflows.</Description>
+      the multi-line text box whose thin themed scroll bars show when its text overflows.
+      McMessageBox.Show is a themed stand-in for MessageBox (a dark-title-bar window with an icon,
+      the message and OK / OK-Cancel / Yes-No / Yes-No-Cancel buttons, returning MessageBoxResult)
+      for prompts when no app window is open to host an McModal.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

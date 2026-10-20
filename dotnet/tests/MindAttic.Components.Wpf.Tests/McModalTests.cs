@@ -195,10 +195,6 @@ public sealed class McModalTests
         Assert.Same(outsideLink, Keyboard.FocusedElement);
     });
 
-    [Fact]
-    public void The_package_is_version_14() =>
-        Assert.Equal(14, typeof(McModal).Assembly.GetName().Version!.Major);
-
     // ---- harness ----
 
     private static void Click(UIElement element) =>

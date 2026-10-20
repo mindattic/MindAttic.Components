@@ -2,7 +2,7 @@
 
 The shared design system behind every MindAttic site and desktop app: plain CSS/JS web components and themes served from jsDelivr, and a WPF theme and controls package for the .NET apps.
 
-[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-14.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
+[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-15.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
 
 ![The Cyberspace backdrop component as it renders on mindattic.com: dim circuit-board panels, terminal readouts and a file browser over a dark grid](docs/web/images/cyberspace-backdrop.png)
 
@@ -25,7 +25,7 @@ The repo is organized by toolchain rather than by visual category: a JS bundle a
 - **Site build** (`web/build/`): splices components into the hand-made pages and apps listed in `web/sites.json`, touching nothing outside their marker blocks.
 - **Parity proof** (`web/tests/parity/`): shows a rebuilt page is indistinguishable from its original.
 - **Site assets** (`web/assets/`): each site's logos, icons and images, with a manifest of every served file.
-- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme (palette brushes, button, text box, progress bar and menu styles, tooltips), building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles) and the `AddressBar`, `DropdownMenu`, `McBadge`, `McLineChart`, `McModal`, `McToast` / `McToastHost` and `McWindow` controls.
+- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme (palette brushes, button, text box, progress bar and menu styles, tooltips), building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles) and the `AddressBar`, `DropdownMenu`, `McBadge`, `McLineChart`, `McMessageBox`, `McModal`, `McToast` / `McToastHost` and `McWindow` controls.
 
 ## Quick start
 
@@ -38,7 +38,7 @@ node web/build/build-sites.mjs mindattic.com                       # rewrite ../
 powershell -File dotnet/tools/publish-wpf.ps1                     # only after the version bump has landed on main
 ```
 
-The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.14.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
+The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.15.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
 
 ## Web components and the MindAttic.Web sites
 
@@ -130,6 +130,7 @@ Merge the theme once, in `App.xaml`:
 | `Controls.McBadge` (+ `McTag`) | Outlined state pill: optional icon-font glyph and a word in a state colour; `McTag` is the plain type/category tag |
 | `Controls.McLineChart` | Percent-over-time line chart: time and percent axes, reference lines, per-point segment colours, a dotted projection |
 | `Controls.McModal` (+ `McBackdrop`) | In-window modal dialog: dimmed backdrop, themed card, heading, close button, footer |
+| `Controls.McMessageBox` | Themed `MessageBox.Show` stand-in for prompts with no app window to host an `McModal` |
 | `Controls.McToast`, `Controls.McToastHost` | Notification card (accent stripe, clickable title + two-line body, dismiss button) and the row that stacks and announces them |
 | `Controls.McWindow.DarkTitleBar` | Attached property: asks Windows to draw the window's title bar dark |
 
@@ -162,6 +163,15 @@ Esc, the close button and a backdrop click close it (through `CloseCommand` when
          ctl:McTextBox.Placeholder="Opening prompt (optional)" AutomationProperties.Name="Opening prompt (optional)" />
 <TextBox Style="{StaticResource McTextArea}" IsReadOnly="True" TextWrapping="NoWrap" FontFamily="Consolas" />
 ```
+
+`Controls.McMessageBox.Show` is a drop-in for `MessageBox.Show` when there is no app window to put an `McModal` in (startup, setup, an installer step): a small `McChrome` window with a dark title bar, an icon, the message and McButtons, returning a `MessageBoxResult`:
+
+```csharp
+var choice = McMessageBox.Show("Build the workspace first?", "MindAttic Orchestrator",
+    MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+```
+
+It takes OK, OK/Cancel, Yes/No and Yes/No/Cancel and the Information, Warning, Error and Question icons (each in its theme colour, read out as its severity); an overload takes an owner window to centre on. The first button is the default (Enter, `McPrimaryButton`) unless `defaultResult` names another; Esc and the title bar's X answer Cancel when there is one, otherwise OK or No. It merges `Theme.xaml` itself when the app hasn't, and a box shown before the app has a window of its own neither becomes `Application.MainWindow` nor ends the app when it closes. The window is named by its caption with the message as its help text.
 
 `McProgressBar` styles a stock `ProgressBar`. Determinate fills `Value`'s share of `Minimum..Maximum` (0..100 by default) from the left; `IsIndeterminate="True"` sweeps a segment across the track instead. The fill is the bar's `Foreground` (`McAccent` by default), so a host can bind it, e.g. a budget colour that turns amber then red:
 
@@ -223,7 +233,7 @@ Invoke-Pester -Path web/tests/package/pester    # tools/vendor.ps1 (from the rep
 
 `web/tests/package/README.md` describes what each group guards, live mode and the CDN checks.
 
-The WPF package (xUnit, covering `McBadge`, `McHyperlink`, `McModal`, `McProgressBar`, `McTextBox` / `McTextArea`, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost` and the building-block styles):
+The WPF package (xUnit, covering `McBadge`, `McHyperlink`, `McModal`, `McProgressBar`, `McTextBox` / `McTextArea`, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost`, `McMessageBox` and the building-block styles):
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
@@ -279,7 +289,7 @@ docs/web/                                The web package's bible, stories, asset
 ## Current state
 
 - The web package is live: the four MindAttic.Web sites, MindAttic.Psst and Tutor are built from it.
-- `MindAttic.Components.Wpf` is at 14.0.0 (adds `McTextBox.Placeholder`, the multi-line `McTextArea` and `McScrollBar`; 13.0.0 added the `McHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
+- `MindAttic.Components.Wpf` is at 15.0.0 (adds `McMessageBox`, a themed `MessageBox.Show` for prompts with no app window; 14.0.0 added `McTextBox.Placeholder`, the multi-line `McTextArea` and `McScrollBar`; 13.0.0 added the `McHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
 
 ## Roadmap
 
