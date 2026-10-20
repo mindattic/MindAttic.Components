@@ -339,6 +339,73 @@
         <Setter Property="Margin" Value="4,4" />
     </Style>
 
+    <!-- A thin rounded progress bar: a McSurface track outlined in McControlBorder, filled in the
+         bar's Foreground (McAccent unless the host sets or binds one, e.g. a budget colour that
+         turns amber then red). Determinate fills Value's share of Minimum..Maximum from the left;
+         IsIndeterminate sweeps a segment across the track instead, for work with no known end.
+         6px tall by default; set Height for a thicker bar. -->
+    <Style x:Key="McProgressBar" TargetType="{x:Type ProgressBar}">
+        <Setter Property="Foreground" Value="{StaticResource McAccent}" />
+        <Setter Property="Background" Value="{StaticResource McSurface}" />
+        <Setter Property="BorderBrush" Value="{StaticResource McControlBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Height" Value="6" />
+        <Setter Property="Minimum" Value="0" />
+        <Setter Property="Maximum" Value="100" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ProgressBar}">
+                    <Border x:Name="TrackBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="3" SnapsToDevicePixels="True">
+                        <Grid x:Name="PART_Track" ClipToBounds="True">
+                            <Border x:Name="PART_Indicator" Background="{TemplateBinding Foreground}" CornerRadius="2"
+                                    HorizontalAlignment="Left" />
+                            <!-- The indeterminate sweep: the fill colour seen through a moving opaque band
+                                 of the opacity mask, so it needs no width of its own. -->
+                            <Border x:Name="IndeterminateFill" Background="{TemplateBinding Foreground}" CornerRadius="2"
+                                    Visibility="Collapsed">
+                                <Border.OpacityMask>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <LinearGradientBrush.RelativeTransform>
+                                            <TranslateTransform X="-0.4" />
+                                        </LinearGradientBrush.RelativeTransform>
+                                        <GradientStop Offset="0" Color="Transparent" />
+                                        <GradientStop Offset="0.04" Color="Black" />
+                                        <GradientStop Offset="0.36" Color="Black" />
+                                        <GradientStop Offset="0.4" Color="Transparent" />
+                                        <GradientStop Offset="1" Color="Transparent" />
+                                    </LinearGradientBrush>
+                                </Border.OpacityMask>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsIndeterminate" Value="True">
+                            <Setter TargetName="PART_Indicator" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="IndeterminateFill" Property="Visibility" Value="Visible" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="Sweep">
+                                    <Storyboard RepeatBehavior="Forever">
+                                        <DoubleAnimation Storyboard.TargetName="IndeterminateFill"
+                                                         Storyboard.TargetProperty="(Border.OpacityMask).(Brush.RelativeTransform).(TranslateTransform.X)"
+                                                         From="-0.4" To="1" Duration="0:0:1.4" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <RemoveStoryboard BeginStoryboardName="Sweep" />
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- McModal's backdrop: McChrome's near-black at 60%, dimming whatever is behind the card. -->
     <SolidColorBrush x:Key="McBackdrop" Color="#99000000" />
 

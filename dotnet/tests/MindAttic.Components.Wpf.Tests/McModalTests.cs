@@ -196,8 +196,8 @@ public sealed class McModalTests
     });
 
     [Fact]
-    public void The_package_is_version_8() =>
-        Assert.Equal(8, typeof(McModal).Assembly.GetName().Version!.Major);
+    public void The_package_is_version_9() =>
+        Assert.Equal(9, typeof(McModal).Assembly.GetName().Version!.Major);
 
     // ---- harness ----
 
