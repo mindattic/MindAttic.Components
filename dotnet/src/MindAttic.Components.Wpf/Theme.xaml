@@ -391,7 +391,96 @@
         </Setter>
     </Style>
 
-    <!-- A dark single-line text box with hover and focus outlines. -->
+    <!-- A thin dark scroll bar: a McControlBorder thumb (McMuted while hovered or dragged) on a
+         clear track, no arrow buttons. The text box styles below use it; base an implicit
+         ScrollBar style on it in any ScrollViewer's resources to use it elsewhere. -->
+    <Style x:Key="McScrollBarThumb" TargetType="{x:Type Thumb}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Border x:Name="Bd" Background="{StaticResource McControlBorder}" CornerRadius="3" />
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McMuted}" />
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McMuted}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="McScrollBarPage" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Border Background="Transparent" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="McScrollBar" TargetType="{x:Type ScrollBar}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Width" Value="10" />
+        <Setter Property="MinWidth" Value="10" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollBar}">
+                    <Border Background="{TemplateBinding Background}" Padding="2">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource McScrollBarPage}" Command="ScrollBar.PageUpCommand" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource McScrollBarPage}" Command="ScrollBar.PageDownCommand" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource McScrollBarThumb}" MinHeight="16" />
+                            </Track.Thumb>
+                        </Track>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="Width" Value="Auto" />
+                <Setter Property="MinWidth" Value="0" />
+                <Setter Property="Height" Value="10" />
+                <Setter Property="MinHeight" Value="10" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ScrollBar}">
+                            <Border Background="{TemplateBinding Background}" Padding="2">
+                                <Track x:Name="PART_Track">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Style="{StaticResource McScrollBarPage}" Command="ScrollBar.PageLeftCommand" />
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Style="{StaticResource McScrollBarPage}" Command="ScrollBar.PageRightCommand" />
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb Style="{StaticResource McScrollBarThumb}" MinWidth="16" />
+                                    </Track.Thumb>
+                                </Track>
+                            </Border>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- A dark single-line text box with hover and focus outlines. ctl:McTextBox.Placeholder shows
+         muted text while it's empty (not hit-testable, not part of the accessible name). Its
+         scroll bars follow the box's own HorizontalScrollBarVisibility/VerticalScrollBarVisibility
+         (Hidden here), so setting either on a box shows a thin McScrollBar. -->
     <Style x:Key="McTextBox" TargetType="{x:Type TextBox}">
         <Setter Property="Background" Value="{StaticResource McSurface}" />
         <Setter Property="Foreground" Value="{StaticResource McText}" />
@@ -401,16 +490,32 @@
         <Setter Property="SelectionBrush" Value="{StaticResource McAccent}" />
         <Setter Property="Padding" Value="6,4" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Hidden" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Hidden" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBox}">
                     <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" SnapsToDevicePixels="True">
-                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" Focusable="False"
-                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
-                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        <Border.Resources>
+                            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource McScrollBar}" />
+                        </Border.Resources>
+                        <Grid Margin="{TemplateBinding Padding}">
+                            <TextBlock x:Name="Placeholder" Text="{TemplateBinding ctl:McTextBox.Placeholder}"
+                                       Foreground="{StaticResource McMuted}" Margin="2,0" IsHitTestVisible="False"
+                                       Visibility="Collapsed" TextWrapping="{TemplateBinding TextWrapping}"
+                                       TextTrimming="CharacterEllipsis" TextAlignment="{TemplateBinding TextAlignment}"
+                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="False"
+                                          HorizontalScrollBarVisibility="{TemplateBinding HorizontalScrollBarVisibility}"
+                                          VerticalScrollBarVisibility="{TemplateBinding VerticalScrollBarVisibility}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="Text" Value="">
+                            <Setter TargetName="Placeholder" Property="Visibility" Value="Visible" />
+                        </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource McControlBorder}" />
                         </Trigger>
@@ -424,6 +529,17 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <!-- A multi-line McTextBox: Enter adds a line, text wraps and starts at the top, and a thin
+         McScrollBar shows whenever the text overflows. Set TextWrapping="NoWrap" for a log; the
+         horizontal bar then shows for long lines. Give it a Height (or a row to fill). -->
+    <Style x:Key="McTextArea" TargetType="{x:Type TextBox}" BasedOn="{StaticResource McTextBox}">
+        <Setter Property="AcceptsReturn" Value="True" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
     </Style>
 
     <!-- A small icon-font toggle (pin/unpin) meant to sit inside a McDropdownMenuItem's header. -->

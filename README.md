@@ -2,7 +2,7 @@
 
 The shared design system behind every MindAttic site and desktop app: plain CSS/JS web components and themes served from jsDelivr, and a WPF theme and controls package for the .NET apps.
 
-[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-13.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
+[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-14.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
 
 ![The Cyberspace backdrop component as it renders on mindattic.com: dim circuit-board panels, terminal readouts and a file browser over a dark grid](docs/web/images/cyberspace-backdrop.png)
 
@@ -38,7 +38,7 @@ node web/build/build-sites.mjs mindattic.com                       # rewrite ../
 powershell -File dotnet/tools/publish-wpf.ps1                     # only after the version bump has landed on main
 ```
 
-The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.13.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
+The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.14.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
 
 ## Web components and the MindAttic.Web sites
 
@@ -119,7 +119,9 @@ Merge the theme once, in `App.xaml`:
 | `McPrimaryButton` | The one emphasized action; re-key `McAccentHover` / set `Background` for a brand colour |
 | `McTextButton` | Borderless dialog button; content is centred unless you set `HorizontalContentAlignment` / `VerticalContentAlignment` (e.g. `Left` for a fill-width link) |
 | `McTileButton` + `McTileSubtitle` | Launcher tile; re-key `McTileHover` for a brand colour |
-| `McTextBox` | Dark text box |
+| `McTextBox` | Dark single-line text box; `Controls.McTextBox.Placeholder` shows muted text while it's empty |
+| `McTextArea` | Multi-line `McTextBox` (Enter adds a line, wraps, top-aligned) whose thin scroll bars show when the text overflows |
+| `McScrollBar` | Thin dark `ScrollBar` (the text boxes use it); base an implicit `ScrollBar` style on it to use it elsewhere |
 | `McProgressBar` | Thin rounded `ProgressBar`: `McSurface` track, `McControlBorder` outline, `Foreground` fill; determinate or indeterminate |
 | `McDropdownMenu`, `McDropdownMenuItem`, `McSeparator`, `McPinToggle` | Dropdown parts (used by `DropdownMenu`) |
 | *(implicit)* `ToolTip` | Every tooltip in the app |
@@ -150,6 +152,16 @@ Every templated control restores a keyboard-focus outline (`McFocus`). `Controls
 ```
 
 Esc, the close button and a backdrop click close it (through `CloseCommand` when set, e.g. a view model whose open flag is read-only, otherwise by clearing `IsOpen`). While open, Tab cycles inside the card, access keys are scoped to it and focus can't be moved out; on close focus goes back to where it was. The title is a level-2 heading and the dialog's accessible name (unless `AutomationProperties.Name` is set), and UI Automation sees it as a dialog window. `Opened` and `Closed` are raised after each change.
+
+`ctl:McTextBox.Placeholder` on a `TextBox` styled `McTextBox` or `McTextArea` shows that text in `McMuted` while the box is empty, so a host no longer overlays its own `TextBlock`. It ignores the mouse (a click on it lands in the box) and is not part of the box's accessible name, so still set `AutomationProperties.Name`. `McTextArea` is the multi-line box: `AcceptsReturn`, wrapping, text from the top, and `McScrollBar`s that show when the text overflows. Set `TextWrapping="NoWrap"` (e.g. a read-only log) and the horizontal bar shows for long lines too. `McTextBox` hides its scroll bars unless the box sets `VerticalScrollBarVisibility` / `HorizontalScrollBarVisibility` itself.
+
+```xml
+<TextBox Style="{StaticResource McTextBox}" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"
+         ctl:McTextBox.Placeholder="Search repos and tickets   Ctrl+F" AutomationProperties.Name="Search repos and tickets" />
+<TextBox Style="{StaticResource McTextArea}" Height="64" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}"
+         ctl:McTextBox.Placeholder="Opening prompt (optional)" AutomationProperties.Name="Opening prompt (optional)" />
+<TextBox Style="{StaticResource McTextArea}" IsReadOnly="True" TextWrapping="NoWrap" FontFamily="Consolas" />
+```
 
 `McProgressBar` styles a stock `ProgressBar`. Determinate fills `Value`'s share of `Minimum..Maximum` (0..100 by default) from the left; `IsIndeterminate="True"` sweeps a segment across the track instead. The fill is the bar's `Foreground` (`McAccent` by default), so a host can bind it, e.g. a budget colour that turns amber then red:
 
@@ -211,7 +223,7 @@ Invoke-Pester -Path web/tests/package/pester    # tools/vendor.ps1 (from the rep
 
 `web/tests/package/README.md` describes what each group guards, live mode and the CDN checks.
 
-The WPF package (xUnit, covering `McBadge`, `McHyperlink`, `McModal`, `McProgressBar`, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost` and the building-block styles):
+The WPF package (xUnit, covering `McBadge`, `McHyperlink`, `McModal`, `McProgressBar`, `McTextBox` / `McTextArea`, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost` and the building-block styles):
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
@@ -267,7 +279,7 @@ docs/web/                                The web package's bible, stories, asset
 ## Current state
 
 - The web package is live: the four MindAttic.Web sites, MindAttic.Psst and Tutor are built from it.
-- `MindAttic.Components.Wpf` is at 13.0.0 (adds the `McHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
+- `MindAttic.Components.Wpf` is at 14.0.0 (adds `McTextBox.Placeholder`, the multi-line `McTextArea` and `McScrollBar`; 13.0.0 added the `McHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
 
 ## Roadmap
 
