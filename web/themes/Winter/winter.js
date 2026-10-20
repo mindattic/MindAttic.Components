@@ -80,7 +80,12 @@ function createWinterLayer() {
     snowSVG.setAttribute('viewBox', `0 0 ${w} ${h}`);
   }
   updateSVGViewBox();
-  const resizeH = ()=>updateSVGViewBox();
+  // stopFX() removes the SVG without calling cleanup(), so the listener drops itself once its SVG
+  // is gone; otherwise every Winter start would leave one more behind.
+  const resizeH = ()=>{
+    if (!snowSVG.isConnected) { window.removeEventListener('resize', resizeH); return; }
+    updateSVGViewBox();
+  };
   window.addEventListener('resize', resizeH);
 
   function buildSnowPath(heights, offsetY) {
