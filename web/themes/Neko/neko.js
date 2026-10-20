@@ -195,11 +195,12 @@ const NEKO_SPRITE_COUNT = 32;
       };
       document.addEventListener("mousemove", this._mouseMoveHandler);
 
-      // Update bounds on resize
-      window.addEventListener("resize", () => {
+      // Update bounds on resize (kept so destroy() can remove it)
+      this._resizeHandler = () => {
         this.boundsWidth = document.documentElement.clientWidth - SPRITE_SIZE;
         this.boundsHeight = window.innerHeight - SPRITE_SIZE;
-      });
+      };
+      window.addEventListener("resize", this._resizeHandler);
 
       // Use provided start position, or random if not given
       if (this.x === 0 && this.y === 0) {
@@ -759,6 +760,9 @@ const NEKO_SPRITE_COUNT = 32;
     destroy() {
       if (this._mouseMoveHandler) {
         document.removeEventListener("mousemove", this._mouseMoveHandler);
+      }
+      if (this._resizeHandler) {
+        window.removeEventListener("resize", this._resizeHandler);
       }
       if (this.element && this.element.parentNode) {
         this.element.parentNode.removeChild(this.element);
