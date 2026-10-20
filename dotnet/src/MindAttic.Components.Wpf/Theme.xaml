@@ -1,5 +1,6 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ctl="clr-namespace:MindAttic.Components.Wpf.Controls">
 
     <!-- The MindAttic dark chrome palette. Merge this dictionary into Application.Resources (or a
          Window's) to pick up every style below, plus an implicit dark ToolTip for the whole app. -->
@@ -333,6 +334,77 @@
         <Setter Property="Background" Value="{StaticResource McChromeBorder}" />
         <Setter Property="Height" Value="1" />
         <Setter Property="Margin" Value="4,4" />
+    </Style>
+
+    <!-- McModal's backdrop: McChrome's near-black at 60%, dimming whatever is behind the card. -->
+    <SolidColorBrush x:Key="McBackdrop" Color="#99000000" />
+
+    <!-- Implicit: the look of every Controls.McModal. A dimmed backdrop (PART_Backdrop) fills the
+         host; on it a centred card (PART_Card) with a drop shadow drawn by a sibling border, so the
+         card's own text isn't rendered through the effect. The title is a level-2 heading; the
+         close button (PART_CloseButton) sits in the header but comes last in the tree, so tab order
+         runs content, footer, close. -->
+    <Style TargetType="{x:Type ctl:McModal}">
+        <Setter Property="Foreground" Value="{StaticResource McText}" />
+        <Setter Property="Background" Value="{StaticResource McChrome}" />
+        <Setter Property="BorderBrush" Value="{StaticResource McChromeBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="20,4,20,20" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Panel.ZIndex" Value="1000" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:McModal}">
+                    <Grid>
+                        <Border x:Name="PART_Backdrop" Background="{DynamicResource McBackdrop}" />
+                        <Grid MaxWidth="{TemplateBinding DialogWidth}" Margin="24" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                            <Border Background="{TemplateBinding Background}" CornerRadius="8">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="28" ShadowDepth="6" Direction="270" Opacity="0.55" Color="Black" />
+                                </Border.Effect>
+                            </Border>
+                            <Border x:Name="PART_Card" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8" SnapsToDevicePixels="True"
+                                    KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle"
+                                    KeyboardNavigation.DirectionalNavigation="Contained">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock x:Name="TitleText" Grid.Row="0" Text="{TemplateBinding Title}" FontSize="17" FontWeight="SemiBold"
+                                               Foreground="{TemplateBinding Foreground}" TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center" Margin="20,14,52,10"
+                                               AutomationProperties.HeadingLevel="Level2" />
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                                                  Focusable="False">
+                                        <ContentPresenter Margin="{TemplateBinding Padding}" />
+                                    </ScrollViewer>
+                                    <Border x:Name="FooterArea" Grid.Row="2" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0,1,0,0"
+                                            Padding="20,12">
+                                        <ContentPresenter Content="{TemplateBinding Footer}" HorizontalAlignment="Right" />
+                                    </Border>
+                                    <Button x:Name="PART_CloseButton" Grid.Row="0" Style="{StaticResource McToolButton}" Content="&#xE711;"
+                                            FontSize="12" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,10,10,0"
+                                            AutomationProperties.Name="Close" ToolTip="Close" />
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Footer" Value="{x:Null}">
+                            <Setter TargetName="FooterArea" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Title" Value="">
+                            <Setter TargetName="TitleText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- Implicit: every ToolTip in an app that merges this dictionary gets the dark chrome look

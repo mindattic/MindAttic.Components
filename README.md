@@ -146,6 +146,7 @@ Merge the theme once, in `App.xaml`:
 | `McDropdownMenu`, `McDropdownMenuItem`, `McSeparator`, `McPinToggle` | Dropdown parts (used by `DropdownMenu`) |
 | *(implicit)* `ToolTip` | Every tooltip in the app |
 | `Controls.AddressBar` | Back/Forward/Reload(/Home) + URL textbox for a WebView2 pane |
+| `Controls.McModal` (+ `McBackdrop`) | In-window modal dialog: dimmed backdrop, themed card, heading, close button, footer |
 
 Every templated control restores a keyboard-focus outline (`McFocus`). `Controls.DropdownMenu` is a
 pinnable action menu driven by a trigger button; see its XML docs.
@@ -154,6 +155,28 @@ pinnable action menu driven by a trigger button; see its XML docs.
 (or rebinds) it to a live core, Enter navigates with an optional `{query}` search-template fallback,
 and an optional `NavigationGuard` lets a host veto Back/Forward/Reload/Navigate/Home (e.g. while
 recording or mid-run) with a reason string surfaced via `NavigationBlocked`.
+
+`Controls.McModal` is an in-window modal dialog. Put it last in the window's root `Grid`, spanning
+every row and column, and bind `IsOpen` (two-way by default):
+
+```xml
+<ctl:McModal IsOpen="{Binding IsSettingsOpen}" Title="Settings" DialogWidth="520"
+             Grid.RowSpan="3" Grid.ColumnSpan="2">
+    <StackPanel>...</StackPanel>
+    <ctl:McModal.Footer>
+        <Button Style="{StaticResource McPrimaryButton}" Content="Done" Command="{Binding ToggleSettingsCommand}" />
+    </ctl:McModal.Footer>
+</ctl:McModal>
+```
+
+Esc, the close button and a backdrop click close it (through `CloseCommand` when set, e.g. a view
+model whose open flag is read-only, otherwise by clearing `IsOpen`). While open, Tab cycles inside
+the card, access keys are scoped to it and focus can't be moved out; on close focus goes back to
+where it was. The title is a level-2 heading and the dialog's accessible name (unless
+`AutomationProperties.Name` is set), and UI Automation sees it as a dialog window. `Opened` and
+`Closed` are raised after each change.
+
+Tests: `dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests`.
 
 Consumers so far: MindAttic.Browser, JobHunt, Prose.Launcher, Prose.Writer, Automata, KdpPublish.
 MediaButler, ProcessLogger and MindAttic.Log.Reader are still WebView2/Blazor shells with no native
