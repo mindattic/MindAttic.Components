@@ -227,7 +227,6 @@ public sealed class McModalTests
 
         public Host()
         {
-            _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// outside an Application
             Modal = new McModal
             {
                 Title = "Settings",
@@ -237,21 +236,9 @@ public sealed class McModalTests
             var root = new Grid();
             root.Children.Add(Outside);
             root.Children.Add(Modal);
-            // M.COMP-T28: the window is real (focus, layout and input need an HwndSource) but it
-            // never appears or activates: it sits far off-screen, borderless, out of the taskbar,
-            // and is shown without activation, so dotnet test never steals the user's keyboard.
-            Window = new Window
-            {
-                Width = 800, Height = 600, Left = -20000, Top = -20000,
-                WindowStyle = WindowStyle.None, ShowInTaskbar = false, ShowActivated = false,
-                WindowStartupLocation = WindowStartupLocation.Manual,
-                Content = root,
-            };
-            Window.Resources.MergedDictionaries.Add(new ResourceDictionary
-            {
-                Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
-            });
-            Window.Show();
+            // M.COMP-T28/T39: the window is real (focus, layout and input need an HwndSource) but it
+            // never appears or activates, so dotnet test never steals the user's keyboard.
+            Window = OffScreenWindow.Show(800, 600, root);
             Pump();
         }
 

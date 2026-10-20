@@ -118,21 +118,9 @@ public sealed class BuildingBlockStyleTests
 
     private static Window Show(FrameworkElement element, string styleKey)
     {
-        _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// outside an Application
-        // M.COMP-T28: off-screen, borderless, out of the taskbar and never activated.
-        var window = new Window
-        {
-            Width = 600, Height = 300, Left = -20000, Top = -20000,
-            WindowStyle = WindowStyle.None, ShowInTaskbar = false, ShowActivated = false,
-            WindowStartupLocation = WindowStartupLocation.Manual,
-            Content = new Grid { Children = { element } },
-        };
-        window.Resources.MergedDictionaries.Add(new ResourceDictionary
-        {
-            Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
-        });
+        var window = OffScreenWindow.Create(600, 300, new Grid { Children = { element } });
         element.Style = (Style)window.FindResource(styleKey);
-        window.Show();
+        OffScreenWindow.Show(window);
         Pump();
         return window;
     }

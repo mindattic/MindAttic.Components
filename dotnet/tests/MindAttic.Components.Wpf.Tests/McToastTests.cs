@@ -229,20 +229,7 @@ public sealed class McToastTests
 
         public Host()
         {
-            _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// outside an Application
-            // M.COMP-T28: off-screen, borderless, out of the taskbar and never activated.
-            Window = new Window
-            {
-                Width = 800, Height = 600, Left = -20000, Top = -20000,
-                WindowStyle = WindowStyle.None, ShowInTaskbar = false, ShowActivated = false,
-                WindowStartupLocation = WindowStartupLocation.Manual,
-                Content = Root,
-            };
-            Window.Resources.MergedDictionaries.Add(new ResourceDictionary
-            {
-                Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
-            });
-            Window.Show();
+            Window = OffScreenWindow.Show(800, 600, Root);
             Pump();
         }
 

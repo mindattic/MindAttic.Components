@@ -93,22 +93,10 @@ public sealed class McProgressBarTests
             Window? window = null;
             try
             {
-                _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// outside an Application
-                // M.COMP-T28: a real window for layout, but far off-screen, borderless, out of the
-                // taskbar and shown without activation, so dotnet test never steals the keyboard.
-                window = new Window
-                {
-                    Width = 400, Height = 200, Left = -20000, Top = -20000,
-                    WindowStyle = WindowStyle.None, ShowInTaskbar = false, ShowActivated = false,
-                    WindowStartupLocation = WindowStartupLocation.Manual,
-                };
-                window.Resources.MergedDictionaries.Add(new ResourceDictionary
-                {
-                    Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
-                });
+                window = OffScreenWindow.Create(400, 200);
                 var bar = new ProgressBar { Width = 300, Style = (Style)window.FindResource("McProgressBar") };
                 window.Content = new StackPanel { Children = { bar } };
-                window.Show();
+                OffScreenWindow.Show(window);
                 Pump();
                 test(window, bar);
             }

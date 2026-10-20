@@ -16,22 +16,12 @@ public sealed class DropdownMenuTests
     [Fact]
     public void After_the_menu_closes_on_its_own_the_next_trigger_click_reopens_it() => Sta(() =>
     {
-        _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// outside an Application
         var trigger = new Button { Content = "Menu" };
-        var window = new Window
-        {
-            Width = 400, Height = 300, Left = 0, Top = 0, ShowInTaskbar = false,
-            WindowStartupLocation = WindowStartupLocation.Manual,
-            Content = new Grid { Children = { trigger } },
-        };
-        window.Resources.MergedDictionaries.Add(new ResourceDictionary
-        {
-            Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
-        });
+        // M.COMP-T39: off-screen and never activated, like every test window.
+        var window = OffScreenWindow.Create(400, 300, new Grid { Children = { trigger } });
         try
         {
-            window.Show();
-            window.Activate();
+            OffScreenWindow.Show(window);
             Pump();
             var dropdown = new DropdownMenu(trigger,
                 () => [new DropdownAction("a", "Action", "", "Action", (_, _) => { })],

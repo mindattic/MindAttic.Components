@@ -49,23 +49,11 @@ public sealed class McTextButtonTests
 
     private static (Window, Button) Show(Action<Button>? configure)
     {
-        _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// outside an Application
         var button = new Button { Content = "short", HorizontalAlignment = HorizontalAlignment.Stretch, Width = 400 };
-        // M.COMP-T28: off-screen, borderless, out of the taskbar and never activated.
-        var window = new Window
-        {
-            Width = 600, Height = 200, Left = -20000, Top = -20000,
-            WindowStyle = WindowStyle.None, ShowInTaskbar = false, ShowActivated = false,
-            WindowStartupLocation = WindowStartupLocation.Manual,
-            Content = new Grid { Children = { button } },
-        };
-        window.Resources.MergedDictionaries.Add(new ResourceDictionary
-        {
-            Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
-        });
+        var window = OffScreenWindow.Create(600, 200, new Grid { Children = { button } });
         button.Style = (Style)window.FindResource("McTextButton");
         configure?.Invoke(button);
-        window.Show();
+        OffScreenWindow.Show(window);
         Pump();
         return (window, button);
     }

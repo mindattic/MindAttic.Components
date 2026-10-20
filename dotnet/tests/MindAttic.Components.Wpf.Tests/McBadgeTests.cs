@@ -119,21 +119,7 @@ public sealed class McBadgeTests
 
         public Host()
         {
-            _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// outside an Application
-            // M.COMP-T28: a real window (templates and layout need one) that never appears or
-            // activates: far off-screen, borderless, out of the taskbar, shown without activation.
-            Window = new Window
-            {
-                Width = 400, Height = 200, Left = -20000, Top = -20000,
-                WindowStyle = WindowStyle.None, ShowInTaskbar = false, ShowActivated = false,
-                WindowStartupLocation = WindowStartupLocation.Manual,
-                Content = _root,
-            };
-            Window.Resources.MergedDictionaries.Add(new ResourceDictionary
-            {
-                Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
-            });
-            Window.Show();
+            Window = OffScreenWindow.Show(400, 200, _root);
             Pump();
         }
 

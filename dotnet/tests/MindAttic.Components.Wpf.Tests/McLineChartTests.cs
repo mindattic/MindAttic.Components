@@ -185,21 +185,8 @@ public sealed class McLineChartTests
 
     private static (Window, McLineChart) Show(McLineChartData? data)
     {
-        _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// outside an Application
         var chart = new McLineChart { Data = data, Height = 260 };
-        // M.COMP-T28: off-screen, borderless, out of the taskbar and never activated.
-        var window = new Window
-        {
-            Width = 1400, Height = 300, Left = -20000, Top = -20000,
-            WindowStyle = WindowStyle.None, ShowInTaskbar = false, ShowActivated = false,
-            WindowStartupLocation = WindowStartupLocation.Manual,
-            Content = new Grid { Children = { chart } },
-        };
-        window.Resources.MergedDictionaries.Add(new ResourceDictionary
-        {
-            Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
-        });
-        window.Show();
+        var window = OffScreenWindow.Show(1400, 300, new Grid { Children = { chart } });
         Pump();
         return (window, chart);
     }
