@@ -28,6 +28,9 @@
     <SolidColorBrush x:Key="McGood" Color="#FF2FBF71" />
     <SolidColorBrush x:Key="McWarn" Color="#FFF5A524" />
     <SolidColorBrush x:Key="McBad" Color="#FFFF7A7D" />
+    <!-- McHyperlink's text: the accent hue lightened for reading, 5.6:1 on McChrome and 4.9:1 on
+         McSurface (McAccent itself is a fill colour, under 3:1 as text). -->
+    <SolidColorBrush x:Key="McLink" Color="#FF7A93F0" />
     <!-- McLineChart's gridlines and hour ticks. -->
     <SolidColorBrush x:Key="McChartGrid" Color="#FF696969" />
 
@@ -257,6 +260,27 @@
         <Setter Property="Foreground" Value="{StaticResource McMuted}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+
+    <!-- A link inside text (a ticket id, a doc reference): McLink, SemiBold, no underline at rest
+         and underlined on hover and on keyboard focus, so focus shows without relying on colour
+         alone (WCAG 1.4.1 / 2.4.7). Set Command/CommandParameter or NavigateUri per use; a
+         BasedOn style can add them, e.g. the Orchestrator's ticket links (M.COMP-T35). -->
+    <Style x:Key="McHyperlink" TargetType="{x:Type Hyperlink}">
+        <Setter Property="Foreground" Value="{StaticResource McLink}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="TextDecorations" Value="{x:Null}" />
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="TextDecorations" Value="Underline" />
+            </Trigger>
+            <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter Property="TextDecorations" Value="Underline" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{StaticResource McMuted}" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- A card: a raised, bordered surface that groups related content. -->

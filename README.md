@@ -2,7 +2,7 @@
 
 The shared design system behind every MindAttic site and desktop app: plain CSS/JS web components and themes served from jsDelivr, and a WPF theme and controls package for the .NET apps.
 
-[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-12.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
+[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-13.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
 
 ![The Cyberspace backdrop component as it renders on mindattic.com: dim circuit-board panels, terminal readouts and a file browser over a dark grid](docs/web/images/cyberspace-backdrop.png)
 
@@ -38,7 +38,7 @@ node web/build/build-sites.mjs mindattic.com                       # rewrite ../
 powershell -File dotnet/tools/publish-wpf.ps1                     # only after the version bump has landed on main
 ```
 
-The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.12.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
+The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.13.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
 
 ## Web components and the MindAttic.Web sites
 
@@ -106,8 +106,10 @@ Merge the theme once, in `App.xaml`:
 |---|---|
 | `McChrome`, `McChromeBorder`, `McSurface`, `McHover`, `McText`, `McMuted`, `McControlBorder`, `McFocus`, `McAccent`, `McRec`, `McStar` | Palette brushes |
 | `McGood`, `McWarn`, `McBad`, `McChartGrid` | Status colours for data, and chart gridlines |
+| `McLink` | Link text: the accent hue lightened to 5.6:1 on `McChrome` (`McAccent` is a fill colour) |
 | `McFocusRing` | 2px `McFocus` outline just outside a control; set it as `FocusVisualStyle` |
 | `McHeading`, `McSectionLabel`, `McMutedText` | Text styles: a level-2 heading, a muted level-3 section label, trimmed muted text |
+| `McHyperlink` | A `Hyperlink` in text: `McLink`, SemiBold, no underline at rest, underlined on hover and keyboard focus, `McMuted` when disabled. Base a style on it to add a `Command` (e.g. the Orchestrator's ticket ids) |
 | `McCard` | A raised, bordered `Border` that groups content |
 | `McPillChoice` | A `ListBox` as a wrapping row of single-choice pills; the chosen one fills with `McAccent` |
 | `McPillToggle` | A `ToggleButton` pill, filled with `McAccent` while on |
@@ -209,7 +211,7 @@ Invoke-Pester -Path web/tests/package/pester    # tools/vendor.ps1 (from the rep
 
 `web/tests/package/README.md` describes what each group guards, live mode and the CDN checks.
 
-The WPF package (xUnit, covering `McBadge`, `McModal`, `McProgressBar`, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost` and the building-block styles):
+The WPF package (xUnit, covering `McBadge`, `McHyperlink`, `McModal`, `McProgressBar`, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost` and the building-block styles):
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
@@ -265,7 +267,7 @@ docs/web/                                The web package's bible, stories, asset
 ## Current state
 
 - The web package is live: the four MindAttic.Web sites, MindAttic.Psst and Tutor are built from it.
-- `MindAttic.Components.Wpf` is at 12.0.0 (adds `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
+- `MindAttic.Components.Wpf` is at 13.0.0 (adds the `McHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
 
 ## Roadmap
 
