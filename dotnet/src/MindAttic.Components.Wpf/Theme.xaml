@@ -810,6 +810,12 @@
         </Setter>
     </Style>
 
+    <!-- Implicit: every Controls.McSpinner (the busy ring that turns on its own thread, so it keeps
+         turning while the UI thread is blocked) draws in McAccent unless the host sets Stroke. -->
+    <Style TargetType="{x:Type ctl:McSpinner}">
+        <Setter Property="Stroke" Value="{StaticResource McAccent}" />
+    </Style>
+
     <!-- McBadge's plain tag variant: a squarer, quieter label (a type or category) with a neutral
          outline and normal-weight 11px text, e.g. a subagent's type. -->
     <Style x:Key="McTag" TargetType="{x:Type ctl:McBadge}" BasedOn="{StaticResource {x:Type ctl:McBadge}}">

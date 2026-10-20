@@ -2,7 +2,7 @@
 
 The shared design system behind every MindAttic site and desktop app: plain CSS/JS web components and themes served from jsDelivr, and a WPF theme and controls package for the .NET apps.
 
-[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-16.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
+[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-17.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
 
 ![The Cyberspace backdrop component as it renders on mindattic.com: dim circuit-board panels, terminal readouts and a file browser over a dark grid](docs/web/images/cyberspace-backdrop.png)
 
@@ -25,7 +25,7 @@ The repo is organized by toolchain rather than by visual category: a JS bundle a
 - **Site build** (`web/build/`): splices components into the hand-made pages and apps listed in `web/sites.json`, touching nothing outside their marker blocks.
 - **Parity proof** (`web/tests/parity/`): shows a rebuilt page is indistinguishable from its original.
 - **Site assets** (`web/assets/`): each site's logos, icons and images, with a manifest of every served file.
-- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme (palette brushes, button, text box, progress bar and menu styles, tooltips, scroll bars), building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles) and the `AddressBar`, `DropdownMenu`, `McBadge`, `McLineChart`, `McMessageBox`, `McModal`, `McToast` / `McToastHost` and `McWindow` controls.
+- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme (palette brushes, button, text box, progress bar and menu styles, tooltips, scroll bars), building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles) and the `AddressBar`, `DropdownMenu`, `McBadge`, `McLineChart`, `McMessageBox`, `McModal`, `McSpinner`, `McToast` / `McToastHost` and `McWindow` controls.
 
 ## Quick start
 
@@ -38,7 +38,7 @@ node web/build/build-sites.mjs mindattic.com                       # rewrite ../
 powershell -File dotnet/tools/publish-wpf.ps1                     # only after the version bump has landed on main
 ```
 
-The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.16.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
+The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.17.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
 
 ## Web components and the MindAttic.Web sites
 
@@ -132,6 +132,7 @@ Merge the theme once, in `App.xaml`:
 | `Controls.McLineChart` | Percent-over-time line chart: time and percent axes, reference lines, per-point segment colours, a dotted projection |
 | `Controls.McModal` (+ `McBackdrop`) | In-window modal dialog: dimmed backdrop, themed card, heading, close button, footer |
 | `Controls.McMessageBox` | Themed `MessageBox.Show` stand-in for prompts with no app window to host an `McModal` |
+| `Controls.McSpinner` | Busy ring in `McAccent` that turns on its own thread, so it keeps turning while the UI thread is blocked |
 | `Controls.McToast`, `Controls.McToastHost` | Notification card (accent stripe, clickable title + two-line body, dismiss button) and the row that stacks and announces them |
 | `Controls.McWindow.DarkTitleBar` | Attached property: asks Windows to draw the window's title bar dark |
 
@@ -191,6 +192,13 @@ It is 6px tall; set `Height` for a thicker bar.
 <ctl:McBadge Style="{StaticResource McTag}" Content="{Binding Type}" />
 ```
 
+`Controls.McSpinner` is a busy ring (a dashed circle in `McAccent`, set `Stroke` for another colour) that keeps turning while the UI thread is blocked, e.g. behind a loader while the window applies a big first result and lays out a heavy page. A storyboard spinner ticks on the window's thread and freezes with it; this one draws into a `HostVisual` whose content lives on its own dispatcher thread, which runs only while the spinner is loaded and visible and shuts down when it's hidden or unloaded. It is 44x44 unless `Width`/`Height` say otherwise; `StrokeThickness` (4) and `Period` (one turn, 1.2s) tune it, and changing any of them while it turns restarts the ring. It reads to UI Automation as a progress bar named "Loading" (or its `AutomationProperties.Name`) and is never a tab stop. `IsSpinning`, `SpinnerThread` and `Angle` are there for tests.
+
+```xml
+<ctl:McSpinner Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
+<ctl:McSpinner Width="24" Height="24" StrokeThickness="3" AutomationProperties.Name="Loading the workspace" />
+```
+
 `Controls.McLineChart` draws a `McLineChartData`: the time span (`StartUtc`..`EndUtc`), the `Points` (each `McChartPoint` carries the brush of the segment ending at it, `McAccent` by default), an `EndLabel` for the last point's dot, an optional `Projection` drawn dotted from the last point and labelled at its end, and `ReferenceLines` (`McChartReferenceLine.Level` for a target, `.Curve` for a pace line). Without a projection it draws the line as it ended; with no points, just the axes. The percent axis has a gridline every 25% and headroom over the highest point; the time axis labels both ends and every whole local hour between (stepped in UTC, so a clock change never stacks or drops a mark), and the last point's label moves aside rather than run into the projection's. Its brushes are the theme's (`McText`, `McMuted`, `McChartGrid`, `McAccent`); pair it with a caption that says the same in words.
 
 ```xml
@@ -234,7 +242,7 @@ Invoke-Pester -Path web/tests/package/pester    # tools/vendor.ps1 (from the rep
 
 `web/tests/package/README.md` describes what each group guards, live mode and the CDN checks.
 
-The WPF package (xUnit, covering `McBadge`, `McHyperlink`, `McModal`, `McProgressBar`, `McTextBox` / `McTextArea`, the scroll bars, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost`, `McMessageBox` and the building-block styles):
+The WPF package (xUnit, covering `McBadge`, `McHyperlink`, `McModal`, `McProgressBar`, `McTextBox` / `McTextArea`, the scroll bars, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost`, `McMessageBox`, `McSpinner` and the building-block styles):
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
@@ -290,7 +298,7 @@ docs/web/                                The web package's bible, stories, asset
 ## Current state
 
 - The web package is live: the four MindAttic.Web sites, MindAttic.Psst and Tutor are built from it.
-- `MindAttic.Components.Wpf` is at 16.0.0 (themes every scroll bar: an implicit dark `ScrollBar` based on `McScrollBar` and a `ScrollViewer` with a `McChrome` corner; 15.0.0 added `McMessageBox`, a themed `MessageBox.Show` for prompts with no app window; 14.0.0 added `McTextBox.Placeholder`, the multi-line `McTextArea` and `McScrollBar`; 13.0.0 added the `McHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
+- `MindAttic.Components.Wpf` is at 17.0.0 (adds `McSpinner`, a busy ring in `McAccent` that turns on its own thread so it keeps turning while the UI thread is blocked; 16.0.0 themed every scroll bar: an implicit dark `ScrollBar` based on `McScrollBar` and a `ScrollViewer` with a `McChrome` corner; 15.0.0 added `McMessageBox`, a themed `MessageBox.Show` for prompts with no app window; 14.0.0 added `McTextBox.Placeholder`, the multi-line `McTextArea` and `McScrollBar`; 13.0.0 added the `McHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
 
 ## Roadmap
 
