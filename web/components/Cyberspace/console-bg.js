@@ -7509,17 +7509,22 @@ window.consoleBg = (function () {
         tickTimer = setTimeout(tick, tickDelay());
     }
 
+    // False once a host has paused auto-spawn (setAutoSpawn(false)); start() then only reinits
+    // textures, so a tab coming back into view or a host remount doesn't silently resume it.
+    var autoSpawnOn = true;
+
     function start() {
         var host = getHost();
         if (!host) return;
         initTextures();           // always reinit textures on this host
-        if (tickTimer) return;    // tick loop already running
+        if (tickTimer || !autoSpawnOn) return;    // tick loop already running, or paused
         tickTimer = setTimeout(tick, rand(500, 1500));
     }
 
     // Pause / resume the auto-spawn tick loop. Used by the demo page so the host can
     // isolate a single manually-spawned effect without background noise.
     function setAutoSpawn(on) {
+        autoSpawnOn = !!on;
         if (on) {
             start();              // start() is idempotent — no-op when already ticking
         } else if (tickTimer) {
