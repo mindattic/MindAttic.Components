@@ -176,8 +176,19 @@ public class McModal : ContentControl
     protected override void OnPreviewLostKeyboardFocus(KeyboardFocusChangedEventArgs e)
     {
         base.OnPreviewLostKeyboardFocus(e);
-        if (IsOpen && e.NewFocus is DependencyObject next && !IsAncestorOf(next) && !ReferenceEquals(next, this))
+        if (IsOpen && e.NewFocus is DependencyObject next && !Contains(next))
             e.Handled = true;
+    }
+
+    /// <summary>Whether <paramref name="element"/> is this dialog or inside it. A focusable
+    /// ContentElement (e.g. a Hyperlink) isn't a Visual, which <see cref="System.Windows.Media.Visual.IsAncestorOf"/>
+    /// rejects, so walk up to its nearest Visual host first.</summary>
+    private bool Contains(DependencyObject element)
+    {
+        DependencyObject? d = element;
+        while (d is not null and not System.Windows.Media.Visual and not System.Windows.Media.Media3D.Visual3D)
+            d = LogicalTreeHelper.GetParent(d) ?? (d is ContentElement ce ? ContentOperations.GetParent(ce) : null);
+        return d is not null && (ReferenceEquals(d, this) || IsAncestorOf(d));
     }
 
     private void OnAccessKeyPressed(object sender, AccessKeyPressedEventArgs e)
@@ -206,7 +217,7 @@ public class McModal : ContentControl
     private void Open()
     {
         var focused = Keyboard.FocusedElement;
-        _returnFocusTo = focused is DependencyObject f && (ReferenceEquals(f, this) || IsAncestorOf(f)) ? null : focused;
+        _returnFocusTo = focused is DependencyObject f && Contains(f) ? null : focused;
 
         SetCurrentValue(VisibilityProperty, Visibility.Visible);
         // Focus the first focusable element once the card has been laid out (its template and

@@ -168,9 +168,35 @@ public sealed class McModalTests
         Assert.Equal("Dashboard settings", peer.GetName());
     });
 
+    /// <summary>M.COMP-T16: a Hyperlink is a focusable ContentElement, not a Visual; focus on one
+    /// (behind the dialog when it opens, or inside it while open) must not throw.</summary>
     [Fact]
-    public void The_package_is_version_6() =>
-        Assert.Equal(6, typeof(McModal).Assembly.GetName().Version!.Major);
+    public void Focus_on_a_ContentElement_such_as_a_Hyperlink_works_inside_and_outside() => Sta(h =>
+    {
+        var outsideLink = new System.Windows.Documents.Hyperlink(new System.Windows.Documents.Run("Help")) { Focusable = true };
+        ((Grid)h.Window.Content).Children.Insert(0, new TextBlock(outsideLink));
+        var insideLink = new System.Windows.Documents.Hyperlink(new System.Windows.Documents.Run("Docs")) { Focusable = true };
+        ((StackPanel)h.Modal.Content).Children.Add(new TextBlock(insideLink));
+        h.Pump();
+
+        Assert.True(outsideLink.Focus());
+        h.Modal.IsOpen = true;
+        h.Pump();
+        Assert.True(h.Modal.IsKeyboardFocusWithin);
+
+        Assert.True(insideLink.Focus());
+        Assert.Same(insideLink, Keyboard.FocusedElement);
+        outsideLink.Focus();
+        Assert.Same(insideLink, Keyboard.FocusedElement); // still trapped
+
+        h.Modal.IsOpen = false;
+        h.Pump();
+        Assert.Same(outsideLink, Keyboard.FocusedElement);
+    });
+
+    [Fact]
+    public void The_package_is_version_7() =>
+        Assert.Equal(7, typeof(McModal).Assembly.GetName().Version!.Major);
 
     // ---- harness ----
 
