@@ -81,9 +81,9 @@ export function parsePng(buf) {
   while (off + 12 <= buf.length) {
     const len = buf.readUInt32BE(off);
     const type = buf.toString('latin1', off + 4, off + 8);
+    if (off + 12 + len > buf.length) return bad(`chunk ${type} runs past end of file`);
     const data = buf.subarray(off + 8, off + 8 + len);
     const crc = buf.readUInt32BE(off + 8 + len);
-    if (off + 12 + len > buf.length) return bad(`chunk ${type} runs past end of file`);
     if (zlib.crc32(buf.subarray(off + 4, off + 8 + len)) >>> 0 !== crc) errors.push(`bad CRC in chunk ${type}`);
     if (type === 'IHDR') ihdr = { width: data.readUInt32BE(0), height: data.readUInt32BE(4), bitDepth: data[8], colorType: data[9], interlace: data[12] };
     else if (type === 'IDAT') idat.push(data);
