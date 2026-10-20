@@ -141,6 +141,9 @@ public sealed class DropdownMenu
             menu.Items.Add(item);
         }
 
+        // The ContextMenu can also close itself (Esc). Forget it then too, or the next click on the
+        // trigger is taken for "close the open menu" and swallowed.
+        menu.Closed += (_, _) => { if (ReferenceEquals(_menu, menu)) Close(); };
         _menu = menu;
         _window = Window.GetWindow(_trigger);
         if (_window is not null)
@@ -162,7 +165,6 @@ public sealed class DropdownMenu
     private void Close()
     {
         if (_menu is not { } menu) return;
-        menu.IsOpen = false;
         _menu = null;
         if (_window is not null)
         {
@@ -170,6 +172,7 @@ public sealed class DropdownMenu
             _window.Deactivated -= OnWindowDeactivated;
         }
         _window = null;
+        menu.IsOpen = false;
     }
 
     private void OnWindowDeactivated(object? sender, EventArgs e) => Close();
