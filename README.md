@@ -35,10 +35,10 @@ Prerequisites: Node 22 for the web build and tests, the .NET 10 SDK on Windows f
 git clone https://github.com/mindattic/MindAttic.Components
 cd MindAttic.Components
 node web/build/build-sites.mjs mindattic.com                       # rewrite ../MindAttic.Web/mindattic.com/index.htm
-dotnet pack dotnet/src/MindAttic.Components.Wpf -c Release -o C:\LocalNuGet
+powershell -File dotnet/tools/publish-wpf.ps1                     # only after the version bump has landed on main
 ```
 
-The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second drops `MindAttic.Components.Wpf.12.0.0.nupkg` into the local NuGet feed.
+The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.12.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
 
 ## Web components and the MindAttic.Web sites
 
@@ -185,11 +185,15 @@ Consumers so far: MindAttic.Browser, JobHunt, Prose.Launcher, Prose.Writer, Auto
 
 ## Building and consuming the .NET package
 
-Same convention as MindAttic.Capture and MindAttic.Vault:
+Publish only with `dotnet/tools/publish-wpf.ps1`, never a bare `dotnet pack -o C:\LocalNuGet`. Every ticket that bumps the package publishes this way, and only after its commit has landed on main:
 
 ```powershell
-dotnet pack dotnet/src/MindAttic.Components.Wpf -c Release -o C:\LocalNuGet
+git fetch origin; git rebase origin/main; git push origin HEAD:main   # land the version bump first
+powershell -File dotnet/tools/publish-wpf.ps1                         # then publish it
+powershell -File dotnet/tools/publish-wpf.ps1 -Ref <sha>              # or an older main commit whose package is missing
 ```
+
+The script fetches origin and refuses unless the commit (`-Ref`, default `HEAD`) is on `origin/main`. It takes the version from that commit's csproj, not from the working tree, and refuses if `MindAttic.Components.Wpf.<version>.nupkg` is already in the feed (`-Feed`, default `C:\LocalNuGet`). It packs a clean export of the commit (`git archive`), so uncommitted edits never get in, and copies the package into the feed without overwriting. This exists because parallel tickets used to pack from their own branch before rebasing: on 2026-10-20 M.COMP-T31 packed 8.0.0 over M.COMP-T36's package and M.COMP-T30 packed 10.0.0 over M.COMP-T31's, and both originals had to be rebuilt from their commits. If the script refuses an existing version, don't delete the package to get past it. Rebase, bump to the next free major, land that, and publish again.
 
 Consumers add `C:\LocalNuGet` as a NuGet source (see any consumer's `nuget.config`) and reference the package normally. Versions are whole numbers only (HOUSE-LAW-1): a release bumps the major. `MindAttic.Components.slnx` holds the package and its tests.
 
@@ -209,6 +213,12 @@ The WPF package (xUnit, covering `McBadge`, `McModal`, `McProgressBar`, `Dropdow
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
+```
+
+The publish script (Pester, against a throwaway git repo and a temp feed folder; it never touches `C:\LocalNuGet`):
+
+```powershell
+Invoke-Pester -Path dotnet/tests/publish        # from the repo root; Pester 5+
 ```
 
 ## Proving parity
@@ -233,8 +243,10 @@ powershell -File web/tools/codex.ps1 digest                     # regenerate its
 
 ```text
 dotnet/
-  src/MindAttic.Components.Wpf/          WPF theme (Theme.xaml) + controls, packed to C:\LocalNuGet
+  src/MindAttic.Components.Wpf/          WPF theme (Theme.xaml) + controls, published to C:\LocalNuGet
   tests/MindAttic.Components.Wpf.Tests/  xUnit tests for the controls
+  tests/publish/                         Pester tests for the publish script
+  tools/publish-wpf.ps1                  The one way to publish the package (refuses to overwrite a version)
 web/                                     Served as is from jsDelivr:
                                           cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V<n>/web/...
   components/<Name>/                     Plain CSS/HTML/JS, no build step (fonts keep their woff2 here)
