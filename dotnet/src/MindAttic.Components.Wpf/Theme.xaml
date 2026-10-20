@@ -391,9 +391,10 @@
         </Setter>
     </Style>
 
-    <!-- A thin dark scroll bar: a McControlBorder thumb (McMuted while hovered or dragged) on a
-         clear track, no arrow buttons. The text box styles below use it; base an implicit
-         ScrollBar style on it in any ScrollViewer's resources to use it elsewhere. -->
+    <!-- A thin dark scroll bar: a McControlBorder thumb (McMuted while hovered, McText while
+         dragged) on a clear track, no arrow buttons. The text box styles below use it as is; the
+         implicit ScrollBar style further down bases on it with a McChrome track, so every other
+         scroll bar in the app looks the same (M.COMP-T37). -->
     <Style x:Key="McScrollBarThumb" TargetType="{x:Type Thumb}">
         <Setter Property="Focusable" Value="False" />
         <Setter Property="Template">
@@ -405,7 +406,7 @@
                             <Setter TargetName="Bd" Property="Background" Value="{StaticResource McMuted}" />
                         </Trigger>
                         <Trigger Property="IsDragging" Value="True">
-                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McMuted}" />
+                            <Setter TargetName="Bd" Property="Background" Value="{StaticResource McText}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -898,6 +899,56 @@
                         <ItemsPresenter />
                         <TextBlock x:Name="PART_Announcer" Width="0" Height="0" Opacity="0" IsHitTestVisible="False"
                                    AutomationProperties.LiveSetting="Polite" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Implicit: every ScrollBar (M.COMP-T37). McScrollBar's slim McControlBorder thumb on a
+         McChrome track, so every scroll bar in an app that merges this dictionary (list boxes,
+         scroll viewers, McModal's body) is dark instead of the light system bar. McTextBox and
+         McTextArea keep McScrollBar's clear track over their own McSurface. -->
+    <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource McScrollBar}">
+        <Setter Property="Background" Value="{StaticResource McChrome}" />
+        <Style.Triggers>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Implicit: every ScrollViewer. The stock layout (content, then the two scroll bars) with the
+         square where they meet (Corner) filled McChrome instead of the system control colour. -->
+    <Style TargetType="{x:Type ScrollViewer}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                    <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Rectangle x:Name="Corner" Grid.Column="1" Grid.Row="1" Fill="{StaticResource McChrome}" />
+                        <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" Grid.Column="0" Grid.Row="0"
+                                                Margin="{TemplateBinding Padding}" Content="{TemplateBinding Content}"
+                                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                CanContentScroll="{TemplateBinding CanContentScroll}"
+                                                CanHorizontallyScroll="False" CanVerticallyScroll="False" />
+                        <ScrollBar x:Name="PART_VerticalScrollBar" Grid.Column="1" Grid.Row="0" Cursor="Arrow"
+                                   AutomationProperties.AutomationId="VerticalScrollBar" Minimum="0"
+                                   Maximum="{TemplateBinding ScrollableHeight}" ViewportSize="{TemplateBinding ViewportHeight}"
+                                   Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />
+                        <ScrollBar x:Name="PART_HorizontalScrollBar" Grid.Column="0" Grid.Row="1" Cursor="Arrow" Orientation="Horizontal"
+                                   AutomationProperties.AutomationId="HorizontalScrollBar" Minimum="0"
+                                   Maximum="{TemplateBinding ScrollableWidth}" ViewportSize="{TemplateBinding ViewportWidth}"
+                                   Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                   Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>
