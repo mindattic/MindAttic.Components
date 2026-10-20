@@ -105,27 +105,16 @@ public sealed class DropdownMenu
 
             if (_pinnedHost is not null)
             {
-                var pinned = _isPinned(action.Id);
-                var pin = new ToggleButton
-                {
-                    Style = (Style)_trigger.FindResource("McPinToggle"),
-                    IsChecked = pinned,
-                    Content = pinned ? "" : "",
-                    Foreground = pinned ? (Brush)_trigger.FindResource("McAccent") : (Brush)_trigger.FindResource("McMuted"),
-                    ToolTip = pinned ? "Unpin from toolbar" : "Pin to toolbar",
-                };
+                var pin = new ToggleButton { Style = (Style)_trigger.FindResource("McPinToggle") };
                 var id = action.Id;
+                ShowPinState(pin, _isPinned(id));
                 // Toggled on mouse-down and marked handled: that keeps the press from also reaching the
                 // menu item (which would run the action). It also means ToggleButton never raises its own
                 // Click, so the toggle can't live in a Click handler.
                 pin.PreviewMouseLeftButtonDown += (_, args) =>
                 {
                     _togglePinned(id);
-                    var nowPinned = _isPinned(id);
-                    pin.IsChecked = nowPinned;
-                    pin.Content = nowPinned ? "" : "";
-                    pin.Foreground = nowPinned ? (Brush)_trigger.FindResource("McAccent") : (Brush)_trigger.FindResource("McMuted");
-                    pin.ToolTip = nowPinned ? "Unpin from toolbar" : "Pin to toolbar";
+                    ShowPinState(pin, _isPinned(id));
                     args.Handled = true;
                     RefreshPinned();
                 };
@@ -160,6 +149,14 @@ public sealed class DropdownMenu
             _window.Deactivated += OnWindowDeactivated;
         }
         menu.IsOpen = true;
+    }
+
+    private void ShowPinState(ToggleButton pin, bool pinned)
+    {
+        pin.IsChecked = pinned;
+        pin.Content = pinned ? "" : "";
+        pin.Foreground = (Brush)_trigger.FindResource(pinned ? "McAccent" : "McMuted");
+        pin.ToolTip = pinned ? "Unpin from toolbar" : "Pin to toolbar";
     }
 
     private void Close()

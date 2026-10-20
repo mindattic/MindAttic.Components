@@ -12,8 +12,11 @@ Used for headings and the wordmark across MindAttic web properties.
 
 ```
 AtticFont/
-├── attic-font.html   # marker comment + usage note
-└── attic-font.css    # the @font-face declaration (base64 woff2 inline)
+├── attic-font.html      # marker comment + usage note (banner for the font-inline build block)
+├── attic-font.css       # the @font-face declaration (base64 woff2 inline)
+├── attic-font.cdn.css   # the same @font-face pointing at fonts/attic.woff2 by CDN URL
+├── attic-font.json      # descriptor: fontFamily, fallback (no applyToSelector)
+└── fonts/attic.woff2    # the served font file
 ```
 
 ---
@@ -35,15 +38,11 @@ silently in some browsers / CSS contexts. Always use the quoted form with a
 generic fallback (`'Attic', serif`) or the `var(--font-attic)` shorthand
 the CSS file exposes.
 
-**Per-subscriber apply rule** — splice-in-place subscribers want Attic on
-a specific element (e.g. `.site-name` for mindattic.com). That mapping
-lives in `subscribers.json` as the `applyToSelector` field on each
-subscription, so the sync pipeline emits the right rule automatically.
-The component's `attic-font.json` deliberately has no default
-`applyToSelector` — each subscriber declares its own.
-
-For CDN-loaded consumers (the sites), the selector is applied by the
-page's own CSS, not by this component.
+**Per-site apply rule** — a page that wants Attic on a specific element (e.g.
+`.site-name` on mindattic.com) declares it in its `sites.json` `font-faces`
+block as an `apply` pair (`[".site-name", "AtticFont"]`), and the site build
+emits the rule. The component's `attic-font.json` deliberately has no
+`applyToSelector`: each page declares its own.
 
 Or via jsDelivr:
 
@@ -53,24 +52,18 @@ Or via jsDelivr:
 
 ---
 
-## Sync delivery
+## Site build delivery
 
-No active subscriber currently receives Attic via marker-block splice. The
-splice contract is still supported: an `html-inline` subscriber gets it between
-`<!-- BEGIN MINDATTIC.UIUX:ATTICFONT --> … <!-- END … -->` markers, a
-`blazor-wwwroot` subscriber between
-`/* == BEGIN MINDATTIC.UIUX:ATTICFONT.CSS == */` markers. `mindattic.com` is
-not enrolled (it loads the font from the CDN), and the Prose subscribers are
-retired (see `subscribers.json`).
+The site build (`web/build/build-sites.mjs`, configured in `web/sites.json`)
+writes Attic into `mindattic.com` through its `FONTS` block (`font-faces`):
+the `@font-face` rule from `attic-font.cdn.css`, pointing at
+`fonts/attic.woff2` by pinned CDN URL, plus the `--font-attic` variable and the
+`.site-name` apply rule. No target currently inlines Attic as base64
+(`font-inline`).
 
 Edit here only. Downstream copies are derived artifacts.
 
----
-
-## Loading it from the CDN instead of inlining
-
-Sites that are not enrolled for splicing (for example `mindattic.com` and `ryandebraal.com`) load the same
-font as a plain woff2 file from the shared asset package, which is smaller than inlining it and is cached
-across sites: `https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@<tag>/web/components/AtticFont/fonts/` (files and rules in
-[`docs/ASSETS.md`](../../docs/ASSETS.md)). Preload the file from `<head>` with `crossorigin`. The original
-TTF is kept in `archive/fonts/attic/` (in the repo, not served).
+Prefer the CDN woff2 over the inline base64 file: it is smaller and cached
+across sites. Preload it from `<head>` with `crossorigin` (files and rules in
+[`docs/web/ASSETS.md`](../../../docs/web/ASSETS.md)). The original TTF is kept
+in `web/assets/archive/fonts/attic/` (in the repo, not served).

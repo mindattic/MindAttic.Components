@@ -80,9 +80,8 @@ Baked-in selectors (free, no setup):
 
 - `.cyberspace-keepout` — opt-in marker; add to any container you want
   protected.
-- `main` — both subscribers (`Prose`, `mindattic.com`) use `<main>` for
-  page content.
-- `.home-content` — Prose's Home wrapper.
+- `main` — page content (mindattic.com uses `<main>`).
+- `.home-content` — a Home wrapper.
 - `.board-grid` — any tab/tile board.
 
 Add more at runtime:
@@ -148,9 +147,8 @@ window.__cyberspaceCircuitboardSrcs = [
 ];
 ```
 
-mindattic.com points these at pinned jsDelivr URLs (emitted by
-`sync/sync-mindattic-com.ps1`). Prose leaves the default and serves them
-via `/api/media/…`. The `assets/` folder here is the canonical, lossless source (pixel-identical
+mindattic.com points these at pinned jsDelivr URLs (emitted by the
+`cyberspace` block of `web/build/build-sites.mjs`). The `assets/` folder here is the canonical, lossless source (pixel-identical
 to the original artwork, re-encoded as 8-bit palette PNGs); edit it here and
 regenerate `assets-manifest.json`.
 
@@ -163,9 +161,8 @@ Canonical names + definitions live in the registry header of
 near the top of the file — flip any `FX_*` to `false` to kill that effect
 entirely.
 
-See the package [`README.md`](../../README.md) for the full effect table
-(TERMINAL, CRASH, TREMOR, LEAK, SCHEMATIC, CASCADE, ARTIFACT — including its
-7 behavior variants — FRAGMENT, TRACE, PULSAR, HEIST, PREDATOR, READER).
+The effects are TERMINAL, CRASH, TREMOR, LEAK, SCHEMATIC, CASCADE, ARTIFACT — including its
+7 behavior variants — FRAGMENT, TRACE, PULSAR, HEIST, PREDATOR and READER.
 
 **SCHEMATIC** is the geometric-shape window. Its shapes (and the canvas/SVG renderer) now
 live in the standalone [SacredGeometry](../SacredGeometry/SacredGeometry.md) component —
@@ -187,7 +184,7 @@ missing or three readers are already open.
 
 ## Editing
 
-Edit files here. Push to `main` and the GitHub Action delivers to both
-subscribers, or run `sync/sync-all.ps1` locally
-for fast iteration without round-tripping through GitHub. Downstream copies
-are derived artifacts — never edit them directly.
+Edit files here, then rebuild the page that uses them
+(`node web/build/build-sites.mjs mindattic.com`); the linked deploy does this
+with the new tag on release. Downstream copies are derived artifacts — never
+edit them directly.

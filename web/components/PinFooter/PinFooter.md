@@ -6,8 +6,7 @@ of the viewport so the page doesn't end with awkward dead space. As soon as
 the content overflows, the element flows normally — a pinned footer over
 scrollable content would cover the last line.
 
-Standalone from `Cyberspace/`. Has its own sync marker pair so subscribers
-can adopt it independently.
+Standalone from `Cyberspace/`, so a page can adopt it on its own.
 
 ---
 
@@ -72,12 +71,10 @@ When `pinned` is on the element, `pin-footer.css` applies:
 
 ---
 
-## Sync delivery
+## Delivery
 
-`sync/sync-mindattic-com.ps1` inlines the bundle between
-`<!-- BEGIN MINDATTIC.UIUX:PINFOOTER --> … <!-- END … -->` markers in
-`mindattic.com/index.htm`. `sync/sync-prose.ps1` copies only the JS into
-the Blazor `wwwroot/js/` folder — the subscription is marked `jsOnly`, so no
-`app.css` marker block is written (Prose keeps its own pin-footer CSS).
+No site currently uses PinFooter and no `web/sites.json` block splices it.
+A page loads `pin-footer.css` and `pin-footer.js` by tag-pinned jsDelivr URL
+(above), or a `style`/`script` block can be added for it in `sites.json`.
 
 Edit in this folder only — downstream copies are derived artifacts.

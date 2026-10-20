@@ -192,7 +192,7 @@ automatic spawn loop and toggles reduced motion.
 
 ## Tests
 
-`tests/specs/components/hyperspace.spec.mjs` (project `components`) checks that every shape loads and
+`web/tests/package/specs/components/hyperspace.spec.mjs` (project `components`) checks that every shape loads and
 projects to finite 2D coordinates, that the Reader opens, animates, shows the threshold bar and the
 scrolling details and removes its DOM on close, and that the Hyperspace page renders from the library.
 
@@ -204,6 +204,6 @@ Hyperspace page.
 
 Adding shapes: append records to `RAW` under a `// ===== ROW n` comment (declaration order is gallery
 order; the hall grows a row per ten shapes on its own). Then update `COUNT` in `hyperspace.spec.mjs`, and
-the count in the Hyperspace page's gallery intro, `Hyperspace/README.md`, the MindAttic.Components README,
-`docs/BIBLE.md`, `docs/USER_STORIES.md`, `docs/data/components.json` and the repo README. A new family
+the count in the Hyperspace page's gallery intro, MindAttic.Web's `Hyperspace/README.md`,
+`docs/web/BIBLE.md`, `docs/web/USER_STORIES.md` and `docs/web/data/components.json` here. A new family
 needs a colour that keeps the Palette guarantees; the spec checks them.

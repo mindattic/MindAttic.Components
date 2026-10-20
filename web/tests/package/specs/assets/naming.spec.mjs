@@ -1,4 +1,4 @@
-// Naming convention (docs/ASSETS.md): lowercase kebab-case, no spaces; the variant goes last
+// Naming convention (docs/web/ASSETS.md): lowercase kebab-case, no spaces; the variant goes last
 // (m-monogram-transparent.png); ordinals use zero-padded dashes or dots (sunset-01.jpg, circuitboard.00.png).
 import { test, expect } from '@playwright/test';
 import { listAssets, rootOf } from '../../lib/walk.mjs';

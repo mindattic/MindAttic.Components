@@ -11,7 +11,7 @@ A thin **styling wrapper** around the MindAttic.Authentication `MaLogin` static-
 - `UserLogin.razor` — Blazor wrapper that renders `<MaLogin>` inside `.ul-card`
 - `UserLogin.md` — this file
 
-## Usage — raw CSS subscriber
+## Usage — raw CSS consumer
 Link `user-login.css` and ensure the rendered form carries the `.ma-auth-login` classes (the
 library's `MaLogin` already emits them). Wrap it in an element with class `ul-card`.
 

@@ -6425,116 +6425,7 @@ window.consoleBg = (function () {
     }
 
     // ── Network connection attempts ───────────────────────────────────────────
-    var NET_OCCUPIED = new Set();
     var NET_GRID = 24;
-
-    function netGk(gx, gy) { return gx + ',' + gy; }
-
-    // 8-direction Manhattan segment (hFirst = horizontal before vertical, or vice versa)
-    function netRouteManh(x0, y0, x1, y1, hFirst, extra) {
-        var path = [[x0, y0]], cx = x0, cy = y0;
-        function blocked(gx, gy) { var k = netGk(gx, gy); return NET_OCCUPIED.has(k) || extra.has(k); }
-        if (hFirst) {
-            var sx = x1 > x0 ? 1 : x1 < x0 ? -1 : 0;
-            while (cx !== x1) { cx += sx; if (blocked(cx, cy)) return null; path.push([cx, cy]); }
-            var sy = y1 > y0 ? 1 : y1 < y0 ? -1 : 0;
-            while (cy !== y1) { cy += sy; if (blocked(cx, cy)) return null; path.push([cx, cy]); }
-        } else {
-            var sy = y1 > y0 ? 1 : y1 < y0 ? -1 : 0;
-            while (cy !== y1) { cy += sy; if (blocked(cx, cy)) return null; path.push([cx, cy]); }
-            var sx = x1 > x0 ? 1 : x1 < x0 ? -1 : 0;
-            while (cx !== x1) { cx += sx; if (blocked(cx, cy)) return null; path.push([cx, cy]); }
-        }
-        return path;
-    }
-
-    // Diagonal-first segment: 45° leg then cardinal remainder (UR, DR, DL, UL then U/D/L/R)
-    function netRouteDiag(x0, y0, x1, y1, extra) {
-        var path = [[x0, y0]], cx = x0, cy = y0;
-        function blocked(gx, gy) { var k = netGk(gx, gy); return NET_OCCUPIED.has(k) || extra.has(k); }
-        var dx = x1 - x0, dy = y1 - y0;
-        var sx = dx > 0 ? 1 : dx < 0 ? -1 : 0;
-        var sy = dy > 0 ? 1 : dy < 0 ? -1 : 0;
-        var diag = Math.min(Math.abs(dx), Math.abs(dy));
-        for (var i = 0; i < diag; i++) {
-            cx += sx; cy += sy;
-            if (blocked(cx, cy)) return null;
-            path.push([cx, cy]);
-        }
-        while (cx !== x1) { cx += sx; if (blocked(cx, cy)) return null; path.push([cx, cy]); }
-        while (cy !== y1) { cy += sy; if (blocked(cx, cy)) return null; path.push([cx, cy]); }
-        return path;
-    }
-
-    // Tron light-cycle routing: right-angle moves only, never diagonal.
-    // NET_OCCUPIED guarantees the path can never cross itself or other live wires.
-    function netRouteSegment(x0, y0, x1, y1, extra) {
-        var hF = Math.random() < 0.5;
-        return netRouteManh(x0, y0, x1, y1, hF, extra) || netRouteManh(x0, y0, x1, y1, !hF, extra);
-    }
-
-    // Liang-Barsky segment-to-AABB entry: returns t∈[0,1] of first entry, or null
-    function netSegEntersBox(ax, ay, bx, by, rx, ry, rw, rh) {
-        var dx = bx-ax, dy = by-ay, tMin = 0, tMax = 1;
-        function clip(p, q) {
-            if (Math.abs(p) < 1e-9) return q >= 0;
-            var t = q/p;
-            if (p < 0) { if (t > tMin) tMin = t; } else { if (t < tMax) tMax = t; }
-            return tMin <= tMax;
-        }
-        if (!clip(-dx,ax-(rx-rw))) return null; if (!clip(dx,(rx+rw)-ax)) return null;
-        if (!clip(-dy,ay-(ry-rh))) return null; if (!clip(dy,(ry+rh)-ay)) return null;
-        return tMax >= tMin ? tMin : null;
-    }
-
-    // Build a full grid path through 0-3 alternating waypoints (variable directness)
-    function netBuildPath(gx0, gy0, gx1, gy1, maxGX, maxGY) {
-        for (var attempt = 0; attempt < 14; attempt++) {
-            var r = Math.random();
-            var numWP = r < 0.40 ? 0 : r < 0.75 ? 1 : r < 0.95 ? 2 : 3;
-            var waypts = [[gx0, gy0]];
-            for (var w = 0; w < numWP; w++) {
-                var f   = (w + 1) / (numWP + 1);
-                var bx  = Math.round(gx0 + (gx1 - gx0) * f);
-                var by  = Math.round(gy0 + (gy1 - gy0) * f);
-                var pdx = -(gy1 - gy0), pdy = gx1 - gx0;
-                var plen = Math.sqrt(pdx * pdx + pdy * pdy) || 1;
-                var amt  = (w % 2 === 0 ? 1 : -1) * (5 + Math.random() * 9);
-                var wx   = Math.max(2, Math.min(maxGX, bx + Math.round(pdx / plen * amt)));
-                var wy   = Math.max(2, Math.min(maxGY, by + Math.round(pdy / plen * amt)));
-                waypts.push([wx, wy]);
-            }
-            waypts.push([gx1, gy1]);
-            var full = [[gx0, gy0]], ok = true;
-            var localSeen = new Set(); localSeen.add(netGk(gx0, gy0));
-            for (var i = 0; i < waypts.length - 1; i++) {
-                var seg = netRouteSegment(waypts[i][0], waypts[i][1], waypts[i+1][0], waypts[i+1][1], localSeen);
-                if (!seg) { ok = false; break; }
-                for (var j = 1; j < seg.length; j++) { localSeen.add(netGk(seg[j][0], seg[j][1])); full.push(seg[j]); }
-            }
-            if (!ok) continue;
-            var clean = [full[0]];
-            for (var i = 1; i < full.length; i++) {
-                if (full[i][0] !== clean[clean.length-1][0] || full[i][1] !== clean[clean.length-1][1])
-                    clean.push(full[i]);
-            }
-            return clean;
-        }
-        return null;
-    }
-
-    // Reduce to direction-change corners (handles all 8 directions)
-    function netSimplifyPath(path) {
-        if (path.length <= 2) return path.slice();
-        var corners = [path[0]];
-        for (var i = 1; i < path.length - 1; i++) {
-            var dx1 = path[i][0] - path[i-1][0], dy1 = path[i][1] - path[i-1][1];
-            var dx2 = path[i+1][0] - path[i][0],  dy2 = path[i+1][1] - path[i][1];
-            if (dx1 !== dx2 || dy1 !== dy2) corners.push(path[i]);
-        }
-        corners.push(path[path.length - 1]);
-        return corners;
-    }
 
     var NET_COLORS = [
         { line: 'rgba(255,0,51,0.32)',   node: 'rgba(255,0,51,0.60)',   fail: '#ff2244' },
@@ -6804,7 +6695,7 @@ window.consoleBg = (function () {
     // Direction-aware fail message. `dir = {dx, dy}` is the wire's last-segment travel vector.
     // Horizontal travel: text continues horizontally past the failure point in the travel direction.
     // Vertical travel:   text is centered above (going up) or below (going down) the failure point.
-    function netShowFail(host, fx, fy, col, elems, gridPath, dir) {
+    function netShowFail(host, fx, fy, col, elems, dir) {
         dir = dir || { dx: 1, dy: 0 };
         var msg = document.createElement('div');
         msg.className = 'cyberspace-net-fail';
@@ -6847,7 +6738,6 @@ window.consoleBg = (function () {
                 el.style.opacity = '0';
                 setTimeout(function () { if (!el.__predated && el.parentNode) el.parentNode.removeChild(el); }, 450);
             });
-            gridPath.forEach(function (p) { NET_OCCUPIED.delete(netGk(p[0], p[1])); });
         }, 1100);
     }
 
@@ -6866,7 +6756,7 @@ window.consoleBg = (function () {
         }
     }
 
-    // Mean glyphs the interception/predator swarm cycles through
+    // Mean glyphs the predator swarm cycles through
     var NET_WASP_CHARS = '#@!*&%§¶†‡¦¤¥×÷±¬¿¡';
 
     // ── Artifact predator swarm — RARE event ────────────────────────────────────
@@ -6950,7 +6840,6 @@ window.consoleBg = (function () {
             target.style.setProperty('--cdy', Math.round(fleeY) + 'px');
         }
 
-        var PRED_COLOR = '255, 34, 68'; // rgb triplet for the wasp red
         var wasps = [];
         for (var i = 0; i < n; i++) {
             var w = document.createElement('span');
@@ -7058,100 +6947,6 @@ window.consoleBg = (function () {
         }
         requestAnimationFrame(step);
         return true;
-    }
-
-    // Hostile interception swarm — originates OFF the wire and HOMES on a moving target.
-    // `getTarget()` returns the current target point (x, y) — typically the LATEST corner the
-    // wire has reached. As the swarm flies, it scans every corner in `corners`; when its centroid
-    // gets within `awareRadius` of an undiscovered corner, `onAware(idx, x, y)` fires (the swarm
-    // "becomes aware" of that corner — caller fires a ping and marks it for the wire's redraw).
-    // `onArrive()` fires when the swarm catches up to the moving target (severs the wire).
-    function netSpawnInterception(host, getTarget, corners, col, onAware, onArrive) {
-        var hostW = host.offsetWidth || 800, hostH = host.offsetHeight || 600;
-        var n = rand(8, 14);
-        // Initial swarm origin — random distant point relative to the *current* target
-        var initial = getTarget();
-        var origAngle = Math.random() * Math.PI * 2;
-        var origDist  = 200 + Math.random() * 200;
-        var swarmX = Math.max(20, Math.min(hostW - 20, initial.x + Math.cos(origAngle) * origDist));
-        var swarmY = Math.max(20, Math.min(hostH - 20, initial.y + Math.sin(origAngle) * origDist));
-
-        var wasps = [];
-        for (var i = 0; i < n; i++) {
-            var w = document.createElement('span');
-            w.className = 'cyberspace-net-wasp';
-            w.style.color = col.fail;
-            w.style.fontSize = rand(10, 16) + 'px';
-            for (var k = 1; k <= 4; k++) {
-                var ang = Math.random() * Math.PI * 2;
-                var r   = 4 + Math.random() * 10;
-                w.style.setProperty('--bx' + k, Math.round(Math.cos(ang) * r) + 'px');
-                w.style.setProperty('--by' + k, Math.round(Math.sin(ang) * r) + 'px');
-            }
-            w.style.setProperty('--bd', rand(80, 140) + 'ms');
-            w.textContent = NET_WASP_CHARS[Math.floor(Math.random() * NET_WASP_CHARS.length)];
-            // Per-wasp offset around swarm centroid — gives the cluster width without breaking the formation
-            var ox = (Math.random() - 0.5) * 32;
-            var oy = (Math.random() - 0.5) * 32;
-            w.style.left = (swarmX + ox) + 'px';
-            w.style.top  = (swarmY + oy) + 'px';
-            host.appendChild(w);
-            wasps.push({ el: w, ox: ox, oy: oy });
-        }
-
-        // Swarm pace: faster than the typical wire speed (720–1100 px/s), so it always catches up.
-        // The wire's speed is its pace ALONG the path; the swarm's speed is straight-line — so even
-        // before doing the math, straight-line beats path-following with turns. 1500 px/s is plenty.
-        var swarmSpeed   = 1500;
-        var arriveDist   = 16;
-        var awareRadius  = 70;  // detection radius — swarm "becomes aware" of corners within this range
-        var awareR2      = awareRadius * awareRadius;
-        var lastTs = null, arrived = false;
-
-        function step(ts) {
-            if (arrived) return;
-            if (!lastTs) { lastTs = ts; requestAnimationFrame(step); return; }
-            var dt = Math.min(0.05, (ts - lastTs) / 1000);
-            lastTs = ts;
-
-            // Awareness scan — every undiscovered corner within radius gets discovered this frame.
-            // The wire keeps appearing dot-less until the swarm sweeps past; then dots bloom along
-            // the path, like the swarm is mapping the route as it hunts.
-            if (corners) {
-                for (var ci = 0; ci < corners.length; ci++) {
-                    var c = corners[ci];
-                    if (c.discovered) continue;
-                    var pdx = c.x - swarmX, pdy = c.y - swarmY;
-                    if (pdx * pdx + pdy * pdy <= awareR2) {
-                        c.discovered = true;
-                        onAware(c.idx, c.x, c.y);
-                    }
-                }
-            }
-
-            var t = getTarget();
-            var dx = t.x - swarmX, dy = t.y - swarmY;
-            var dist = Math.hypot(dx, dy);
-            if (dist <= arriveDist) {
-                arrived = true;
-                wasps.forEach(function (w) {
-                    w.el.style.transition = 'opacity 0.3s ease';
-                    w.el.style.opacity = '0';
-                    setTimeout(function () { if (w.el.parentNode) w.el.parentNode.removeChild(w.el); }, 320);
-                });
-                onArrive();
-                return;
-            }
-            var advance = Math.min(dist, swarmSpeed * dt);
-            swarmX += (dx / dist) * advance;
-            swarmY += (dy / dist) * advance;
-            for (var i = 0; i < wasps.length; i++) {
-                wasps[i].el.style.left = (swarmX + wasps[i].ox) + 'px';
-                wasps[i].el.style.top  = (swarmY + wasps[i].oy) + 'px';
-            }
-            requestAnimationFrame(step);
-        }
-        requestAnimationFrame(step);
     }
 
     // Small tracer that homes toward (tx, ty) and fires a ping on arrival
@@ -7438,7 +7233,6 @@ window.consoleBg = (function () {
             return false;
         }
         var pts = plan.pts;
-        var gridPath = []; // legacy occupancy hook — empty since the new planner doesn't use NET_OCCUPIED
         var canvas = document.createElement('canvas');
         canvas.width = hostW; canvas.height = hostH;
         canvas.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none;z-index:1;';
@@ -7507,7 +7301,6 @@ window.consoleBg = (function () {
                         el.style.opacity    = '0';
                         setTimeout(function () { if (!el.__predated && el.parentNode) el.parentNode.removeChild(el); }, fadeMs + 60);
                     });
-                    gridPath.forEach(function (p) { NET_OCCUPIED.delete(netGk(p[0], p[1])); });
                     // Release the single-connection lock once the fade is done — next attempt allowed
                     setTimeout(function () { NET_BUSY = false; }, fadeMs + 80);
                 }, blinkMs + 40);
@@ -7538,7 +7331,7 @@ window.consoleBg = (function () {
                     var prev = pts[segIdx - 1];
                     var dir = { dx: fx - prev[0], dy: fy - prev[1] };
                     redraw();
-                    netShowFail(host, fx, fy, col, [box1, box2, canvas], gridPath, dir);
+                    netShowFail(host, fx, fy, col, [box1, box2, canvas], dir);
                     setTimeout(function () { NET_BUSY = false; }, 1600);
                     return;
                 }

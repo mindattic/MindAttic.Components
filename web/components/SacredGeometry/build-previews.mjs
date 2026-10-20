@@ -1,4 +1,4 @@
-/* build-previews.mjs — emit Components/SacredGeometry/previews/shape-0000.svg .. shape-1023.svg
+/* build-previews.mjs — emit components/SacredGeometry/previews/shape-0000.svg .. shape-1023.svg
  * and double as the catalog smoke test.
  *
  *   node build-previews.mjs            # write posters + validate

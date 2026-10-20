@@ -16,8 +16,11 @@ Used as the default body face across MindAttic web properties.
 
 ```
 OutfitFont/
-├── outfit-font.html   # marker comment + usage note
-└── outfit-font.css    # two @font-face declarations (base64 woff2 inline)
+├── outfit-font.html      # marker comment + usage note (banner for the font-inline build block)
+├── outfit-font.css       # two @font-face declarations (base64 woff2 inline)
+├── outfit-font.cdn.css   # the same declarations pointing at fonts/*.woff2 by CDN URL
+├── outfit-font.json      # descriptor: applyToSelector (html, body), fontFamily, fallback
+└── fonts/                # outfit-latin.woff2, outfit-latin-ext.woff2 (the served files)
 ```
 
 ---
@@ -43,10 +46,9 @@ silently in some browsers / CSS contexts. Always use the quoted form with a
 generic fallback (`'Outfit', system-ui, sans-serif`) or the
 `var(--font-outfit)` shorthand the CSS file exposes.
 
-**Activating on the whole page** — the sync pipeline reads
-`applyToSelector` from `outfit-font.json` (default: `html, body`) and emits
-the rule automatically for any subscriber that opts into OutfitFont
-through `subscribers.json`.
+**Activating on the whole page** — a `font-inline` build block reads
+`applyToSelector` from `outfit-font.json` (`html, body`) and emits the rule;
+a `font-faces` block declares its own `apply` pairs in `sites.json`.
 
 Or via jsDelivr:
 
@@ -56,26 +58,21 @@ Or via jsDelivr:
 
 ---
 
-## Sync delivery
+## Site build delivery
 
-One active subscriber receives Outfit via marker-block splice:
+The site build (`web/build/build-sites.mjs`, configured in `web/sites.json`)
+delivers Outfit two ways:
 
-- `MindAttic.Psst/{terms,privacy}.htm` — inlined between
-  `<!-- BEGIN MINDATTIC.UIUX:OUTFITFONT --> … <!-- END … -->` markers by
-  `sync/sync-mindattic-psst.ps1`.
+- **Inline (`font-inline`)** — `MindAttic.Psst/{privacy,terms}.htm` get
+  `outfit-font.css` (base64) between their
+  `<!-- BEGIN MINDATTIC.COMPONENTS:OUTFITFONT -->` markers, so the legal pages
+  make no network request.
+- **By CDN URL (`font-faces`)** — mindattic.com, ryandebraal.com and
+  mindatticcares.com get the `@font-face` rules from `outfit-font.cdn.css` in
+  their `FONTS` block, pointing at `fonts/*.woff2` at the pinned tag: smaller
+  than inlining and cached across sites. Preload the files from `<head>` with
+  `crossorigin` (files and rules in
+  [`docs/web/ASSETS.md`](../../../docs/web/ASSETS.md)).
 
-`mindattic.com` is not enrolled (it loads the font from the CDN), and the Prose
-subscribers (`blazor-wwwroot`, `/* == BEGIN MINDATTIC.UIUX:OUTFITFONT.CSS == */`
-markers) are retired (see `subscribers.json`).
-
-Edit here only. Downstream copies are derived artifacts.
-
----
-
-## Loading it from the CDN instead of inlining
-
-Sites that are not enrolled for splicing (for example `mindattic.com` and `ryandebraal.com`) load the same
-font as a plain woff2 file from the shared asset package, which is smaller than inlining it and is cached
-across sites: `https://cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@<tag>/web/components/OutfitFont/fonts/` (files and rules in
-[`docs/ASSETS.md`](../../docs/ASSETS.md)). Preload the file from `<head>` with `crossorigin`. The original
-TTF is kept in `archive/fonts/outfit/` (in the repo, not served).
+Edit here only. Downstream copies are derived artifacts. The original TTF is
+kept in `web/assets/archive/fonts/outfit/` (in the repo, not served).

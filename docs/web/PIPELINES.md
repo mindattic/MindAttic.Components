@@ -6,8 +6,6 @@ MindAttic.Web.Shared, a folder of the MindAttic.Web repo). Content reaches its c
 1. **jsDelivr CDN** — every file is served at a versioned URL. The CDN consumers are the four sites (`mindattic.com`, `ryandebraal.com`, `mindatticcares.com`, `Hyperspace`, folders of the MindAttic.Web repo), pinned to one whole-number tag by `MindAttic.Deploy`'s linked deploy.
 2. **Site build** (`web/build/build-sites.mjs`, configured in `web/sites.json`) — splices component source into the marker blocks of hand-made files: the four site pages, the `MindAttic.Psst` legal pages and Tutor's `wwwroot`.
 
-The old subscriber sync of MindAttic.Web.Shared (`sync/*.ps1`, `subscribers.json` and the `sync-subscribers.yml` GitHub workflow that opened sync PRs) is retired; the site build replaces it. Its Prose and Ideas subscribers had already been retired because their target projects no longer exist.
-
 ## Pipeline 1 — jsDelivr CDN (runtime)
 
 Every file in `web/` is served by [jsDelivr](https://www.jsdelivr.com/) at a versioned URL of the public MindAttic.Components repo — zero setup, global edge cache.

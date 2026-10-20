@@ -153,19 +153,13 @@ Run `npm run snapshot` to refresh all, or `npm run snapshot <name>` for one.
 
 ---
 
-## Sync delivery
+## Delivery
 
-`sync/sync-mindattic-com.ps1` inlines `web-snapshot.css` and
-`web-snapshot-viewer.js` into `mindattic.com/index.htm` between
-`<!-- BEGIN/END MINDATTIC.UIUX:WEBSNAPSHOT -->` markers. The `.b64.txt`
-payloads are *not* synced — each subscriber manages its own per-tile inline
-base64 (mindattic.com keeps them in a `PORTFOLIO_IMAGES` map applied at
-render time).
-
-On mindattic.com, the portfolio tile builder adds `.web-snapshot` to any tile
-whose name appears in `PORTFOLIO_IMAGES`, then calls `WebSnapshot.autoInit()`
-after `tabifyPortfolio()` builds the DOM so the viewer attaches to the
-freshly-created containers.
+No site currently uses WebSnapshot and no `web/sites.json` block splices it.
+A page loads `web-snapshot.css` and `web-snapshot-viewer.js` by tag-pinned
+jsDelivr URL and supplies its own per-tile base64 (the `.b64.txt` payloads
+are generated here, not delivered), then calls `WebSnapshot.autoInit()` once
+the tile containers exist.
 
 ---
 

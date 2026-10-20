@@ -21,7 +21,7 @@ BackHomeM/
 ## Usage
 
 Add the anchor once anywhere inside `<body>` — leave it empty; the `❮ M`
-glyphs are injected via a `::before` pseudo-element so subscribers don't
+glyphs are injected via a `::before` pseudo-element so pages don't
 have to type them:
 
 ```html
@@ -31,8 +31,8 @@ have to type them:
    aria-label="Back to mindattic.com" title="Back to mindattic.com"></a>
 ```
 
-Requires the `Attic` `@font-face` to be present in the host (the subscriber
-already syncs `AtticFont/`). The CSS uses `font-family: 'Attic', serif;` and
+Requires the `Attic` `@font-face` to be present in the host (see
+`AtticFont/`). The CSS uses `font-family: 'Attic', serif;` and
 falls back to a serif if the font hasn't loaded yet.
 
 Or via jsDelivr:
@@ -62,8 +62,8 @@ Or via jsDelivr:
 ## Delivery
 
 CDN only: a page includes `back-home-m.css` via a tag-pinned jsDelivr `<link>`
-and hand-authors the `<a class="back-home-m">` element in its `<body>`. It is not
-spliced by any sync script. The theme `body-prelude.html` files carry only
+and hand-authors the `<a class="back-home-m">` element in its `<body>`. No
+`web/sites.json` block splices it. The theme `body-prelude.html` files carry only
 background-effect scaffolding, not this anchor.
 
 Edit here only. Downstream copies are derived artifacts.

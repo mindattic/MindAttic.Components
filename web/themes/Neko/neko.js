@@ -68,7 +68,6 @@ const NEKO_SPRITE_COUNT = 32;
   const WASH_TIME = AppSettings.neko_wash_time;
   const SCRATCH_TIME = AppSettings.neko_scratch_time;
   const YAWN_TIME = 3;
-  const AWAKE_TIME = 3;
   const CLAW_TIME = 10;
 
   // Sprite size

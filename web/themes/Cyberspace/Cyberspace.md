@@ -10,9 +10,9 @@ Dark cyberpunk landing-page chrome. Composes with the **Cyberspace** Component (
 |---|---|
 | Page chrome (`.hero`, `.readme`, `.btn`, layout) | `theme.css` (this folder) |
 | The three Cyberspace-effects fixed-position divs | `body-prelude.html` (this folder) |
-| The Cyberspace effects engine (animated console background) | `Components/Cyberspace/*.js` |
-| Outfit + Attic typography | `Components/OutfitFont/`, `Components/AtticFont/` |
-| Back-to-mindattic.com glyph | `Components/BackHomeM/` |
+| The Cyberspace effects engine (animated console background) | `components/Cyberspace/*.js` |
+| Outfit + Attic typography | `components/OutfitFont/`, `components/AtticFont/` |
+| Back-to-mindattic.com glyph | `components/BackHomeM/` |
 
 ## Layout the theme expects
 
@@ -41,8 +41,8 @@ Dark cyberpunk landing-page chrome. Composes with the **Cyberspace** Component (
 
 ## Direct (non-theme) consumption
 
-Prose consumes the **Cyberspace Component directly** from its Blazor `wwwroot` — not via this theme. If you want only the effects engine without the page chrome, depend on `Components/Cyberspace/` rather than `Themes/Cyberspace/`.
+If you want only the effects engine without the page chrome, depend on `components/Cyberspace/` rather than `themes/Cyberspace/`.
 
 ## Related
 
-- Component layer: [`Components/Cyberspace/`](../../Components/Cyberspace/Cyberspace.md) — the raw effects engine.
+- Component layer: [`components/Cyberspace/`](../../components/Cyberspace/Cyberspace.md) — the raw effects engine.

@@ -214,7 +214,6 @@ function startCyberpunk() {
         const baseH = h*0.1 + Math.random()*h*0.12;
         const domeR = bw * 0.52 - 0.6; // subtract half stroke-width so arc fits flush
         const basY = h - baseH;
-        const domeCY = basY - domeR*0.6;
         // Base block
         bCol(c); c.fillRect(x, basY, bw, baseH);
         drawWindows(c, x, basY, bw, baseH);

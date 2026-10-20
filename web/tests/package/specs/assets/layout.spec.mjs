@@ -1,4 +1,4 @@
-// Does MindAttic.Components contain what the sites need, in the shape docs/ASSETS.md promises?
+// Does MindAttic.Components contain what the sites need, in the shape docs/web/ASSETS.md promises?
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';

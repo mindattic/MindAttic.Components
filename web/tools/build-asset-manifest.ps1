@@ -5,7 +5,7 @@
     Walks the asset folders (one per domain, plus the top-level fonts/ and the component-owned asset dirs),
     and records for each file: its path (the same path appears after @<tag>/MindAttic.Components (web/)/ in a jsDelivr URL),
     byte size, SHA-256, and, for raster images, pixel dimensions. Use it to verify that what the
-    CDN serves is byte-identical to what is committed (see docs/ASSETS.md).
+    CDN serves is byte-identical to what is committed (see docs/web/ASSETS.md).
 
     The manifest is data, not canon: re-run this script whenever an asset is added, replaced or
     removed, then commit the result with the assets.

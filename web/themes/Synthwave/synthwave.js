@@ -112,7 +112,6 @@ function startSynthwave() {
     ctx.beginPath();
     ctx.rect(0, 0, w, horizon); // clip to sky
     ctx.clip();
-    const sliceCount = 8;
     const sliceGap = 3 + Math.floor(sunR / 25);
     for (let row = -sunR; row < sunR; row += sliceGap * 2) {
       ctx.beginPath();

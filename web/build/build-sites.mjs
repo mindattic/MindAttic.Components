@@ -35,7 +35,6 @@ function latestTag() {
 const tag = opt('--tag') || latestTag();
 const base = manifest.cdnBase.replace('{tag}', tag);
 const themesBase = base.replace(/\/components$/, '/themes');
-const WEB_ROOT = WEB;
 const tokens = (text) => text.replaceAll('{{BASE}}', base).replaceAll('{{THEMES}}', themesBase);
 const read = (rel) => fs.readFileSync(path.join(COMPONENTS, rel), 'utf8');
 const json = (rel) => JSON.parse(read(rel));
@@ -44,7 +43,7 @@ const json = (rel) => JSON.parse(read(rel));
 const builders = {
   /** Component files inserted verbatim (tokens filled) into the page's own <style> or <script>:
    *  for code written to live inside the host page, e.g. theme effects that share its scope. */
-  raw: (b) => b.files.map((rel) => tokens(fs.readFileSync(path.join(WEB_ROOT, rel), 'utf8'))).join('').trimEnd(),
+  raw: (b) => b.files.map((rel) => tokens(fs.readFileSync(path.join(WEB, rel), 'utf8'))).join('').trimEnd(),
 
   /** One component stylesheet, inline. Site CSS placed after it can override anything. */
   style: (b) => `<style id="${b.id}">\n${read(b.css).trimEnd()}\n</style>`,
