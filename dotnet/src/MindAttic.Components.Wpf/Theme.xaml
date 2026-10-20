@@ -477,6 +477,59 @@
         </Setter>
     </Style>
 
+    <!-- Implicit: the look of every Controls.McBadge, a small outlined pill: an optional icon-font
+         glyph (PART_Glyph, collapsed when Glyph is empty, hidden from UI Automation by the
+         control's automation peer) then the content, all in Foreground, the state colour. The
+         outline follows Foreground unless BorderBrush is set. -->
+    <Style TargetType="{x:Type ctl:McBadge}">
+        <Setter Property="Foreground" Value="{StaticResource McText}" />
+        <Setter Property="BorderBrush" Value="{Binding Foreground, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="10" />
+        <Setter Property="Padding" Value="8,2" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:McBadge}">
+                    <Border x:Name="PART_Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock x:Name="PART_Glyph" Text="{TemplateBinding Glyph}" FontFamily="{TemplateBinding GlyphFontFamily}"
+                                       FontSize="{TemplateBinding GlyphFontSize}" FontWeight="Normal" Foreground="{TemplateBinding Foreground}"
+                                       VerticalAlignment="Center" Margin="0,0,5,0" />
+                            <ContentPresenter VerticalAlignment="Center" RecognizesAccessKey="False" />
+                        </StackPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Glyph" Value="">
+                            <Setter TargetName="PART_Glyph" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Glyph" Value="{x:Null}">
+                            <Setter TargetName="PART_Glyph" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- McBadge's plain tag variant: a squarer, quieter label (a type or category) with a neutral
+         outline and normal-weight 11px text, e.g. a subagent's type. -->
+    <Style x:Key="McTag" TargetType="{x:Type ctl:McBadge}" BasedOn="{StaticResource {x:Type ctl:McBadge}}">
+        <Setter Property="BorderBrush" Value="{StaticResource McControlBorder}" />
+        <Setter Property="CornerRadius" Value="3" />
+        <Setter Property="Padding" Value="5,0" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+
     <!-- Implicit: every ToolTip in an app that merges this dictionary gets the dark chrome look
          automatically, with no per-ToolTip Style reference needed. -->
     <Style TargetType="{x:Type ToolTip}">

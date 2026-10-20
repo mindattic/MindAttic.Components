@@ -2,7 +2,7 @@
 
 The shared design system behind every MindAttic site and desktop app: plain CSS/JS web components and themes served from jsDelivr, and a WPF theme and controls package for the .NET apps.
 
-[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-9.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
+[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-10.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
 
 ![The Cyberspace backdrop component as it renders on mindattic.com: dim circuit-board panels, terminal readouts and a file browser over a dark grid](docs/web/images/cyberspace-backdrop.png)
 
@@ -25,7 +25,7 @@ The repo is organized by toolchain rather than by visual category: a JS bundle a
 - **Site build** (`web/build/`): splices components into the hand-made pages and apps listed in `web/sites.json`, touching nothing outside their marker blocks.
 - **Parity proof** (`web/tests/parity/`): shows a rebuilt page is indistinguishable from its original.
 - **Site assets** (`web/assets/`): each site's logos, icons and images, with a manifest of every served file.
-- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme (palette brushes, button, text box, progress bar and menu styles, tooltips) and the `AddressBar`, `DropdownMenu`, `McModal` and `McWindow` controls.
+- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme (palette brushes, button, text box, progress bar and menu styles, tooltips) and the `AddressBar`, `DropdownMenu`, `McBadge`, `McModal` and `McWindow` controls.
 
 ## Quick start
 
@@ -38,7 +38,7 @@ node web/build/build-sites.mjs mindattic.com                       # rewrite ../
 dotnet pack dotnet/src/MindAttic.Components.Wpf -c Release -o C:\LocalNuGet
 ```
 
-The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second drops `MindAttic.Components.Wpf.9.0.0.nupkg` into the local NuGet feed.
+The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second drops `MindAttic.Components.Wpf.10.0.0.nupkg` into the local NuGet feed.
 
 ## Web components and the MindAttic.Web sites
 
@@ -116,6 +116,7 @@ Merge the theme once, in `App.xaml`:
 | *(implicit)* `ToolTip` | Every tooltip in the app |
 | `Controls.AddressBar` | Back/Forward/Reload(/Home) + URL textbox for a WebView2 pane |
 | `Controls.DropdownMenu` | Pinnable action menu driven by a trigger button |
+| `Controls.McBadge` (+ `McTag`) | Outlined state pill: optional icon-font glyph and a word in a state colour; `McTag` is the plain type/category tag |
 | `Controls.McModal` (+ `McBackdrop`) | In-window modal dialog: dimmed backdrop, themed card, heading, close button, footer |
 | `Controls.McWindow.DarkTitleBar` | Attached property: asks Windows to draw the window's title bar dark |
 
@@ -149,6 +150,13 @@ Esc, the close button and a backdrop click close it (through `CloseCommand` when
 
 It is 6px tall; set `Height` for a thicker bar.
 
+`Controls.McBadge` is a small outlined pill for a state: set `Foreground` to the state colour and the glyph, the word and the outline all follow it (the outline unless `BorderBrush` is set), so the state reads as a word and a glyph as well as a colour (WCAG 1.4.1). `Glyph` is an icon-font character (Segoe MDL2 Assets by default, `GlyphFontFamily` to change it); leave it empty for a word only. The `McTag` style is the plain variant: a squarer, neutral-outlined, normal-weight label for a type or category. The glyph is decoration and is left out of the UI Automation tree; the badge reads as text named by its content.
+
+```xml
+<ctl:McBadge Glyph="{Binding StateGlyph}" Content="{Binding StateLabel}" Foreground="{Binding StateBrush}" />
+<ctl:McBadge Style="{StaticResource McTag}" Content="{Binding Type}" />
+```
+
 Consumers so far: MindAttic.Browser, JobHunt, Prose.Launcher, Prose.Writer, Automata, KdpPublish. MediaButler, ProcessLogger and MindAttic.Log.Reader are still WebView2/Blazor shells with no native WPF chrome, so their UI belongs to the web side, not this package.
 
 ## Building and consuming the .NET package
@@ -173,7 +181,7 @@ Invoke-Pester -Path web/tests/package/pester    # tools/vendor.ps1 (from the rep
 
 `web/tests/package/README.md` describes what each group guards, live mode and the CDN checks.
 
-The WPF package (xUnit, covering `McModal`, `McProgressBar` and `DropdownMenu`):
+The WPF package (xUnit, covering `McBadge`, `McModal`, `McProgressBar` and `DropdownMenu`):
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
@@ -221,7 +229,7 @@ docs/web/                                The web package's bible, stories, asset
 ## Current state
 
 - The web package is live: the four MindAttic.Web sites, MindAttic.Psst and Tutor are built from it.
-- `MindAttic.Components.Wpf` is at 9.0.0 and used by six desktop apps; `McProgressBar` is its newest style.
+- `MindAttic.Components.Wpf` is at 10.0.0 and used by six desktop apps; `McBadge` is its newest control (for the Orchestrator agent board's state pills and subagent type tags).
 
 ## Roadmap
 

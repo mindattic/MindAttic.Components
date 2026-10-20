@@ -5,7 +5,7 @@
     <UseWPF>true</UseWPF>
     <PackageId>MindAttic.Components.Wpf</PackageId>
     <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
-    <Version>9.0.0</Version>
+    <Version>10.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the
@@ -16,7 +16,8 @@
       (dimmed backdrop, themed card with a heading, close button and footer) opened through a
       bindable IsOpen, closed by Esc or a backdrop click, with focus trapped inside and returned
       on close. McProgressBar styles a ProgressBar as a thin rounded track with a coloured fill,
-      determinate or indeterminate.</Description>
+      determinate or indeterminate. McBadge is a small outlined pill (an optional icon-font glyph
+      and a word in a state colour) with a plain McTag variant for a type or category label.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
