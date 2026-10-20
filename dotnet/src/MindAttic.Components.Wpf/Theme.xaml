@@ -680,6 +680,90 @@
         <Setter Property="VerticalAlignment" Value="Top" />
     </Style>
 
+    <!-- Implicit: the look of every Controls.McToast. A McSurface card outlined in its Accent with
+         a 4px Accent stripe on the left; the title and a two-line body are one borderless button
+         (PART_OpenButton, focus ring in McFocus), and a McToolButton (x) on the right dismisses it
+         (PART_DismissButton, named "Dismiss: {Title}"). -->
+    <Style TargetType="{x:Type ctl:McToast}">
+        <Setter Property="Foreground" Value="{StaticResource McText}" />
+        <Setter Property="Background" Value="{StaticResource McSurface}" />
+        <Setter Property="Accent" Value="{StaticResource McAccent}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Width" Value="340" />
+        <Setter Property="Margin" Value="0,0,8,8" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:McToast}">
+                    <Border x:Name="Card" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding Accent}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" SnapsToDevicePixels="True">
+                        <DockPanel>
+                            <Border x:Name="AccentStripe" DockPanel.Dock="Left" Width="4" Background="{TemplateBinding Accent}"
+                                    CornerRadius="5,0,0,5" />
+                            <Button x:Name="PART_DismissButton" DockPanel.Dock="Right" Style="{StaticResource McToolButton}"
+                                    Content="&#xE711;" FontSize="10" VerticalAlignment="Top" Margin="0,4,4,0" ToolTip="Dismiss"
+                                    AutomationProperties.Name="{Binding Title, RelativeSource={RelativeSource TemplatedParent}, StringFormat='Dismiss: {0}'}" />
+                            <Button x:Name="PART_OpenButton" Cursor="Hand" FocusVisualStyle="{x:Null}"
+                                    AutomationProperties.Name="{TemplateBinding Title}"
+                                    AutomationProperties.HelpText="{TemplateBinding Body}">
+                                <Button.Template>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Border x:Name="Ring" Background="Transparent" BorderBrush="Transparent" BorderThickness="1"
+                                                CornerRadius="4" Margin="2">
+                                            <ContentPresenter Margin="9,7,2,7" />
+                                        </Border>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                                <Setter TargetName="Ring" Property="BorderBrush" Value="{StaticResource McFocus}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Button.Template>
+                                <StackPanel>
+                                    <TextBlock x:Name="TitleText" Text="{TemplateBinding Title}" FontWeight="SemiBold"
+                                               Foreground="{TemplateBinding Foreground}" TextTrimming="CharacterEllipsis" />
+                                    <!-- Exactly two 16px lines, then clipped with an ellipsis. -->
+                                    <TextBlock x:Name="BodyText" Text="{TemplateBinding Body}" Foreground="{StaticResource McMuted}"
+                                               FontSize="12" Margin="0,2,0,0" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                               LineHeight="16" LineStackingStrategy="BlockLineHeight" MaxHeight="32" />
+                                </StackPanel>
+                            </Button>
+                        </DockPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Body" Value="">
+                            <Setter TargetName="BodyText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Implicit: every Controls.McToastHost. A wrapping row of toasts (so full-width ones stack)
+         plus a hidden polite live region (PART_Announcer) that reads each new toast out. -->
+    <Style TargetType="{x:Type ctl:McToastHost}">
+        <Setter Property="AutomationProperties.Name" Value="Notifications" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:McToastHost}">
+                    <Grid>
+                        <ItemsPresenter />
+                        <TextBlock x:Name="PART_Announcer" Width="0" Height="0" Opacity="0" IsHitTestVisible="False"
+                                   AutomationProperties.LiveSetting="Polite" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Implicit: every ToolTip in an app that merges this dictionary gets the dark chrome look
          automatically, with no per-ToolTip Style reference needed. -->
     <Style TargetType="{x:Type ToolTip}">

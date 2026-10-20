@@ -5,7 +5,7 @@
     <UseWPF>true</UseWPF>
     <PackageId>MindAttic.Components.Wpf</PackageId>
     <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
-    <Version>11.0.0</Version>
+    <Version>12.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the
@@ -21,7 +21,10 @@
       Building blocks: McPillChoice (a single-choice pill row), McPillToggle, McCard,
       McStatCard/McSmallStat tiles, the McFocusRing keyboard focus ring, McHeading/McSectionLabel/
       McMutedText text styles, and McLineChart, a themed percent-over-time line chart (time and
-      percent axes, reference lines, per-point segment colours, a dotted projection).</Description>
+      percent axes, reference lines, per-point segment colours, a dotted projection).
+      McToast is a themed notification card (accent stripe, a title and two-line body
+      that is one clickable button, a dismiss button), and McToastHost a row that stacks them
+      from a bound collection and announces each new one politely to screen readers.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
