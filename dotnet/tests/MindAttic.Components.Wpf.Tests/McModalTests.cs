@@ -67,6 +67,7 @@ public sealed class McModalTests
         h.Modal.IsOpen = false;
         h.Pump();
         Assert.Same(h.Outside, Keyboard.FocusedElement);
+        Assert.False(h.IsForeground); // M.COMP-T28: focus moved without stealing the user's keyboard
     });
 
     [Fact]
@@ -236,9 +237,13 @@ public sealed class McModalTests
             var root = new Grid();
             root.Children.Add(Outside);
             root.Children.Add(Modal);
+            // M.COMP-T28: the window is real (focus, layout and input need an HwndSource) but it
+            // never appears or activates: it sits far off-screen, borderless, out of the taskbar,
+            // and is shown without activation, so dotnet test never steals the user's keyboard.
             Window = new Window
             {
-                Width = 800, Height = 600, Left = 0, Top = 0, ShowInTaskbar = false,
+                Width = 800, Height = 600, Left = -20000, Top = -20000,
+                WindowStyle = WindowStyle.None, ShowInTaskbar = false, ShowActivated = false,
                 WindowStartupLocation = WindowStartupLocation.Manual,
                 Content = root,
             };
@@ -247,9 +252,17 @@ public sealed class McModalTests
                 Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
             });
             Window.Show();
-            Window.Activate();
             Pump();
         }
+
+        /// <summary>Whether this test window took the system foreground (the user's keyboard).
+        /// WPF keyboard focus needs Win32 focus, which activates the window within the test
+        /// thread's own input queue (Window.IsActive), but that must never reach the foreground.</summary>
+        public bool IsForeground =>
+            GetForegroundWindow() == new System.Windows.Interop.WindowInteropHelper(Window).Handle;
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        private static extern nint GetForegroundWindow();
 
         public void Pump() => Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.ContextIdle, () => { });
 
