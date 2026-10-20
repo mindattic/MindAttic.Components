@@ -5,6 +5,13 @@ Today jsDelivr serves any file at `https://cdn.jsdelivr.net/gh/mindattic/MindAtt
 Entries below the first are history from MindAttic.Web.Shared (tags `V12` onward on MindAttic.Web) and, before
 that, the MindAttic.UiUx repo; their paths and URLs are as they were then.
 
+## Next tag (not yet published)
+- **Tag places its own tip.** `components/Tag/tag.js` (`MindAtticTag.init({ tip, tipClass, onShow })`), moved from
+  ryandebraal.com's skill tooltips: builds the tip on first hover, flips it below near the top, keeps it on screen at
+  the left/right edges and sets `--tt-arrow-x` so the arrow still points at the tag. The page supplies only the tip's
+  content and inner styling. The `TAG` block in `sites.json` splices the script in after `tag.css` (the `style`
+  block type takes an optional `js`/`jsId`). Tests: `specs/components/tag.spec.mjs`.
+
 ## MindAttic.Components V3 — MindAttic.Web.Shared moves into MindAttic.Components
 - **New home.** Everything MindAttic.Web.Shared served now lives in the `web/` folder of MindAttic.Components:
   components in `web/components/`, themes in `web/themes/`, each site's assets in `web/assets/<domain>/`,

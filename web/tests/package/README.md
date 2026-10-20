@@ -113,6 +113,11 @@ if absent): it pins the library to a whole-number tag whose file exists here, an
 gallery boots to Ready both from the pinned CDN URL (answered from this tree) and from the
 `../../MindAttic.Components/web/` fallback (CDN answering 404). three.js is fetched from its real CDN for the gallery; Google Fonts are blocked.
 
+`tag.spec` covers the Tag component's script (`components/Tag/tag.js`) on a scratch page: the tip is built from the
+page's content on first hover and only once (no content, no tip), sits centred above the tag and flips below near the
+top edge, stays inside the viewport margin at the left and right edges with `--tt-arrow-x` putting the arrow on the
+tag's centre, resets to centred once clear of the edge, and `destroy()` stops it.
+
 ### `specs/cdn/` — live CDN (live mode only)
 
 For every site, parses the tag it pins from the **live** HTML and checks that each referenced file is served by jsDelivr with
@@ -160,6 +165,6 @@ web/tests/package/
 ├── package.json  playwright.config.mjs  baselines.json  README.md  ci.workflow.example.yml
 ├── lib/   paths.mjs budgets.mjs walk.mjs binfmt.mjs site-session.mjs static-server.mjs update-baselines.mjs font_check.py
 ├── specs/ assets/*.spec.mjs   cdn/cdn.live.spec.mjs   sites/{common,mindattic,ryandebraal,mindatticcares}.spec.mjs
-│          components/hyperspace.spec.mjs
+│          components/{hyperspace,tag}.spec.mjs
 └── pester/ build.Tests.ps1
 ```

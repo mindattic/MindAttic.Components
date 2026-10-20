@@ -250,9 +250,10 @@
     {
       "id": "component.tag",
       "name": "Tag",
-      "type": "css-only",
+      "type": "css-js",
       "folder": "components/Tag",
-      "summary": ".ma-tag pill with a hover tip __tip (--below).",
+      "doc": "components/Tag/Tag.md",
+      "summary": ".ma-tag pill with a hover tip __tip (--below); tag.js (MindAtticTag.init) builds the tip on first hover, flips it below near the top and keeps it on screen with --tt-arrow-x.",
       "feeds": []
     },
     {

@@ -45,8 +45,10 @@ const builders = {
    *  for code written to live inside the host page, e.g. theme effects that share its scope. */
   raw: (b) => b.files.map((rel) => tokens(fs.readFileSync(path.join(WEB, rel), 'utf8'))).join('').trimEnd(),
 
-  /** One component stylesheet, inline. Site CSS placed after it can override anything. */
-  style: (b) => `<style id="${b.id}">\n${read(b.css).trimEnd()}\n</style>`,
+  /** One component stylesheet, inline. Site CSS placed after it can override anything. With `js`
+   *  (and `jsId`), the component's script follows it inline in the same block. */
+  style: (b) => `<style id="${b.id}">\n${read(b.css).trimEnd()}\n</style>` +
+    (b.js ? `\n<script id="${b.jsId}">\n${read(b.js).trimEnd()}\n</script>` : ''),
 
   /** One component script, inline (runs where it is placed, before any later page script). */
   script: (b) => `<script id="${b.id}">\n${read(b.js).trimEnd()}\n</script>`,

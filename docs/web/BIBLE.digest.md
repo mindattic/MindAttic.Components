@@ -95,5 +95,5 @@ are validated before commit ([ASSETS.md](ASSETS.md)).
 - **`assets/archive/`** — kept-but-unserved files ([MAU-LAW-7](#MAU-LAW-7)).
 
 ## Status index (from USER_STORIES.md)
-- done: 20 | partial: 7 | planned: 1
+- done: 21 | partial: 7 | planned: 1
 

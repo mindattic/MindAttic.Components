@@ -219,11 +219,15 @@ Status legend: ✅ done (verified) · 🟡 partial · ⬜ planned · living.
   effect (`spawnHyperspaceReader(origin)` in `console-bg.js`). Verified 2026-10-13:
   `tests/package/specs/components/hyperspace.spec.mjs` (stories MAU-US-F1 to F5) and the READER test in
   `tests/package/specs/sites/mindattic.spec.mjs` (MAU-US-F6), in the same run.
+- ✅ **Tag tip placement (`components/Tag/tag.js`).** `MindAtticTag.init({ tip })` builds a `.ma-tag` pill's
+  hover tip from the page's content on first hover, flips it below near the top edge, keeps it on screen at the
+  left/right edges and sets `--tt-arrow-x` so the arrow points at the tag; the `TAG` block of `sites.json` splices
+  it in after `tag.css`. Verified 2026-10-20: `tests/package/specs/components/tag.spec.mjs` (MAU-US-G1).
 - ✅ **Site build (`build/build-sites.mjs`).** The four sites rebuild at the pinned tag, and the parity
   harness (`tests/parity/`) proved each rebuilt page indistinguishable from the page it replaced (screenshots,
   computed styles, resource bytes) before it shipped.
 - 🟡 **Component catalog (`components/`).** All components present with source; most UI components are
-  verified through the sites suite and the parity harness, Hyperspace has component-level tests, and the
+  verified through the sites suite and the parity harness, Hyperspace and Tag have component-level tests, and the
   rest are verified manually (harnesses such as `components/Cyberspace/index.htm`).
 - 🟡 **Psst and Tutor targets.** `node build/build-sites.mjs MindAttic.Psst` and `… Tutor` run cleanly and are
   idempotent (a second run changes nothing); no automated test.

@@ -62,5 +62,8 @@ updated: 2026-10-13
 - **MAU-US-F5 ✅** As the Hyperspace page, I build my explorers and my 159-exhibit gallery from the pinned library, and still work opened as a local file before the tag is published (fallback to a MindAttic.Components checkout next to MindAttic.Web). *(verified by `renders its explorers and gallery from the library` and `pins the library to a whole-number MindAttic.Components tag that exists in this tree`.)*
 - **MAU-US-F6 ✅** As a mindattic.com visitor, I occasionally see a Hyperspace Reader as a Cyberspace effect (READER), and a tap can open one where I tapped: it starts at the origin, shows the Dimensional Threshold bar and the scrolling details, and shuts down cleanly after 6 to 11 s. *(verified by `READER: a Hyperspace Reader spawns at an origin, shows the threshold bar and the scrolling details, and shuts down cleanly`.)*
 
+## Epic G — UI components
+- **MAU-US-G1 ✅** As a page author, I can give `MindAtticTag.init({ tip })` only the content of a `.ma-tag` pill's hover tip, and the Tag component builds the tip on first hover, flips it below when there is no room above, keeps it on screen at the left and right edges, and moves the arrow (`--tt-arrow-x`) so it still points at the tag. *(verified by `builds the tip lazily on first hover, from the content the page gives, and only once`, `sits centred above the tag when there is room, and flips below near the top edge` and `stays on screen at the`.)*
+
 ## Priority backlog
 1. Add an in-repo build-idempotency check over every `sites.json` entry so Epic B stories can graduate to ✅ with a named test.

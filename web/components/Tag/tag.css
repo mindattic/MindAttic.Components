@@ -3,7 +3,8 @@
    differently in its own CSS on top. */
 /* A pill. With a .ma-tag__tip inside, hovering the pill shows the tip above it (or below, with
    .ma-tag__tip--below, when there is no room above). --tt-arrow-x moves the arrow when the tip has
-   been shifted to stay on screen. The tip's content is the page's. */
+   been shifted to stay on screen. tag.js (MindAtticTag.init) builds the tip on first hover and does
+   that placement; the tip's content and inner styling are the page's. */
 .ma-tag{display:inline-flex;align-items:center;font-family:var(--font-resume);font-size:11px;padding:2px 9px;background:var(--tag-bg);color:var(--tag-text);border:1px solid var(--tag-border);border-radius:20px;cursor:default;transition:all 0.12s;position:relative;white-space:nowrap;}
 /* Narrow screens: a long label wraps inside its pill instead of forcing a horizontal scrollbar. */
 @media(max-width:600px){.ma-tag{white-space:normal;max-width:100%;}}
