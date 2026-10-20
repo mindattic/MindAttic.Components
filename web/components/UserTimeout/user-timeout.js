@@ -37,9 +37,12 @@
         var logoutNow = document.querySelector('.ut-logout');
         if (logoutNow && logoutForm) logoutNow.addEventListener('click', function () { logoutForm.requestSubmit(); });
 
-        setInterval(function () {
+        var timer = setInterval(function () {
             var elapsed = Date.now() - last;   // keeps counting in backgrounded tabs
             if (elapsed >= idleMs) {
+                // Submit once: re-submitting every tick while the logout POST is in flight would
+                // cancel it and post the same antiforgery token again.
+                clearInterval(timer);
                 if (logoutForm) logoutForm.requestSubmit();
                 return;
             }
