@@ -88,7 +88,7 @@ namespace MindAttic.Components.Unity
                 return;
             }
             if (Mathf.Approximately(_shown, value)) return;
-            float k = Motion.Approach(Time.unscaledDeltaTime, MaTheme.Metrics.DurationBase, MaTheme.ReduceMotion || !Application.isPlaying);
+            float k = Core.Motion.Approach(Time.unscaledDeltaTime, MaTheme.Metrics.DurationBase, MaTheme.ReduceMotion || !Application.isPlaying);
             _shown = Mathf.Abs(_shown - value) < 0.001f ? value : Mathf.Lerp(_shown, value, k);
             Place();
         }
@@ -111,7 +111,7 @@ namespace MindAttic.Components.Unity
                 {
                     fill.canvasRenderer.SetAlpha(1);
                     float t = Mathf.Repeat(Time.unscaledTime / 1.4f, 1f);
-                    float x = Mathf.Lerp(-seg, 1f, Motion.Ease(t));
+                    float x = Mathf.Lerp(-seg, 1f, Core.Motion.Ease(t));
                     fr.anchorMin = new Vector2(Mathf.Clamp01(x), 0);
                     fr.anchorMax = new Vector2(Mathf.Clamp01(x + seg), 1);
                 }

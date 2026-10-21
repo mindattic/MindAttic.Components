@@ -133,7 +133,7 @@ namespace MindAttic.Components.Unity
         void Update()
         {
             if (!_animating) return;
-            float k = Motion.Approach(Time.unscaledDeltaTime, MaTheme.Metrics.DurationFast, MaTheme.ReduceMotion);
+            float k = Core.Motion.Approach(Time.unscaledDeltaTime, MaTheme.Metrics.DurationFast, MaTheme.ReduceMotion);
             _fill = Color.Lerp(_fill, _fillTarget, k);
             _border = Color.Lerp(_border, _borderTarget, k);
             _text = Color.Lerp(_text, _textTarget, k);

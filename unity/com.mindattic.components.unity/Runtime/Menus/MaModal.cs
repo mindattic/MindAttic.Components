@@ -392,7 +392,7 @@ namespace MindAttic.Components.Unity
 
         void ApplyAnim()
         {
-            float e = Motion.Ease(_anim);
+            float e = Core.Motion.Ease(_anim);
             group.alpha = e;
             float s = MaTheme.ReduceMotion ? 1 : Mathf.Lerp(0.96f, 1f, e);
             dialog.transform.localScale = new Vector3(s, s, 1);

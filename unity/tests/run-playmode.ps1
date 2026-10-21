@@ -20,7 +20,8 @@
 $ErrorActionPreference = 'Stop'
 $project = Join-Path $PSScriptRoot 'UnityHost'
 $logs = Join-Path $project 'logs'
-New-Item -ItemType Directory -Force $logs | Out-Null
+# Assets/ holds only git-ignored files, so a clean checkout has none, and Unity refuses a project without it.
+New-Item -ItemType Directory -Force $logs, (Join-Path $project 'Assets') | Out-Null
 
 # First run on a clean checkout: let the package's editor import TextMesh Pro's Essential Resources
 # (git-ignored in the host) before the tests need them.

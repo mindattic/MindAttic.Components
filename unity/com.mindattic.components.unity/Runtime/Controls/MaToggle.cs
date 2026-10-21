@@ -189,7 +189,7 @@ namespace MindAttic.Components.Unity
         {
             float target = toggle != null && toggle.isOn ? 1 : 0;
             if (Mathf.Approximately(_knob, target)) return;
-            float k = Motion.Approach(Time.unscaledDeltaTime, MaTheme.Metrics.DurationFast, MaTheme.ReduceMotion || !Application.isPlaying);
+            float k = Core.Motion.Approach(Time.unscaledDeltaTime, MaTheme.Metrics.DurationFast, MaTheme.ReduceMotion || !Application.isPlaying);
             _knob = Mathf.Abs(_knob - target) < 0.01f ? target : Mathf.Lerp(_knob, target, k);
             PlaceKnob();
         }

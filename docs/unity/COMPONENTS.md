@@ -162,7 +162,7 @@ powershell -File unity/tests/run-editmode.ps1              # editor: CSS-to-Them
 powershell -File unity/tests/run-playmode.ps1              # runtime: construction, theming, menu stack, navigation, modal focus, toasts
 ```
 
-The Unity suites run in batch mode on Unity 6000.4.3f1 in `unity/tests/UnityHost`, a bare project whose manifest references the package by `file:` path, lists it in `testables` and adds the Input System (active input handling: both). Its `Library/`, logs and the imported TMP Essentials are git-ignored; the scripts import TMP Essentials on a clean checkout before the first run.
+The Unity suites run in batch mode on Unity 6000.4.3f1 in `unity/tests/UnityHost`, a bare project whose manifest references the package by `file:` path, lists it in `testables` and adds the Input System (active input handling: both) and the engine modules most games have (animation, audio, physics, physics 2D), so a name that clashes with a `UnityEngine` type in a real game (`UnityEngine.Motion` from the animation module, M.COMP-T44) fails the suites here first. Its `Library/`, logs and the imported TMP Essentials are git-ignored; the scripts import TMP Essentials on a clean checkout before the first run.
 
 ## Layout
 

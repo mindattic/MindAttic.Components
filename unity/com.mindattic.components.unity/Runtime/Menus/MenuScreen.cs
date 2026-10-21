@@ -392,7 +392,7 @@ namespace MindAttic.Components.Unity
 
         void ApplyAnim()
         {
-            float e = Motion.Ease(_anim);
+            float e = Core.Motion.Ease(_anim);
             group.alpha = e;
             var p = panel.RectTransform;
             p.anchoredPosition = new Vector2(MaTheme.ReduceMotion ? 0 : (1 - e) * 24f * _animDirection, 0);
