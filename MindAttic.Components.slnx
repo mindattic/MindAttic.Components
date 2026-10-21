@@ -5,4 +5,8 @@
   <Folder Name="/dotnet/tests/">
     <Project Path="dotnet/tests/MindAttic.Components.Wpf.Tests/MindAttic.Components.Wpf.Tests.csproj" />
   </Folder>
+  <Folder Name="/unity/tests/">
+    <Project Path="unity/tests/Core.Build/Core.Build.csproj" />
+    <Project Path="unity/tests/Core.Tests/Core.Tests.csproj" />
+  </Folder>
 </Solution>

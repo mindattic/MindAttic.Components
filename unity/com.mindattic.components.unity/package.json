@@ -1,0 +1,20 @@
+{
+  "name": "com.mindattic.components.unity",
+  "version": "1.0.0",
+  "displayName": "MindAttic Components",
+  "description": "The MindAttic design system for Unity 6: themed uGUI + TextMeshPro menus and controls that look like the MindAttic web components (same token names and palette as web/themes, dark by default, light built in). MenuStack/MenuScreen for game menus, Modal alert/confirm/busy, Toast, Tooltip, Button, IconButton, Toggle, Textbox, Select, Range, ProgressBar, Spinner, Toolbar, FormRow, a join-code display with copy, and roster lists. Built from code with a small fluent API or from prefabs, keyboard/gamepad navigable with explicit navigation, laid out on a 1920x1080 reference canvas, reduce-motion aware. Works with the Input System UI module and the old input manager.",
+  "unity": "6000.0",
+  "author": { "name": "MindAttic" },
+  "license": "UNLICENSED",
+  "keywords": [ "ui", "menu", "ugui", "textmeshpro", "theme", "design system", "gamepad" ],
+  "dependencies": {
+    "com.unity.ugui": "2.0.0"
+  },
+  "samples": [
+    {
+      "displayName": "Gallery",
+      "description": "Every component in both themes: open Gallery.unity and press Play. A theme switch, a reduce-motion switch, a menu stack (main menu, multiplayer, lobby with join code and roster, settings), a pause menu on Esc, modals, toasts and a HUD toolbar, all built from code in GalleryDemo.cs.",
+      "path": "Samples~/Gallery"
+    }
+  ]
+}

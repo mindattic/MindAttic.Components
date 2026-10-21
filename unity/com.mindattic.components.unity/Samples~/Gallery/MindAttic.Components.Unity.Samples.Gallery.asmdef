@@ -1,0 +1,19 @@
+{
+    "name": "MindAttic.Components.Unity.Samples.Gallery",
+    "rootNamespace": "MindAttic.Components.Unity.Samples.Gallery",
+    "references": [
+        "MindAttic.Components.Unity.Core",
+        "MindAttic.Components.Unity",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

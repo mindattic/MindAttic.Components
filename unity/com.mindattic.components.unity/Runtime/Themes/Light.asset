@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90b4335a607da204cb7b46cd1ebeed48, type: 3}
+  m_Name: Light
+  m_EditorClassIdentifier: MindAttic.Components.Unity::MindAttic.Components.Unity.ThemeTokens
+  themeName: light
+  bg: {r: 1, g: 1, b: 1, a: 1}
+  bg2: {r: 0.972549, g: 0.9764706, b: 0.9843137, a: 1}
+  bg3: {r: 0.9411765, g: 0.9490196, b: 0.9607843, a: 1}
+  border: {r: 0.8862745, g: 0.9019608, b: 0.91764706, a: 1}
+  accent: {r: 0.105882354, g: 0.30980393, b: 0.54901963, a: 1}
+  accent2: {r: 0.14509805, g: 0.3882353, b: 0.6901961, a: 1}
+  text: {r: 0.101960786, g: 0.101960786, b: 0.18039216, a: 1}
+  text2: {r: 0.2901961, g: 0.33333334, b: 0.40784314, a: 1}
+  text3: {r: 0.44313726, g: 0.5019608, b: 0.5882353, a: 1}
+  tagBg: {r: 0.93333334, g: 0.9490196, b: 0.972549, a: 1}
+  tagText: {r: 0.105882354, g: 0.30980393, b: 0.54901963, a: 1}
+  tagBorder: {r: 0.77254903, g: 0.8352941, b: 0.92156863, a: 1}
+  tagHoverBg: {r: 0.105882354, g: 0.30980393, b: 0.54901963, a: 1}
+  tagHoverText: {r: 1, g: 1, b: 1, a: 1}
+  rule: {r: 0.17254902, g: 0.37254903, b: 0.5411765, a: 1}
+  danger: {r: 0.7764706, g: 0.18431373, b: 0.20784314, a: 1}
+  danger2: {r: 0.8980392, g: 0.28235295, b: 0.3019608, a: 1}
+  success: {r: 0.101960786, g: 0.49803922, b: 0.21568628, a: 1}
+  warning: {r: 0.6039216, g: 0.40392157, b: 0, a: 1}
+  onAccent: {r: 1, g: 1, b: 1, a: 1}
+  overlay: {r: 0, g: 0, b: 0, a: 0.5}
+  shadow: {r: 0, g: 0, b: 0, a: 0.18}
+  font: {fileID: 0}
+  metrics:
+    Unit: 4
+    RadiusSm: 12
+    RadiusMd: 16
+    RadiusLg: 24
+    BorderWidth: 2
+    FocusRingWidth: 3
+    FocusRingOffset: 3
+    ControlHeight: 60
+    IconButtonSize: 52
+    IconSize: 26
+    RowHeight: 56
+    MenuWidth: 640
+    DialogWidth: 680
+    LabelWidth: 220
+    FontCaption: 20
+    FontBody: 24
+    FontControl: 26
+    FontHeading: 32
+    FontTitle: 46
+    FontCode: 40
+    DurationFast: 0.15
+    DurationBase: 0.28
+    TooltipDelay: 0.45
+    ToastSeconds: 3.5

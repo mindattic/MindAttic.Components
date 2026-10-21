@@ -1,8 +1,8 @@
 # MindAttic.Components
 
-The shared design system behind every MindAttic site and desktop app: plain CSS/JS web components and themes served from jsDelivr, and a WPF theme and controls package for the .NET apps.
+The shared design system behind every MindAttic site, desktop app and game: plain CSS/JS web components and themes served from jsDelivr, a WPF theme and controls package for the .NET apps, and a Unity UI package for the games.
 
-[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-19.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
+[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%2C%20WPF%20and%20Unity-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-19.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
 
 ![The Cyberspace backdrop component as it renders on mindattic.com: dim circuit-board panels, terminal readouts and a file browser over a dark grid](docs/web/images/cyberspace-backdrop.png)
 
@@ -14,6 +14,7 @@ Try it: the web package is served as is from `cdn.jsdelivr.net/gh/mindattic/Mind
 - Hand-made pages stay hand-made: a component only replaces part of a page once it is proven to render identically.
 - No build step for the sites that consume it: a page loads a pinned CDN file or receives a regenerated marker block.
 - Desktop apps get the same dark chrome, focus outlines and dialogs without copying styles between repos.
+- Unity games build their menus and buttons from one package that uses the web themes' palette and token names.
 - Every served asset is listed with its size and SHA-256, and the CDN copy is checked byte for byte on release.
 
 ## Features
@@ -26,6 +27,7 @@ The repo is organized by toolchain rather than by visual category: a JS bundle a
 - **Parity proof** (`web/tests/parity/`): shows a rebuilt page is indistinguishable from its original.
 - **Site assets** (`web/assets/`): each site's logos, icons and images, with a manifest of every served file.
 - **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme that meets WCAG 2.2 AA by itself (palette brushes, button, text box, progress bar and menu styles, tooltips, scroll bars) with persistent tooltips and a live high-contrast swap, building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles), MVVM helpers (`ObservableObject`, `RelayCommand`, `CollectionSync`, `ZoomLevel`) and the `AddressBar`, `DropdownMenu`, `MaBadge`, `MaLineChart`, `MaMessageBox`, `MaModal`, `MaSpinner`, `MaToast` / `MaToastHost` and `MaWindow` controls.
+- **Unity package** (`unity/com.mindattic.components.unity`): themed uGUI + TextMesh Pro menus and controls for Unity 6 (`MenuStack`/`MenuScreen`, modals, toasts, tooltips, buttons, toggles, text fields, selects, sliders, progress, toolbars, a join-code display, roster lists), the dark and light web palettes as `ThemeTokens`, keyboard/gamepad navigation, built from code or prefabs. See [MindAttic.Components.Unity](#mindatticcomponentsunity).
 
 ## Quick start
 
@@ -250,6 +252,31 @@ Each toast is a MaSurface card outlined in its accent (MaAccent by default) with
 
 Consumers so far: MindAttic.Browser, JobHunt, Prose.Launcher, Prose.Writer, Automata, KdpPublish. MediaButler, ProcessLogger and MindAttic.Log.Reader are still WebView2/Blazor shells with no native WPF chrome, so their UI belongs to the web side, not this package.
 
+## MindAttic.Components.Unity
+
+The UPM package `com.mindattic.components.unity` (Unity 6000.0+, depends only on `com.unity.ugui`) is how every MindAttic Unity game standardizes its menus and buttons. A game references it by path, `"com.mindattic.components.unity": "file:../../MindAttic.Components/unity/com.mindattic.components.unity"`, and builds from code:
+
+```csharp
+var stack = MenuStack.Create();
+var main = stack.CreateScreen("Multiplayer");
+main.AddButton("Host", OnHost, ButtonVariant.Primary, MaIcon.Play);
+var code = main.AddTextbox("Join code", "ABC123").AsCode(6);
+main.AddButton("Join", () => Join(code.Text));
+stack.Push(main);
+MaModal.Confirm("Leave the lobby?", "The others keep playing.", ok => { if (ok) Leave(); }, "Leave", "Stay", ButtonVariant.Danger);
+MaToast.Show("Join code copied", ToastKind.Success);
+```
+
+- `ThemeTokens` (a ScriptableObject) carries the web themes' tokens under the same names (`bg`, `bg2`, `bg3`, `border`, `accent`, `accent2`, `text`, `text2`, `text3`, `tag-*`, `rule`, plus `danger`, `success`, `warning`, `on-accent`, `overlay`, `shadow`); `MaTheme.Dark` (default) and `MaTheme.Light` are `web/themes/Dark/dark.css` and `Light/light.css` exactly (a Core test parses those files), and `ThemeTokens.FromCss` reads any other web theme. `MaTheme.Current` restyles everything live; `MaTheme.ReduceMotion` makes every transition instant.
+- Components: `MaButton` (primary/secondary/danger/ghost, icons), `MaIconButton`, `MaToggle`, `MaTextbox`, `MaSelect`, `MaRange`, `MaProgressBar`, `MaSpinner`, `MaTooltip`, `MaToast`, `MaModal` (alert, confirm, busy; focus trap), `MaToolbar`, `MaRow`, `MaFormRow`, `MaCodeDisplay` (copy to clipboard), `MaList` rows with colour swatches, tags and actions, `MaTag`, `MaText`, `MaPanel`, and `MenuScreen`/`MenuStack` (push/pop, Esc/B back, focus restored on return, `ConfigureAsPauseMenu`).
+- Explicit keyboard/gamepad navigation on every screen and dialog, first item selected, Input System UI module or the old input manager, a 1920x1080 reference canvas, rounded panels and focus rings drawn at runtime (no textures or third-party assets).
+- An engine-free Core assembly (token parser, palette, control colours, contrast check, navigation graph, menu stack model, menu validation, toast queue) tested with plain `dotnet test`.
+- Prefabs of every component, GameObject > MindAttic UI, a ThemeTokens inspector that loads web theme CSS and checks contrast, and a Gallery sample of every component in both themes.
+
+The full guide, with the API and recipes for the multiplayer front end and the HUD, is [docs/unity/COMPONENTS.md](docs/unity/COMPONENTS.md).
+
+![The Unity Gallery's confirm dialog over a menu in the dark theme](docs/unity/images/gallery-confirm-dark.png)
+
 ## Building and consuming the .NET package
 
 Publish only with `dotnet/tools/publish-wpf.ps1`, never a bare `dotnet pack -o C:\LocalNuGet`. Every ticket that bumps the package publishes this way, and only after its commit has landed on main:
@@ -280,6 +307,14 @@ The WPF package (xUnit, covering the Mvvm helpers, `ZoomLevel`, `MaToolTips`, `M
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
+```
+
+The Unity package: the engine-free Core with plain `dotnet test`, then the EditMode and PlayMode suites in batch mode on Unity 6000.4.3f1 (`unity/tests/UnityHost` is the host project; the scripts import TextMesh Pro's Essential Resources on a clean checkout):
+
+```powershell
+dotnet test unity/tests/Core.Tests
+powershell -File unity/tests/run-editmode.ps1
+powershell -File unity/tests/run-playmode.ps1
 ```
 
 The publish script (Pester, against a throwaway git repo and a temp feed folder; it never touches `C:\LocalNuGet`):
@@ -314,6 +349,10 @@ dotnet/
   tests/MindAttic.Components.Wpf.Tests/  xUnit tests for the controls
   tests/publish/                         Pester tests for the publish script
   tools/publish-wpf.ps1                  The one way to publish the package (refuses to overwrite a version)
+unity/
+  com.mindattic.components.unity/        Unity UI package (Runtime, Runtime/Core engine-free, Editor, Tests, Samples~/Gallery)
+  tests/Core.Tests/, tests/Core.Build/   dotnet NUnit for the Core (globs Runtime/Core)
+  tests/UnityHost/ + run-*.ps1           Batch-mode EditMode/PlayMode test host
 web/                                     Served as is from jsDelivr:
                                           cdn.jsdelivr.net/gh/mindattic/MindAttic.Components@V<n>/web/...
   components/<Name>/                     Plain CSS/HTML/JS, no build step (fonts keep their woff2 here)
@@ -326,12 +365,14 @@ web/                                     Served as is from jsDelivr:
   tests/parity/                          Proves a rebuilt page is indistinguishable from its original
   tools/                                 vendor.ps1, build-asset-manifest.ps1, codex.ps1
 docs/web/                                The web package's bible, stories, asset and pipeline docs
+docs/unity/                              The Unity package's guide and screenshots
 .github/workflows/sync-psst.yml          Splices OutfitFont into MindAttic.Psst and opens a PR there
 ```
 
 ## Current state
 
 - The web package is live: the four MindAttic.Web sites, MindAttic.Psst and Tutor are built from it.
+- `com.mindattic.components.unity` 1.0.0 is new (M.COMP-T43); Unity.Multiplayer's drop-in front end (UM-T48) and Unity.Cursory's HUD and pause menu (UC-T11) are its first consumers.
 - `MindAttic.Components.Wpf` is at 19.0.0 (every `Mc`-prefixed style key and control class renamed to `Ma`, for MindAttic, e.g. `McButton` -> `MaButton`, `McModal` -> `MaModal`; a breaking rename, so a consumer moves to it on its own schedule by bumping its `PackageReference` and updating its XAML/code, not automatically; 18.0.0 added the shared `Mvvm` helpers and `ZoomLevel`, `MaToolTips.KeepOpen`, `MaHighContrast`, a WCAG AA palette (`MaRec` 4.5:1, `MaFieldBorder` 3:1, `MaOnAccent`) and dynamic palette references throughout; 17.0.0 added `MaSpinner`, a busy ring in `MaAccent` that turns on its own thread so it keeps turning while the UI thread is blocked; 16.0.0 themed every scroll bar: an implicit dark `ScrollBar` based on `MaScrollBar` and a `ScrollViewer` with a `MaChrome` corner; 15.0.0 added `MaMessageBox`, a themed `MessageBox.Show` for prompts with no app window; 14.0.0 added `MaTextBox.Placeholder`, the multi-line `MaTextArea` and `MaScrollBar`; 13.0.0 added the `MaHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `MaToast` / `MaToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `MaLineChart`) and used by six desktop apps.
 
 ## Roadmap
@@ -343,6 +384,7 @@ docs/web/                                The web package's bible, stories, asset
 - [docs/web/BIBLE.md](docs/web/BIBLE.md): what the web package is and the rules it keeps
 - [docs/web/ASSETS.md](docs/web/ASSETS.md) and [docs/web/PIPELINES.md](docs/web/PIPELINES.md): assets and delivery pipelines
 - [docs/web/AMENDMENTS.md](docs/web/AMENDMENTS.md) and [docs/web/CHANGELOG.md](docs/web/CHANGELOG.md)
+- [docs/unity/COMPONENTS.md](docs/unity/COMPONENTS.md): the Unity package
 - [docs/USER_STORIES.md](docs/USER_STORIES.md): stories and tickets (generated from MindAttic.Workflow; change them with the workflow CLI)
 - [web/themes/README.md](web/themes/README.md) and [web/tests/package/README.md](web/tests/package/README.md)
 - [AGENTS.md](AGENTS.md): entry point for coding agents

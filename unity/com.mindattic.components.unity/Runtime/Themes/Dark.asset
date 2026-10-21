@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90b4335a607da204cb7b46cd1ebeed48, type: 3}
+  m_Name: Dark
+  m_EditorClassIdentifier: MindAttic.Components.Unity::MindAttic.Components.Unity.ThemeTokens
+  themeName: dark
+  bg: {r: 0.050980393, g: 0.05882353, b: 0.07058824, a: 1}
+  bg2: {r: 0.07450981, g: 0.08627451, b: 0.105882354, a: 1}
+  bg3: {r: 0.101960786, g: 0.11764706, b: 0.14509805, a: 1}
+  border: {r: 0.16470589, g: 0.18431373, b: 0.22745098, a: 1}
+  accent: {r: 0.41960785, g: 0.6392157, b: 0.9098039, a: 1}
+  accent2: {r: 0.5647059, g: 0.73333335, b: 0.9411765, a: 1}
+  text: {r: 0.9098039, g: 0.91764706, b: 0.9411765, a: 1}
+  text2: {r: 0.6039216, g: 0.627451, b: 0.6901961, a: 1}
+  text3: {r: 0.36078432, g: 0.38431373, b: 0.45882353, a: 1}
+  tagBg: {r: 0.101960786, g: 0.1254902, b: 0.1882353, a: 1}
+  tagText: {r: 0.41960785, g: 0.6392157, b: 0.9098039, a: 1}
+  tagBorder: {r: 0.16470589, g: 0.22745098, b: 0.32941177, a: 1}
+  tagHoverBg: {r: 0.41960785, g: 0.6392157, b: 0.9098039, a: 1}
+  tagHoverText: {r: 0.050980393, g: 0.05882353, b: 0.07058824, a: 1}
+  rule: {r: 0.23921569, g: 0.43529412, b: 0.6392157, a: 1}
+  danger: {r: 0.8980392, g: 0.28235295, b: 0.3019608, a: 1}
+  danger2: {r: 1, g: 0.41960785, b: 0.4392157, a: 1}
+  success: {r: 0.24705882, g: 0.7254902, b: 0.3137255, a: 1}
+  warning: {r: 0.8235294, g: 0.6, b: 0.13333334, a: 1}
+  onAccent: {r: 0.050980393, g: 0.05882353, b: 0.07058824, a: 1}
+  overlay: {r: 0, g: 0, b: 0, a: 0.7}
+  shadow: {r: 0, g: 0, b: 0, a: 0.4}
+  font: {fileID: 0}
+  metrics:
+    Unit: 4
+    RadiusSm: 12
+    RadiusMd: 16
+    RadiusLg: 24
+    BorderWidth: 2
+    FocusRingWidth: 3
+    FocusRingOffset: 3
+    ControlHeight: 60
+    IconButtonSize: 52
+    IconSize: 26
+    RowHeight: 56
+    MenuWidth: 640
+    DialogWidth: 680
+    LabelWidth: 220
+    FontCaption: 20
+    FontBody: 24
+    FontControl: 26
+    FontHeading: 32
+    FontTitle: 46
+    FontCode: 40
+    DurationFast: 0.15
+    DurationBase: 0.28
+    TooltipDelay: 0.45
+    ToastSeconds: 3.5

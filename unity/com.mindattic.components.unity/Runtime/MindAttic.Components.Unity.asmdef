@@ -1,0 +1,25 @@
+{
+    "name": "MindAttic.Components.Unity",
+    "rootNamespace": "MindAttic.Components.Unity",
+    "references": [
+        "MindAttic.Components.Unity.Core",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0.0",
+            "define": "MINDATTIC_INPUTSYSTEM"
+        }
+    ],
+    "noEngineReferences": false
+}

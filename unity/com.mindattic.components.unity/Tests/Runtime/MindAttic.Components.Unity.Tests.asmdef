@@ -1,0 +1,32 @@
+{
+    "name": "MindAttic.Components.Unity.Tests",
+    "rootNamespace": "MindAttic.Components.Unity.Tests",
+    "references": [
+        "MindAttic.Components.Unity.Core",
+        "MindAttic.Components.Unity",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "1.0.0",
+            "define": "MINDATTIC_INPUTSYSTEM"
+        }
+    ],
+    "noEngineReferences": false
+}

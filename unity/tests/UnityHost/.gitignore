@@ -1,0 +1,13 @@
+# Unity test host: everything Unity and the run-*.ps1 scripts regenerate.
+Library/
+Temp/
+Logs/
+UserSettings/
+Builds/
+*.csproj
+*.sln
+*.slnx
+logs/
+# TextMesh Pro Essential Resources: imported by the package's editor (TmpEssentials) on first load.
+Assets/TextMesh Pro/
+Assets/TextMesh Pro.meta

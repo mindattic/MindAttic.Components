@@ -1,0 +1,28 @@
+{
+    "name": "MindAttic.Components.Unity.Editor.Tests",
+    "rootNamespace": "MindAttic.Components.Unity.Editor.Tests",
+    "references": [
+        "MindAttic.Components.Unity.Core",
+        "MindAttic.Components.Unity",
+        "MindAttic.Components.Unity.Editor",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
