@@ -37,13 +37,13 @@ internal static class OffScreenWindow
         return window;
     }
 
-    /// <summary>Builds an <see cref="McMessageBox"/> (M.COMP-T38) and shows it non-modally in the same off-screen,
+    /// <summary>Builds an <see cref="MaMessageBox"/> (M.COMP-T38) and shows it non-modally in the same off-screen,
     /// transparent, never-activated way, so a test can click its buttons in code instead of blocking on ShowDialog.</summary>
-    public static McMessageBox ShowMessageBox(string message, string caption = "", MessageBoxButton buttons = MessageBoxButton.OK,
+    public static MaMessageBox ShowMessageBox(string message, string caption = "", MessageBoxButton buttons = MessageBoxButton.OK,
         MessageBoxImage image = MessageBoxImage.None, MessageBoxResult defaultResult = MessageBoxResult.None)
     {
         _ = System.IO.Packaging.PackUriHelper.UriSchemePack;
-        var box = new McMessageBox(message, caption, buttons, image, defaultResult)
+        var box = new MaMessageBox(message, caption, buttons, image, defaultResult)
         {
             Left = Offset, Top = Offset, WindowStartupLocation = WindowStartupLocation.Manual,
             WindowStyle = WindowStyle.None, AllowsTransparency = true, Opacity = 0,

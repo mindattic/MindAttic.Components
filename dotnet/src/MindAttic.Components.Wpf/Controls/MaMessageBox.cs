@@ -8,14 +8,14 @@ using System.Windows.Media;
 namespace MindAttic.Components.Wpf.Controls;
 
 /// <summary>
-/// A themed stand-in for <see cref="MessageBox"/>: a small McChrome window with a dark title bar
-/// (<see cref="McWindow.DarkTitleBarProperty"/>), an icon, the message and a row of McButtons (OK,
+/// A themed stand-in for <see cref="MessageBox"/>: a small MaChrome window with a dark title bar
+/// (<see cref="MaWindow.DarkTitleBarProperty"/>), an icon, the message and a row of MaButtons (OK,
 /// OK/Cancel, Yes/No or Yes/No/Cancel), returning a <see cref="MessageBoxResult"/>. Use it for a
-/// prompt when no app window is open to host an <see cref="McModal"/>, e.g. during startup or setup.
+/// prompt when no app window is open to host an <see cref="MaModal"/>, e.g. during startup or setup.
 /// <para>
 /// <see cref="Show(string, string, MessageBoxButton, MessageBoxImage, MessageBoxResult)"/> shows
 /// it modally and returns the choice. The first button (OK or Yes) is the default (Enter) and is
-/// drawn as McPrimaryButton unless <c>defaultResult</c> names another one. Esc and the title
+/// drawn as MaPrimaryButton unless <c>defaultResult</c> names another one. Esc and the title
 /// bar's close button answer Cancel when there is a Cancel button, otherwise OK for an OK box and
 /// No for a Yes/No box. It merges Theme.xaml itself when the app hasn't, and a box shown before
 /// the app has a window of its own neither becomes <see cref="Application.MainWindow"/> nor shuts
@@ -26,29 +26,29 @@ namespace MindAttic.Components.Wpf.Controls;
 /// its severity ("Information", "Warning", "Error", "Question").
 /// </para>
 /// </summary>
-public class McMessageBox : Window
+public class MaMessageBox : Window
 {
     private readonly MessageBoxResult _escapeResult;
     private readonly List<Button> _buttons = [];
 
     /// <summary>Builds the box without showing it; <see cref="Show(string, string, MessageBoxButton,
     /// MessageBoxImage, MessageBoxResult)"/> is the usual entry point.</summary>
-    public McMessageBox(string message, string caption = "", MessageBoxButton buttons = MessageBoxButton.OK,
+    public MaMessageBox(string message, string caption = "", MessageBoxButton buttons = MessageBoxButton.OK,
         MessageBoxImage image = MessageBoxImage.None, MessageBoxResult defaultResult = MessageBoxResult.None)
     {
         Message = message ?? string.Empty;
         Image = image;
         Title = caption ?? string.Empty;
 
-        if (TryFindResource("McChrome") is null)
+        if (TryFindResource("MaChrome") is null)
             Resources.MergedDictionaries.Add(new ResourceDictionary
             {
                 Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
             });
 
-        McWindow.SetDarkTitleBar(this, true);
-        SetResourceReference(BackgroundProperty, "McChrome");
-        SetResourceReference(ForegroundProperty, "McText");
+        MaWindow.SetDarkTitleBar(this, true);
+        SetResourceReference(BackgroundProperty, "MaChrome");
+        SetResourceReference(ForegroundProperty, "MaText");
         FontSize = 13;
         SizeToContent = SizeToContent.WidthAndHeight;
         ResizeMode = ResizeMode.NoResize;
@@ -82,8 +82,8 @@ public class McMessageBox : Window
                 MinWidth = 84,
                 Margin = new Thickness(_buttons.Count == 0 ? 0 : 8, 0, 0, 0),
             };
-            button.SetResourceReference(StyleProperty, isDefault ? "McPrimaryButton" : "McButton");
-            button.FocusVisualStyle = null; // the McButton styles draw their own focus border
+            button.SetResourceReference(StyleProperty, isDefault ? "MaPrimaryButton" : "MaButton");
+            button.FocusVisualStyle = null; // the MaButton styles draw their own focus border
             AutomationProperties.SetName(button, result.ToString());
             button.Click += (_, _) => Choose(result);
             _buttons.Add(button);
@@ -116,8 +116,8 @@ public class McMessageBox : Window
         body.Children.Add(text);
 
         var footer = new Border { BorderThickness = new Thickness(0, 1, 0, 0), Padding = new Thickness(20, 12, 20, 12), Child = row };
-        footer.SetResourceReference(Border.BorderBrushProperty, "McChromeBorder");
-        footer.SetResourceReference(Border.BackgroundProperty, "McSurface");
+        footer.SetResourceReference(Border.BorderBrushProperty, "MaChromeBorder");
+        footer.SetResourceReference(Border.BackgroundProperty, "MaSurface");
         DockPanel.SetDock(footer, Dock.Bottom);
 
         var root = new DockPanel { LastChildFill = true };
@@ -183,7 +183,7 @@ public class McMessageBox : Window
         if (shutdownMode is not null) app!.ShutdownMode = ShutdownMode.OnExplicitShutdown;
         try
         {
-            var box = new McMessageBox(message, caption, buttons, image, defaultResult);
+            var box = new MaMessageBox(message, caption, buttons, image, defaultResult);
             if (owner is not null)
             {
                 box.Owner = owner;
@@ -199,7 +199,7 @@ public class McMessageBox : Window
         {
             if (shutdownMode is not null)
             {
-                if (app!.MainWindow is McMessageBox) app.MainWindow = mainWindow;
+                if (app!.MainWindow is MaMessageBox) app.MainWindow = mainWindow;
                 app.ShutdownMode = shutdownMode.Value;
             }
         }
@@ -217,10 +217,10 @@ public class McMessageBox : Window
     // Error), so the spoken name is spelled out rather than taken from Enum.ToString().
     private static (string Glyph, string Brush, string Name)? Glyph(MessageBoxImage image) => image switch
     {
-        MessageBoxImage.Information => ("", "McFocus", "Information"),
-        MessageBoxImage.Warning => ("", "McWarn", "Warning"),
-        MessageBoxImage.Error => ("", "McBad", "Error"),
-        MessageBoxImage.Question => ("", "McFocus", "Question"),
+        MessageBoxImage.Information => ("", "MaFocus", "Information"),
+        MessageBoxImage.Warning => ("", "MaWarn", "Warning"),
+        MessageBoxImage.Error => ("", "MaBad", "Error"),
+        MessageBoxImage.Question => ("", "MaFocus", "Question"),
         _ => null,
     };
 

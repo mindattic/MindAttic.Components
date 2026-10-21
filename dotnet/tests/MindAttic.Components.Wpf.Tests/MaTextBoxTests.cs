@@ -11,18 +11,18 @@ using Xunit;
 
 namespace MindAttic.Components.Wpf.Tests;
 
-/// <summary>M.COMP-T34: McTextBox's placeholder and the multi-line McTextArea with scroll bars.</summary>
-public sealed class McTextBoxTests
+/// <summary>M.COMP-T34: MaTextBox's placeholder and the multi-line MaTextArea with scroll bars.</summary>
+public sealed class MaTextBoxTests
 {
     [Fact]
     public void Placeholder_shows_muted_only_while_the_box_is_empty() => Sta(window =>
     {
-        var box = Add(window, "McTextBox", b => McTextBox.SetPlaceholder(b, "Search repos and tickets"));
+        var box = Add(window, "MaTextBox", b => MaTextBox.SetPlaceholder(b, "Search repos and tickets"));
         var placeholder = (TextBlock)box.Template.FindName("Placeholder", box);
 
         Assert.Equal("Search repos and tickets", placeholder.Text);
         Assert.Equal(Visibility.Visible, placeholder.Visibility);
-        Assert.Equal(window.FindResource("McMuted"), placeholder.Foreground);
+        Assert.Equal(window.FindResource("MaMuted"), placeholder.Foreground);
         Assert.False(placeholder.IsHitTestVisible);
 
         box.Text = "orch";
@@ -37,7 +37,7 @@ public sealed class McTextBoxTests
     [Fact]
     public void A_click_on_the_placeholder_reaches_the_box() => Sta(window =>
     {
-        var box = Add(window, "McTextBox", b => McTextBox.SetPlaceholder(b, "Reply to this tab"));
+        var box = Add(window, "MaTextBox", b => MaTextBox.SetPlaceholder(b, "Reply to this tab"));
         var placeholder = (TextBlock)box.Template.FindName("Placeholder", box);
         var centre = placeholder.TranslatePoint(new Point(placeholder.ActualWidth / 2, placeholder.ActualHeight / 2), box);
 
@@ -50,12 +50,12 @@ public sealed class McTextBoxTests
     [Fact]
     public void Placeholder_is_kept_out_of_the_accessible_name() => Sta(window =>
     {
-        var named = Add(window, "McTextBox", b =>
+        var named = Add(window, "MaTextBox", b =>
         {
-            McTextBox.SetPlaceholder(b, "Search repos and tickets   Ctrl+F");
+            MaTextBox.SetPlaceholder(b, "Search repos and tickets   Ctrl+F");
             AutomationProperties.SetName(b, "Search repos and tickets");
         });
-        var unnamed = Add(window, "McTextArea", b => McTextBox.SetPlaceholder(b, "Opening prompt (optional)"));
+        var unnamed = Add(window, "MaTextArea", b => MaTextBox.SetPlaceholder(b, "Opening prompt (optional)"));
 
         var peer = UIElementAutomationPeer.CreatePeerForElement(named);
         Assert.Equal("Search repos and tickets", peer.GetName());
@@ -63,14 +63,14 @@ public sealed class McTextBoxTests
         foreach (var box in new[] { named, unnamed })
         {
             var children = UIElementAutomationPeer.CreatePeerForElement(box).GetChildren() ?? [];
-            Assert.DoesNotContain(children, c => c.IsControlElement() && c.GetName().Contains(McTextBox.GetPlaceholder(box)));
+            Assert.DoesNotContain(children, c => c.IsControlElement() && c.GetName().Contains(MaTextBox.GetPlaceholder(box)));
         }
     });
 
     [Fact]
-    public void McTextBox_keeps_its_scroll_bars_hidden_unless_the_host_asks() => Sta(window =>
+    public void MaTextBox_keeps_its_scroll_bars_hidden_unless_the_host_asks() => Sta(window =>
     {
-        var box = Add(window, "McTextBox", b => { b.Height = 60; b.AcceptsReturn = true; b.Text = Lines(40); });
+        var box = Add(window, "MaTextBox", b => { b.Height = 60; b.AcceptsReturn = true; b.Text = Lines(40); });
         Assert.Equal(Visibility.Collapsed, Host(box).ComputedVerticalScrollBarVisibility);
 
         box.VerticalScrollBarVisibility = ScrollBarVisibility.Auto; // the Orchestrator's build log asks
@@ -79,9 +79,9 @@ public sealed class McTextBoxTests
     });
 
     [Fact]
-    public void McTextArea_is_multi_line_and_shows_themed_scroll_bars_when_the_text_overflows() => Sta(window =>
+    public void MaTextArea_is_multi_line_and_shows_themed_scroll_bars_when_the_text_overflows() => Sta(window =>
     {
-        var area = Add(window, "McTextArea", b => b.Height = 80);
+        var area = Add(window, "MaTextArea", b => b.Height = 80);
         Assert.True(area.AcceptsReturn);
         Assert.Equal(TextWrapping.Wrap, area.TextWrapping);
         Assert.Equal(Visibility.Collapsed, Host(area).ComputedVerticalScrollBarVisibility);
@@ -94,7 +94,7 @@ public sealed class McTextBoxTests
 
         var bar = (ScrollBar)host.Template.FindName("PART_VerticalScrollBar", host);
         var thumb = Descendant<Thumb>(bar)!;
-        Assert.Equal(window.FindResource("McControlBorder"), ((Border)VisualTreeHelper.GetChild(thumb, 0)).Background);
+        Assert.Equal(window.FindResource("MaControlBorder"), ((Border)VisualTreeHelper.GetChild(thumb, 0)).Background);
         Assert.True(bar.ActualWidth <= 12);
 
         area.TextWrapping = TextWrapping.NoWrap; // a log

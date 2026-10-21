@@ -12,42 +12,42 @@ namespace MindAttic.Components.Wpf.Controls;
 /// <see cref="Control.BorderBrush"/> is set too), so a state is shown as a word and a glyph as
 /// well as a colour (WCAG 1.4.1).
 /// <code>
-/// &lt;ctl:McBadge Glyph="{Binding StateGlyph}" Content="{Binding StateLabel}" Foreground="{Binding StateBrush}" /&gt;
-/// &lt;ctl:McBadge Style="{StaticResource McTag}" Content="{Binding Type}" /&gt;
+/// &lt;ctl:MaBadge Glyph="{Binding StateGlyph}" Content="{Binding StateLabel}" Foreground="{Binding StateBrush}" /&gt;
+/// &lt;ctl:MaBadge Style="{StaticResource MaTag}" Content="{Binding Type}" /&gt;
 /// </code>
 /// <para>
-/// Its look is the implicit <c>McBadge</c> style in Theme.xaml (a rounded pill, 12px semibold);
-/// the <c>McTag</c> style is the plain variant: a squarer, quieter label with a neutral
-/// <c>McControlBorder</c> outline and normal-weight 11px text, for a type or category tag. The
+/// Its look is the implicit <c>MaBadge</c> style in Theme.xaml (a rounded pill, 12px semibold);
+/// the <c>MaTag</c> style is the plain variant: a squarer, quieter label with a neutral
+/// <c>MaControlBorder</c> outline and normal-weight 11px text, for a type or category tag. The
 /// glyph is decoration: it's hidden from UI Automation, so a screen reader reads only the word.
 /// </para>
 /// </summary>
-public class McBadge : ContentControl
+public class MaBadge : ContentControl
 {
     /// <summary>Segoe MDL2 Assets, the icon font the rest of the theme uses.</summary>
     public static readonly FontFamily DefaultGlyphFontFamily = new("Segoe MDL2 Assets");
 
     public static readonly DependencyProperty GlyphProperty = DependencyProperty.Register(
-        nameof(Glyph), typeof(string), typeof(McBadge),
+        nameof(Glyph), typeof(string), typeof(MaBadge),
         new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
     public static readonly DependencyProperty GlyphFontFamilyProperty = DependencyProperty.Register(
-        nameof(GlyphFontFamily), typeof(FontFamily), typeof(McBadge),
+        nameof(GlyphFontFamily), typeof(FontFamily), typeof(MaBadge),
         new FrameworkPropertyMetadata(DefaultGlyphFontFamily, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
     public static readonly DependencyProperty GlyphFontSizeProperty = DependencyProperty.Register(
-        nameof(GlyphFontSize), typeof(double), typeof(McBadge),
+        nameof(GlyphFontSize), typeof(double), typeof(MaBadge),
         new FrameworkPropertyMetadata(10d, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
     public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(
-        nameof(CornerRadius), typeof(CornerRadius), typeof(McBadge),
+        nameof(CornerRadius), typeof(CornerRadius), typeof(MaBadge),
         new FrameworkPropertyMetadata(new CornerRadius(10), FrameworkPropertyMetadataOptions.AffectsRender));
 
-    static McBadge()
+    static MaBadge()
     {
         // A badge is a label, not a stop in the tab order.
-        FocusableProperty.OverrideMetadata(typeof(McBadge), new FrameworkPropertyMetadata(false));
-        IsTabStopProperty.OverrideMetadata(typeof(McBadge), new FrameworkPropertyMetadata(false));
+        FocusableProperty.OverrideMetadata(typeof(MaBadge), new FrameworkPropertyMetadata(false));
+        IsTabStopProperty.OverrideMetadata(typeof(MaBadge), new FrameworkPropertyMetadata(false));
     }
 
     /// <summary>The icon-font character drawn before the content (e.g. <c>"\uE768"</c>, or
@@ -73,7 +73,7 @@ public class McBadge : ContentControl
         set => SetValue(GlyphFontSizeProperty, value);
     }
 
-    /// <summary>The outline's corner radius: 10 (a pill) by default, 3 in <c>McTag</c>.</summary>
+    /// <summary>The outline's corner radius: 10 (a pill) by default, 3 in <c>MaTag</c>.</summary>
     public CornerRadius CornerRadius
     {
         get => (CornerRadius)GetValue(CornerRadiusProperty);
@@ -83,14 +83,14 @@ public class McBadge : ContentControl
     /// <summary>The template part that draws the <see cref="Glyph"/>.</summary>
     public const string PartGlyph = "PART_Glyph";
 
-    protected override AutomationPeer OnCreateAutomationPeer() => new McBadgeAutomationPeer(this);
+    protected override AutomationPeer OnCreateAutomationPeer() => new MaBadgeAutomationPeer(this);
 
     /// <summary>A badge reads as text: its name is its content (unless
     /// <c>AutomationProperties.Name</c> is set), and the decorative glyph is left out of its
     /// children so a screen reader never announces a private-use icon character.</summary>
-    private sealed class McBadgeAutomationPeer(McBadge owner) : FrameworkElementAutomationPeer(owner)
+    private sealed class MaBadgeAutomationPeer(MaBadge owner) : FrameworkElementAutomationPeer(owner)
     {
-        protected override string GetClassNameCore() => nameof(McBadge);
+        protected override string GetClassNameCore() => nameof(MaBadge);
 
         protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Text;
 
@@ -98,7 +98,7 @@ public class McBadge : ContentControl
         {
             var name = base.GetNameCore();
             if (!string.IsNullOrEmpty(name)) return name;
-            var badge = (McBadge)Owner;
+            var badge = (MaBadge)Owner;
             return badge.Content switch
             {
                 null => string.Empty,
@@ -111,7 +111,7 @@ public class McBadge : ContentControl
         protected override List<AutomationPeer>? GetChildrenCore()
         {
             var children = base.GetChildrenCore();
-            var badge = (McBadge)Owner;
+            var badge = (MaBadge)Owner;
             var glyph = badge.Template?.FindName(PartGlyph, badge) as UIElement;
             if (children is null || glyph is null) return children;
             children.RemoveAll(p => p is UIElementAutomationPeer u && ReferenceEquals(u.Owner, glyph));

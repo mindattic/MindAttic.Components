@@ -149,8 +149,8 @@ public sealed class SharedPiecesTests
     [Fact]
     public void Tooltips_stay_open_until_dismissed_once_kept_open() => Sta(() =>
     {
-        McToolTips.KeepOpen();
-        McToolTips.KeepOpen(); // a second call is harmless
+        MaToolTips.KeepOpen();
+        MaToolTips.KeepOpen(); // a second call is harmless
 
         Assert.Equal(int.MaxValue, ToolTipService.GetShowDuration(new Button()));
         Assert.Equal(int.MaxValue, ToolTipService.GetShowDuration(new TextBlock()));
@@ -168,15 +168,15 @@ public sealed class SharedPiecesTests
         var window = OffScreenWindow.Create(content: box);
         try
         {
-            box.Style = (Style)window.FindResource("McTextBox");
+            box.Style = (Style)window.FindResource("MaTextBox");
             OffScreenWindow.Show(window);
             Pump();
 
-            Assert.Same(window.FindResource("McFieldBorder"), box.BorderBrush);
-            foreach (var surface in new[] { "McChrome", "McSurface" })
+            Assert.Same(window.FindResource("MaFieldBorder"), box.BorderBrush);
+            foreach (var surface in new[] { "MaChrome", "MaSurface" })
             {
-                Assert.True(Contrast(window, "McFieldBorder", surface) >= 3, $"McFieldBorder on {surface}");
-                Assert.True(Contrast(window, "McRec", surface) >= 4.5, $"McRec on {surface}");
+                Assert.True(Contrast(window, "MaFieldBorder", surface) >= 3, $"MaFieldBorder on {surface}");
+                Assert.True(Contrast(window, "MaRec", surface) >= 4.5, $"MaRec on {surface}");
             }
         }
         finally { window.Close(); }
@@ -191,10 +191,10 @@ public sealed class SharedPiecesTests
         var theme = File.ReadAllText(Path.Combine(root, "dotnet", "src", "MindAttic.Components.Wpf", "Theme.xaml"));
         var brushes = Regex.Matches(theme, @"<SolidColorBrush x:Key=""(\w+)""").Select(m => m.Groups[1].Value).ToList();
 
-        Assert.Contains("McFieldBorder", brushes);
-        Assert.Contains("McOnAccent", brushes);
+        Assert.Contains("MaFieldBorder", brushes);
+        Assert.Contains("MaOnAccent", brushes);
         Assert.DoesNotContain(brushes, b => theme.Contains("{StaticResource " + b + "}"));
-        Assert.Empty(McHighContrast.Keys.Except(brushes));
+        Assert.Empty(MaHighContrast.Keys.Except(brushes));
     }
 
     // ---- high contrast ----
@@ -207,29 +207,29 @@ public sealed class SharedPiecesTests
         var window = OffScreenWindow.Create(content: new StackPanel { Children = { box, toggle } });
         try
         {
-            box.Style = (Style)window.FindResource("McTextBox");
-            toggle.Style = (Style)window.FindResource("McPillToggle");
+            box.Style = (Style)window.FindResource("MaTextBox");
+            toggle.Style = (Style)window.FindResource("MaPillToggle");
             var appRed = new SolidColorBrush(Colors.OrangeRed);
-            window.Resources["McRec"] = appRed; // an app's own override of a theme key
+            window.Resources["MaRec"] = appRed; // an app's own override of a theme key
             OffScreenWindow.Show(window);
             Pump();
             var themeBorder = box.BorderBrush;
 
-            McHighContrast.Apply(window.Resources, on: true, foregrounds: ["AppState"]);
+            MaHighContrast.Apply(window.Resources, on: true, foregrounds: ["AppState"]);
             Pump();
             Assert.Same(SystemColors.WindowTextBrush, box.BorderBrush);
             Assert.Same(SystemColors.HighlightBrush, Pill(toggle).Background);
             Assert.Same(SystemColors.HighlightTextBrush, toggle.Foreground);
             Assert.Same(SystemColors.WindowTextBrush, window.Resources["AppState"]);
-            Assert.Same(SystemColors.WindowTextBrush, window.Resources["McRec"]);
+            Assert.Same(SystemColors.WindowTextBrush, window.Resources["MaRec"]);
 
-            McHighContrast.Apply(window.Resources, on: false, foregrounds: ["AppState"]);
+            MaHighContrast.Apply(window.Resources, on: false, foregrounds: ["AppState"]);
             Pump();
             Assert.Same(themeBorder, box.BorderBrush);
-            Assert.Same(window.FindResource("McAccent"), Pill(toggle).Background);
-            Assert.Same(appRed, window.Resources["McRec"]);
+            Assert.Same(window.FindResource("MaAccent"), Pill(toggle).Background);
+            Assert.Same(appRed, window.Resources["MaRec"]);
             Assert.DoesNotContain("AppState", window.Resources.Keys.Cast<object>());
-            Assert.DoesNotContain("McText", window.Resources.Keys.Cast<object>()); // the theme's own is back in charge
+            Assert.DoesNotContain("MaText", window.Resources.Keys.Cast<object>()); // the theme's own is back in charge
         }
         finally { window.Close(); }
     });
@@ -240,8 +240,8 @@ public sealed class SharedPiecesTests
         var window = OffScreenWindow.Create();
         try
         {
-            using (McHighContrast.Track(window.Resources, window.Dispatcher, force: true))
-                Assert.Same(SystemColors.WindowBrush, window.Resources["McChrome"]);
+            using (MaHighContrast.Track(window.Resources, window.Dispatcher, force: true))
+                Assert.Same(SystemColors.WindowBrush, window.Resources["MaChrome"]);
         }
         finally { window.Close(); }
     });

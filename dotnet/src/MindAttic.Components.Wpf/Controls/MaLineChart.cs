@@ -4,13 +4,13 @@ using System.Windows.Media;
 
 namespace MindAttic.Components.Wpf.Controls;
 
-/// <summary>One reading on a <see cref="McLineChart"/>: a percent at an instant. <paramref name="Brush"/> colours the
-/// segment that ends at this point (e.g. <c>McBad</c> while above a pace line, <c>McGood</c> below); null draws it in
-/// <c>McAccent</c>.</summary>
-public sealed record McChartPoint(DateTime AtUtc, double Percent, Brush? Brush = null);
+/// <summary>One reading on a <see cref="MaLineChart"/>: a percent at an instant. <paramref name="Brush"/> colours the
+/// segment that ends at this point (e.g. <c>MaBad</c> while above a pace line, <c>MaGood</c> below); null draws it in
+/// <c>MaAccent</c>.</summary>
+public sealed record MaChartPoint(DateTime AtUtc, double Percent, Brush? Brush = null);
 
-/// <summary>How a <see cref="McChartReferenceLine"/> is stroked.</summary>
-public enum McLineDash
+/// <summary>How a <see cref="MaChartReferenceLine"/> is stroked.</summary>
+public enum MaLineDash
 {
     /// <summary>A continuous line.</summary>
     Solid,
@@ -22,23 +22,23 @@ public enum McLineDash
 
 /// <summary>
 /// A line drawn behind the data: a level (a target, a limit) or any path (a pace curve). <paramref name="Label"/>, when
-/// set, is written just above its first point in the line's own brush. A null <paramref name="Brush"/> is <c>McMuted</c>.
+/// set, is written just above its first point in the line's own brush. A null <paramref name="Brush"/> is <c>MaMuted</c>.
 /// </summary>
-public sealed record McChartReferenceLine(IReadOnlyList<McChartPoint> Path, Brush? Brush = null, McLineDash Dash = McLineDash.Solid,
+public sealed record MaChartReferenceLine(IReadOnlyList<MaChartPoint> Path, Brush? Brush = null, MaLineDash Dash = MaLineDash.Solid,
     double Thickness = 1, string? Label = null)
 {
     /// <summary>A horizontal line at <paramref name="percent"/> across <paramref name="fromUtc"/>..<paramref name="toUtc"/>.</summary>
-    public static McChartReferenceLine Level(DateTime fromUtc, DateTime toUtc, double percent, Brush? brush = null,
-        McLineDash dash = McLineDash.Solid, double thickness = 1, string? label = null) =>
+    public static MaChartReferenceLine Level(DateTime fromUtc, DateTime toUtc, double percent, Brush? brush = null,
+        MaLineDash dash = MaLineDash.Solid, double thickness = 1, string? label = null) =>
         new([new(fromUtc, percent), new(toUtc, percent)], brush, dash, thickness, label);
 
     /// <summary><paramref name="percentAt"/> sampled <paramref name="steps"/> times across the span: a straight line
     /// needs 1 step, a curve about 60.</summary>
-    public static McChartReferenceLine Curve(DateTime fromUtc, DateTime toUtc, Func<DateTime, double> percentAt, int steps = 60,
-        Brush? brush = null, McLineDash dash = McLineDash.Dashed, double thickness = 1.5, string? label = null)
+    public static MaChartReferenceLine Curve(DateTime fromUtc, DateTime toUtc, Func<DateTime, double> percentAt, int steps = 60,
+        Brush? brush = null, MaLineDash dash = MaLineDash.Dashed, double thickness = 1.5, string? label = null)
     {
         steps = Math.Max(1, steps);
-        var points = new McChartPoint[steps + 1];
+        var points = new MaChartPoint[steps + 1];
         for (var i = 0; i <= steps; i++)
         {
             var at = fromUtc + (toUtc - fromUtc) * ((double)i / steps);
@@ -49,17 +49,17 @@ public sealed record McChartReferenceLine(IReadOnlyList<McChartPoint> Path, Brus
 }
 
 /// <summary>Where the line is headed: a dotted segment from the last point to (<paramref name="AtUtc"/>,
-/// <paramref name="Percent"/>), labelled at its end. A null <paramref name="Brush"/> is <c>McMuted</c>.</summary>
-public sealed record McChartProjection(DateTime AtUtc, double Percent, Brush? Brush = null, string? Label = null);
+/// <paramref name="Percent"/>), labelled at its end. A null <paramref name="Brush"/> is <c>MaMuted</c>.</summary>
+public sealed record MaChartProjection(DateTime AtUtc, double Percent, Brush? Brush = null, string? Label = null);
 
 /// <summary>
-/// What a <see cref="McLineChart"/> draws. The time axis runs <paramref name="StartUtc"/> to <paramref name="EndUtc"/>.
+/// What a <see cref="MaLineChart"/> draws. The time axis runs <paramref name="StartUtc"/> to <paramref name="EndUtc"/>.
 /// <paramref name="Points"/> is the line (empty draws only the axes); its last point gets a dot labelled
 /// <paramref name="EndLabel"/> (e.g. "now 42%", or "ended 42%" for a finished span, which has no
 /// <paramref name="Projection"/>).
 /// </summary>
-public sealed record McLineChartData(DateTime StartUtc, DateTime EndUtc, IReadOnlyList<McChartPoint> Points, string? EndLabel = null,
-    McChartProjection? Projection = null, IReadOnlyList<McChartReferenceLine>? ReferenceLines = null);
+public sealed record MaLineChartData(DateTime StartUtc, DateTime EndUtc, IReadOnlyList<MaChartPoint> Points, string? EndLabel = null,
+    MaChartProjection? Projection = null, IReadOnlyList<MaChartReferenceLine>? ReferenceLines = null);
 
 /// <summary>
 /// A percent-over-time line chart in the theme's brushes, lifted from MindAttic.Orchestrator's utilization chart. A
@@ -67,20 +67,20 @@ public sealed record McLineChartData(DateTime StartUtc, DateTime EndUtc, IReadOn
 /// a time axis labelled at both ends, with a faint tick and local time on every whole hour between; reference lines
 /// behind the data; the line itself, each segment in its end point's brush; a dot on the last point with its label; and
 /// a dotted projection to where the line is headed, labelled at its end. With no points it draws just the axes, and
-/// without a projection just the line as it ended. Brushes come from the theme: <c>McText</c>, <c>McMuted</c>,
-/// <c>McChartGrid</c> and <c>McAccent</c> (re-key any of them to restyle every chart). Nothing is told by colour alone:
+/// without a projection just the line as it ended. Brushes come from the theme: <c>MaText</c>, <c>MaMuted</c>,
+/// <c>MaChartGrid</c> and <c>MaAccent</c> (re-key any of them to restyle every chart). Nothing is told by colour alone:
 /// pair the chart with a caption that says the same in words.
 /// </summary>
-public sealed class McLineChart : FrameworkElement
+public sealed class MaLineChart : FrameworkElement
 {
     /// <summary>Identifies <see cref="Data"/>.</summary>
-    public static readonly DependencyProperty DataProperty = DependencyProperty.Register(nameof(Data), typeof(McLineChartData), typeof(McLineChart),
+    public static readonly DependencyProperty DataProperty = DependencyProperty.Register(nameof(Data), typeof(MaLineChartData), typeof(MaLineChart),
         new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
     /// <summary>What to draw; null draws nothing.</summary>
-    public McLineChartData? Data
+    public MaLineChartData? Data
     {
-        get => (McLineChartData?)GetValue(DataProperty);
+        get => (MaLineChartData?)GetValue(DataProperty);
         set => SetValue(DataProperty, value);
     }
 
@@ -97,10 +97,10 @@ public sealed class McLineChart : FrameworkElement
     protected override void OnRender(DrawingContext dc)
     {
         if (Data is not { } d || d.EndUtc <= d.StartUtc || ActualWidth <= Left + Right || ActualHeight <= Top + Bottom) return;
-        var text = Brush("McText", Brushes.White);
-        var muted = Brush("McMuted", Brushes.Gray);
-        var grid = Brush("McChartGrid", Brushes.DimGray);
-        var accent = Brush("McAccent", Brushes.SteelBlue);
+        var text = Brush("MaText", Brushes.White);
+        var muted = Brush("MaMuted", Brushes.Gray);
+        var grid = Brush("MaChartGrid", Brushes.DimGray);
+        var accent = Brush("MaAccent", Brushes.SteelBlue);
         var dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
         var typeface = new Typeface("Segoe UI");
         FormattedText Text(string s, Brush b) => new(s, CultureInfo.CurrentCulture, FlowDirection.LeftToRight, typeface, FontSize, b, dpi);
@@ -143,7 +143,7 @@ public sealed class McLineChart : FrameworkElement
         {
             if (r.Path.Count == 0) continue;
             var brush = r.Brush ?? muted;
-            var pen = new Pen(brush, r.Thickness) { DashStyle = r.Dash switch { McLineDash.Dashed => DashStyles.Dash, McLineDash.Dotted => DashStyles.Dot, _ => DashStyles.Solid } };
+            var pen = new Pen(brush, r.Thickness) { DashStyle = r.Dash switch { MaLineDash.Dashed => DashStyles.Dash, MaLineDash.Dotted => DashStyles.Dot, _ => DashStyles.Solid } };
             if (r.Path.Count == 2) dc.DrawLine(pen, P(r.Path[0].AtUtc, r.Path[0].Percent), P(r.Path[1].AtUtc, r.Path[1].Percent));
             else if (r.Path.Count > 2)
             {

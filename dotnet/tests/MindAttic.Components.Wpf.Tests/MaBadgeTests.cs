@@ -9,8 +9,8 @@ using Xunit;
 
 namespace MindAttic.Components.Wpf.Tests;
 
-/// <summary>M.COMP-T31: McBadge, the outlined state pill, and its plain McTag variant.</summary>
-public sealed class McBadgeTests
+/// <summary>M.COMP-T31: MaBadge, the outlined state pill, and its plain MaTag variant.</summary>
+public sealed class MaBadgeTests
 {
     private static readonly SolidColorBrush Running = Frozen(new SolidColorBrush(Color.FromRgb(0x3F, 0xB9, 0x50)));
 
@@ -19,7 +19,7 @@ public sealed class McBadgeTests
     [Fact]
     public void A_state_badge_draws_glyph_word_and_outline_in_its_state_colour() => Sta(h =>
     {
-        var badge = new McBadge { Glyph = "\uE768", Content = "Running", Foreground = Running };
+        var badge = new MaBadge { Glyph = "\uE768", Content = "Running", Foreground = Running };
         h.Show(badge);
 
         var border = (Border)badge.Template.FindName("PART_Border", badge);
@@ -41,7 +41,7 @@ public sealed class McBadgeTests
     [Fact]
     public void The_outline_follows_a_state_colour_that_changes() => Sta(h =>
     {
-        var badge = new McBadge { Glyph = "\uE768", Content = "Running", Foreground = Running };
+        var badge = new MaBadge { Glyph = "\uE768", Content = "Running", Foreground = Running };
         h.Show(badge);
         var border = (Border)badge.Template.FindName("PART_Border", badge);
 
@@ -53,17 +53,17 @@ public sealed class McBadgeTests
     [Fact]
     public void Without_a_glyph_the_glyph_and_its_gap_collapse() => Sta(h =>
     {
-        var badge = new McBadge { Content = "Done" };
+        var badge = new MaBadge { Content = "Done" };
         h.Show(badge);
         var glyph = (TextBlock)badge.Template.FindName("PART_Glyph", badge);
         Assert.Equal(Visibility.Collapsed, glyph.Visibility);
-        Assert.Equal(h.Window.FindResource("McText"), badge.Foreground);
+        Assert.Equal(h.Window.FindResource("MaText"), badge.Foreground);
     });
 
     [Fact]
     public void The_glyph_is_hidden_from_screen_readers_which_read_only_the_word() => Sta(h =>
     {
-        var badge = new McBadge { Glyph = "\uE768", Content = "Running", Foreground = Running };
+        var badge = new MaBadge { Glyph = "\uE768", Content = "Running", Foreground = Running };
         h.Show(badge);
         var peer = UIElementAutomationPeer.CreatePeerForElement(badge);
         Assert.Equal("Running", peer.GetName());
@@ -75,14 +75,14 @@ public sealed class McBadgeTests
     });
 
     [Fact]
-    public void McTag_is_a_plain_square_neutral_label() => Sta(h =>
+    public void MaTag_is_a_plain_square_neutral_label() => Sta(h =>
     {
-        var tag = new McBadge { Content = "general-purpose", Style = (Style)h.Window.FindResource("McTag") };
+        var tag = new MaBadge { Content = "general-purpose", Style = (Style)h.Window.FindResource("MaTag") };
         h.Show(tag);
         var border = (Border)tag.Template.FindName("PART_Border", tag);
         var glyph = (TextBlock)tag.Template.FindName("PART_Glyph", tag);
 
-        Assert.Equal(h.Window.FindResource("McControlBorder"), border.BorderBrush);
+        Assert.Equal(h.Window.FindResource("MaControlBorder"), border.BorderBrush);
         Assert.Equal(new CornerRadius(3), border.CornerRadius);
         Assert.Equal(new Thickness(5, 0, 5, 0), border.Padding);
         Assert.Equal(11d, tag.FontSize);

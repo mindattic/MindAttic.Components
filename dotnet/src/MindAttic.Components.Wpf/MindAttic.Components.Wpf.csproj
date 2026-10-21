@@ -5,40 +5,40 @@
     <UseWPF>true</UseWPF>
     <PackageId>MindAttic.Components.Wpf</PackageId>
     <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
-    <Version>18.0.0</Version>
+    <Version>19.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the
       start of a recording), and an AddressBar control: a themed Back/Forward/Reload(/Home) +
       URL bar attachable to a CoreWebView2 that can change at runtime, with an optional
-      navigation guard a host can use to veto any action. McWindow.DarkTitleBar asks Windows to
-      draw a window's title bar dark to match the theme. McModal is an in-window modal dialog
+      navigation guard a host can use to veto any action. MaWindow.DarkTitleBar asks Windows to
+      draw a window's title bar dark to match the theme. MaModal is an in-window modal dialog
       (dimmed backdrop, themed card with a heading, close button and footer) opened through a
       bindable IsOpen, closed by Esc or a backdrop click, with focus trapped inside and returned
-      on close. McProgressBar styles a ProgressBar as a thin rounded track with a coloured fill,
-      determinate or indeterminate. McBadge is a small outlined pill (an optional icon-font glyph
-      and a word in a state colour) with a plain McTag variant for a type or category label.
-      Building blocks: McPillChoice (a single-choice pill row), McPillToggle, McCard,
-      McStatCard/McSmallStat tiles, the McFocusRing keyboard focus ring, McHeading/McSectionLabel/
-      McMutedText text styles, and McLineChart, a themed percent-over-time line chart (time and
+      on close. MaProgressBar styles a ProgressBar as a thin rounded track with a coloured fill,
+      determinate or indeterminate. MaBadge is a small outlined pill (an optional icon-font glyph
+      and a word in a state colour) with a plain MaTag variant for a type or category label.
+      Building blocks: MaPillChoice (a single-choice pill row), MaPillToggle, MaCard,
+      MaStatCard/MaSmallStat tiles, the MaFocusRing keyboard focus ring, MaHeading/MaSectionLabel/
+      MaMutedText text styles, and MaLineChart, a themed percent-over-time line chart (time and
       percent axes, reference lines, per-point segment colours, a dotted projection).
-      McToast is a themed notification card (accent stripe, a title and two-line body
-      that is one clickable button, a dismiss button), and McToastHost a row that stacks them
+      MaToast is a themed notification card (accent stripe, a title and two-line body
+      that is one clickable button, a dismiss button), and MaToastHost a row that stacks them
       from a bound collection and announces each new one politely to screen readers.
-      McHyperlink styles a Hyperlink in text: the McLink accent, SemiBold, underlined only on hover
+      MaHyperlink styles a Hyperlink in text: the MaLink accent, SemiBold, underlined only on hover
       and keyboard focus.
-      McTextBox.Placeholder shows muted placeholder text in an empty McTextBox, and McTextArea is
+      MaTextBox.Placeholder shows muted placeholder text in an empty MaTextBox, and MaTextArea is
       the multi-line text box whose thin themed scroll bars show when its text overflows.
-      McMessageBox.Show is a themed stand-in for MessageBox (a dark-title-bar window with an icon,
+      MaMessageBox.Show is a themed stand-in for MessageBox (a dark-title-bar window with an icon,
       the message and OK / OK-Cancel / Yes-No / Yes-No-Cancel buttons, returning MessageBoxResult)
-      for prompts when no app window is open to host an McModal.
-      McSpinner is a busy ring in McAccent that turns on its own thread, so it keeps turning while
+      for prompts when no app window is open to host an MaModal.
+      MaSpinner is a busy ring in MaAccent that turns on its own thread, so it keeps turning while
       the UI thread is blocked.
       MindAttic.Components.Wpf.Mvvm: ObservableObject, RelayCommand, CollectionSync (in-place
-      ReorderTo/SyncBy) and ZoomLevel (80-200% with Ctrl+Plus/Minus/0). McToolTips.KeepOpen makes
-      tooltips stay up until dismissed, and McHighContrast swaps the Windows high-contrast colours
-      into every theme brush live. The palette meets WCAG 2.2 AA by itself: McRec text is 4.5:1 and
-      a text field's McFieldBorder outline 3:1 on every surface.</Description>
+      ReorderTo/SyncBy) and ZoomLevel (80-200% with Ctrl+Plus/Minus/0). MaToolTips.KeepOpen makes
+      tooltips stay up until dismissed, and MaHighContrast swaps the Windows high-contrast colours
+      into every theme brush live. The palette meets WCAG 2.2 AA by itself: MaRec text is 4.5:1 and
+      a text field's MaFieldBorder outline 3:1 on every surface.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

@@ -8,7 +8,7 @@ namespace MindAttic.Components.Wpf.Controls;
 /// stay up until the pointer or focus leaves it or Esc is pressed, rather than vanishing after WPF's 5 seconds. Call it
 /// once at startup, e.g. from the App's static constructor. Lifted from the Orchestrator and Workflow Desktop (M.COMP-T11).
 /// </summary>
-public static class McToolTips
+public static class MaToolTips
 {
     private static int applied;
 

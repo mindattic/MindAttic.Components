@@ -14,23 +14,23 @@ namespace MindAttic.Components.Wpf.Controls;
 /// back. The theme's styles use DynamicResource, so every library control follows live, with no restart. An app adds
 /// its own brush keys through the optional lists. Lifted from Workflow Desktop's Theme/HighContrast (M.COMP-T11).
 /// </summary>
-public static class McHighContrast
+public static class MaHighContrast
 {
     /// <summary>The theme's background brushes (filled with the system Window colour).</summary>
-    public static IReadOnlyList<string> Backgrounds { get; } = ["McChrome", "McSurface", "McHover"];
+    public static IReadOnlyList<string> Backgrounds { get; } = ["MaChrome", "MaSurface", "MaHover"];
 
     /// <summary>The theme's text, line and status brushes (WindowText).</summary>
     public static IReadOnlyList<string> Foregrounds { get; } =
     [
-        "McText", "McMuted", "McRec", "McStar", "McChromeBorder", "McControlBorder", "McFieldBorder",
-        "McGood", "McWarn", "McBad", "McLink", "McChartGrid",
+        "MaText", "MaMuted", "MaRec", "MaStar", "MaChromeBorder", "MaControlBorder", "MaFieldBorder",
+        "MaGood", "MaWarn", "MaBad", "MaLink", "MaChartGrid",
     ];
 
     /// <summary>The theme's accent and focus brushes (Highlight).</summary>
-    public static IReadOnlyList<string> Accents { get; } = ["McAccent", "McAccentHover", "McFocus", "McTileHover"];
+    public static IReadOnlyList<string> Accents { get; } = ["MaAccent", "MaAccentHover", "MaFocus", "MaTileHover"];
 
     /// <summary>Text on the accent (HighlightText).</summary>
-    public const string OnAccent = "McOnAccent";
+    public const string OnAccent = "MaOnAccent";
 
     /// <summary>Every theme key this swaps.</summary>
     public static IEnumerable<string> Keys => [.. Backgrounds, .. Foregrounds, .. Accents, OnAccent];

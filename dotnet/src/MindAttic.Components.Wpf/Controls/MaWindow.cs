@@ -5,14 +5,14 @@ using System.Windows.Interop;
 namespace MindAttic.Components.Wpf.Controls;
 
 /// <summary>
-/// Window chrome helpers. <c>mc:McWindow.DarkTitleBar="True"</c> on a <see cref="Window"/> asks
+/// Window chrome helpers. <c>mc:MaWindow.DarkTitleBar="True"</c> on a <see cref="Window"/> asks
 /// Windows (10 20H1 and later) to draw its title bar and frame dark, so the system caption matches
-/// the McChrome theme instead of a light strip above it. Older Windows ignores the request.
+/// the MaChrome theme instead of a light strip above it. Older Windows ignores the request.
 /// </summary>
-public static class McWindow
+public static class MaWindow
 {
     public static readonly DependencyProperty DarkTitleBarProperty = DependencyProperty.RegisterAttached(
-        "DarkTitleBar", typeof(bool), typeof(McWindow), new PropertyMetadata(false, OnDarkTitleBarChanged));
+        "DarkTitleBar", typeof(bool), typeof(MaWindow), new PropertyMetadata(false, OnDarkTitleBarChanged));
 
     public static bool GetDarkTitleBar(Window window) => (bool)window.GetValue(DarkTitleBarProperty);
 

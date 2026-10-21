@@ -9,21 +9,21 @@ using Xunit;
 
 namespace MindAttic.Components.Wpf.Tests;
 
-/// <summary>M.COMP-T12: McLineChart, the Orchestrator's utilization chart as a library control.</summary>
-public sealed class McLineChartTests
+/// <summary>M.COMP-T12: MaLineChart, the Orchestrator's utilization chart as a library control.</summary>
+public sealed class MaLineChartTests
 {
     private static readonly DateTime Start = new(2026, 10, 16, 14, 0, 0, DateTimeKind.Utc);
     private static readonly DateTime End = Start.AddHours(5);
     private static readonly DateTime Now = Start.AddHours(3);
 
-    private static McLineChartData Running(Brush over, Brush under, Brush lands) => new(Start, End,
+    private static MaLineChartData Running(Brush over, Brush under, Brush lands) => new(Start, End,
         [new(Start, 0), new(Start.AddHours(1), 30, over), new(Start.AddHours(2), 45, under), new(Now, 70, over)],
         EndLabel: "now 70%",
         Projection: new(End, 110, lands, "110% at reset"),
         ReferenceLines:
         [
-            McChartReferenceLine.Level(Start, End, 99, Brushes.SteelBlue, label: "99% target"),
-            McChartReferenceLine.Curve(Start, End, at => 99 * Math.Sqrt((at - Start) / (End - Start))),
+            MaChartReferenceLine.Level(Start, End, 99, Brushes.SteelBlue, label: "99% target"),
+            MaChartReferenceLine.Curve(Start, End, at => 99 * Math.Sqrt((at - Start) / (End - Start))),
         ]);
 
     [Fact]
@@ -37,15 +37,15 @@ public sealed class McLineChartTests
             var text = Texts(chart);
 
             // Percent axis: a gridline and label every 25%; time axis labelled at both ends.
-            foreach (var p in McLineChart.PercentTicks) Assert.Contains($"{p}%", text);
+            foreach (var p in MaLineChart.PercentTicks) Assert.Contains($"{p}%", text);
             Assert.Contains(Start.ToLocalTime().ToString("t"), text);
             Assert.Contains(End.ToLocalTime().ToString("t"), text);
-            Assert.Contains(lines, g => g.Pen?.Brush == window.FindResource("McChartGrid"));
+            Assert.Contains(lines, g => g.Pen?.Brush == window.FindResource("MaChartGrid"));
 
-            // Reference lines: the solid target with its label, and the dashed pace curve in McMuted.
+            // Reference lines: the solid target with its label, and the dashed pace curve in MaMuted.
             Assert.Contains("99% target", text);
             Assert.Contains(lines, g => g.Pen?.Brush == Brushes.SteelBlue && g.Pen.DashStyle == DashStyles.Solid);
-            Assert.Contains(lines, g => g.Geometry is StreamGeometry && g.Pen?.Brush == window.FindResource("McMuted") && g.Pen.DashStyle == DashStyles.Dash);
+            Assert.Contains(lines, g => g.Geometry is StreamGeometry && g.Pen?.Brush == window.FindResource("MaMuted") && g.Pen.DashStyle == DashStyles.Dash);
 
             // The line: each segment in its end point's brush.
             Assert.Equal(2, lines.Count(g => g.Pen?.Brush == over && g.Pen.Thickness == 2.5));
@@ -55,7 +55,7 @@ public sealed class McLineChartTests
             Assert.Single(lines, g => g.Pen?.Brush == lands && g.Pen.DashStyle == DashStyles.Dot);
             Assert.Contains("now 70%", text);
             Assert.Contains("110% at reset", text);
-            Assert.Contains(lines, g => g.Geometry is EllipseGeometry && g.Brush == window.FindResource("McText"));
+            Assert.Contains(lines, g => g.Geometry is EllipseGeometry && g.Brush == window.FindResource("MaText"));
         }
         finally { window.Close(); }
     });
@@ -81,12 +81,12 @@ public sealed class McLineChartTests
     [Fact]
     public void With_no_points_it_draws_an_empty_axis() => Sta(() =>
     {
-        var (window, chart) = Show(new McLineChartData(Start, End, []));
+        var (window, chart) = Show(new MaLineChartData(Start, End, []));
         try
         {
             var lines = Geometry(chart);
             var text = Texts(chart);
-            foreach (var p in McLineChart.PercentTicks) Assert.Contains($"{p}%", text);
+            foreach (var p in MaLineChart.PercentTicks) Assert.Contains($"{p}%", text);
             Assert.Contains(Start.ToLocalTime().ToString("t"), text);
             Assert.DoesNotContain(lines, g => g.Pen?.Thickness == 2.5);
             Assert.DoesNotContain(lines, g => g.Geometry is EllipseGeometry);
@@ -101,7 +101,7 @@ public sealed class McLineChartTests
         try
         {
             Assert.Empty(Geometry(chart));
-            chart.Data = new McLineChartData(Start, Start, [new(Start, 10)]);
+            chart.Data = new MaLineChartData(Start, Start, [new(Start, 10)]);
             Pump();
             Assert.Empty(Geometry(chart));
         }
@@ -111,8 +111,8 @@ public sealed class McLineChartTests
     [Fact]
     public void A_segment_without_a_brush_is_drawn_in_McAccent() => Sta(() =>
     {
-        var (window, chart) = Show(new McLineChartData(Start, End, [new(Start, 0), new(Now, 40)], "now 40%"));
-        try { Assert.Single(Geometry(chart), g => g.Pen?.Brush == window.FindResource("McAccent") && g.Pen.Thickness == 2.5); }
+        var (window, chart) = Show(new MaLineChartData(Start, End, [new(Start, 0), new(Now, 40)], "now 40%"));
+        try { Assert.Single(Geometry(chart), g => g.Pen?.Brush == window.FindResource("MaAccent") && g.Pen.Thickness == 2.5); }
         finally { window.Close(); }
     });
 
@@ -122,14 +122,14 @@ public sealed class McLineChartTests
     [InlineData(110, 125)]
     [InlineData(400, 170)]
     public void The_percent_axis_leaves_headroom_over_the_highest_point(double highest, double top) =>
-        Assert.Equal(top, McLineChart.AxisTop(highest));
+        Assert.Equal(top, MaLineChart.AxisTop(highest));
 
     // ---- hour ticks (M.ORCH-T464): stepped in UTC, so a clock change never stacks or drops a mark ----
 
     private static readonly TimeZoneInfo Central = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
 
     private static string[] Marks(DateTime startUtc, DateTime endUtc, TimeZoneInfo zone) =>
-        [.. McLineChart.HourTicks(startUtc, endUtc, zone).Select(t => TimeZoneInfo.ConvertTimeFromUtc(t, zone).ToString("HH:mm", CultureInfo.InvariantCulture) + "@" + t.ToString("HH:mm", CultureInfo.InvariantCulture))];
+        [.. MaLineChart.HourTicks(startUtc, endUtc, zone).Select(t => TimeZoneInfo.ConvertTimeFromUtc(t, zone).ToString("HH:mm", CultureInfo.InvariantCulture) + "@" + t.ToString("HH:mm", CultureInfo.InvariantCulture))];
 
     [Fact]
     public void Hour_marks_fall_on_every_whole_local_hour_between_the_ends()
@@ -161,7 +161,7 @@ public sealed class McLineChartTests
     [Fact]
     public void Far_from_the_end_the_last_points_label_sits_above_right_of_the_dot()
     {
-        var (now, end) = McLineChart.PlaceEndLabels(new Point(800, 120), NowSize, new Point(Plot.Right, 60), EndSize, Plot);
+        var (now, end) = MaLineChart.PlaceEndLabels(new Point(800, 120), NowSize, new Point(Plot.Right, 60), EndSize, Plot);
         Assert.Equal(806, now.Left);
         Assert.Equal(102, now.Top + now.Height / 2);
         Assert.NotNull(end);
@@ -175,7 +175,7 @@ public sealed class McLineChartTests
     [InlineData(1300, 120, 118)]
     public void Near_the_end_the_two_labels_do_not_overlap(double nowX, double nowY, double endY)
     {
-        var (now, end) = McLineChart.PlaceEndLabels(new Point(nowX, nowY), NowSize, new Point(Plot.Right, endY), EndSize, Plot);
+        var (now, end) = MaLineChart.PlaceEndLabels(new Point(nowX, nowY), NowSize, new Point(Plot.Right, endY), EndSize, Plot);
         if (end is { } r) Assert.False(now.IntersectsWith(r), $"now {now} overlaps end {r}");
         Assert.True(now.Left >= Plot.Left);
         Assert.True(now.Right <= Plot.Right + 12);
@@ -183,17 +183,17 @@ public sealed class McLineChartTests
 
     // ---- harness ----
 
-    private static (Window, McLineChart) Show(McLineChartData? data)
+    private static (Window, MaLineChart) Show(MaLineChartData? data)
     {
-        var chart = new McLineChart { Data = data, Height = 260 };
+        var chart = new MaLineChart { Data = data, Height = 260 };
         var window = OffScreenWindow.Show(1400, 300, new Grid { Children = { chart } });
         Pump();
         return (window, chart);
     }
 
-    private static List<GeometryDrawing> Geometry(McLineChart chart) => [.. Drawings(VisualTreeHelper.GetDrawing(chart)).OfType<GeometryDrawing>()];
+    private static List<GeometryDrawing> Geometry(MaLineChart chart) => [.. Drawings(VisualTreeHelper.GetDrawing(chart)).OfType<GeometryDrawing>()];
 
-    private static List<string> Texts(McLineChart chart) =>
+    private static List<string> Texts(MaLineChart chart) =>
         [.. Drawings(VisualTreeHelper.GetDrawing(chart)).OfType<GlyphRunDrawing>().Select(g => new string([.. g.GlyphRun.Characters]))];
 
     private static IEnumerable<Drawing> Drawings(Drawing? drawing)

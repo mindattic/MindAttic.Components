@@ -15,8 +15,8 @@ using Xunit;
 
 namespace MindAttic.Components.Wpf.Tests;
 
-/// <summary>M.COMP-T15: McModal, the in-window modal dialog.</summary>
-public sealed class McModalTests
+/// <summary>M.COMP-T15: MaModal, the in-window modal dialog.</summary>
+public sealed class MaModalTests
 {
     [Fact]
     public void Starts_closed_and_IsOpen_shows_and_hides_it() => Sta(h =>
@@ -35,15 +35,15 @@ public sealed class McModalTests
     {
         h.Modal.IsOpen = true;
         h.Pump();
-        var backdrop = (Border)h.Modal.Template.FindName(McModal.PartBackdrop, h.Modal);
-        var card = (Border)h.Modal.Template.FindName(McModal.PartCard, h.Modal);
-        var close = (Button)h.Modal.Template.FindName(McModal.PartCloseButton, h.Modal);
+        var backdrop = (Border)h.Modal.Template.FindName(MaModal.PartBackdrop, h.Modal);
+        var card = (Border)h.Modal.Template.FindName(MaModal.PartCard, h.Modal);
+        var close = (Button)h.Modal.Template.FindName(MaModal.PartCloseButton, h.Modal);
         var title = (TextBlock)h.Modal.Template.FindName("TitleText", h.Modal);
         var footer = (Border)h.Modal.Template.FindName("FooterArea", h.Modal);
 
         Assert.NotNull(backdrop.Background);
-        Assert.Equal(h.Window.FindResource("McChrome"), card.Background);
-        Assert.Equal(h.Window.FindResource("McChromeBorder"), card.BorderBrush);
+        Assert.Equal(h.Window.FindResource("MaChrome"), card.Background);
+        Assert.Equal(h.Window.FindResource("MaChromeBorder"), card.BorderBrush);
         Assert.Contains(FindAll<Border>(h.Modal), b => b.Effect is System.Windows.Media.Effects.DropShadowEffect);
         Assert.Equal("Settings", title.Text);
         Assert.Equal(AutomationHeadingLevel.Level2, AutomationProperties.GetHeadingLevel(title));
@@ -82,7 +82,7 @@ public sealed class McModalTests
         Assert.True(h.Modal.IsKeyboardFocusWithin);
 
         // ...and Tab cycles: past the last stop (the close button) it wraps to the first.
-        var close = (Button)h.Modal.Template.FindName(McModal.PartCloseButton, h.Modal);
+        var close = (Button)h.Modal.Template.FindName(MaModal.PartCloseButton, h.Modal);
         close.Focus();
         close.MoveFocus(new TraversalRequest(FocusNavigationDirection.Next));
         Assert.Same(h.Inside, Keyboard.FocusedElement);
@@ -104,11 +104,11 @@ public sealed class McModalTests
     {
         h.Modal.IsOpen = true;
         h.Pump();
-        var card = (Border)h.Modal.Template.FindName(McModal.PartCard, h.Modal);
+        var card = (Border)h.Modal.Template.FindName(MaModal.PartCard, h.Modal);
         Click(card);
         Assert.True(h.Modal.IsOpen);
 
-        Click((UIElement)h.Modal.Template.FindName(McModal.PartBackdrop, h.Modal));
+        Click((UIElement)h.Modal.Template.FindName(MaModal.PartBackdrop, h.Modal));
         Assert.False(h.Modal.IsOpen);
     });
 
@@ -117,7 +117,7 @@ public sealed class McModalTests
     {
         h.Modal.IsOpen = true;
         h.Pump();
-        var close = (Button)h.Modal.Template.FindName(McModal.PartCloseButton, h.Modal);
+        var close = (Button)h.Modal.Template.FindName(MaModal.PartCloseButton, h.Modal);
         close.RaiseEvent(new RoutedEventArgs(ButtonBase.ClickEvent, close));
         Assert.False(h.Modal.IsOpen);
     });
@@ -127,7 +127,7 @@ public sealed class McModalTests
     {
         var vm = new ViewModel();
         h.Modal.DataContext = vm;
-        h.Modal.SetBinding(McModal.IsOpenProperty, new Binding(nameof(ViewModel.IsSettingsOpen)));
+        h.Modal.SetBinding(MaModal.IsOpenProperty, new Binding(nameof(ViewModel.IsSettingsOpen)));
         vm.IsSettingsOpen = true;
         h.Pump();
         Assert.Equal(Visibility.Visible, h.Modal.Visibility);
@@ -142,7 +142,7 @@ public sealed class McModalTests
     {
         var vm = new ViewModel();
         h.Modal.DataContext = vm;
-        h.Modal.SetBinding(McModal.IsOpenProperty, new Binding(nameof(ViewModel.IsSettingsOpen)) { Mode = BindingMode.OneWay });
+        h.Modal.SetBinding(MaModal.IsOpenProperty, new Binding(nameof(ViewModel.IsSettingsOpen)) { Mode = BindingMode.OneWay });
         var ran = 0;
         h.Modal.CloseCommand = new Command(() => { ran++; vm.IsSettingsOpen = false; });
         vm.IsSettingsOpen = true;
@@ -152,7 +152,7 @@ public sealed class McModalTests
         h.Pump();
         Assert.Equal(1, ran);
         Assert.False(h.Modal.IsOpen);
-        Assert.NotNull(BindingOperations.GetBindingExpression(h.Modal, McModal.IsOpenProperty)); // binding kept
+        Assert.NotNull(BindingOperations.GetBindingExpression(h.Modal, MaModal.IsOpenProperty)); // binding kept
     });
 
     [Fact]
@@ -217,13 +217,13 @@ public sealed class McModalTests
     private sealed class Host
     {
         public Window Window { get; }
-        public McModal Modal { get; }
+        public MaModal Modal { get; }
         public Button Outside { get; } = new() { Content = "Open settings" };
         public TextBox Inside { get; } = new();
 
         public Host()
         {
-            Modal = new McModal
+            Modal = new MaModal
             {
                 Title = "Settings",
                 Content = new StackPanel { Children = { Inside } },

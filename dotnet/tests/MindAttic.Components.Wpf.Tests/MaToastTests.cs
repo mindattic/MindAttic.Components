@@ -13,27 +13,27 @@ using Xunit;
 
 namespace MindAttic.Components.Wpf.Tests;
 
-/// <summary>M.COMP-T30: McToast, the notification card, and McToastHost, the row that stacks and announces them.</summary>
-public sealed class McToastTests
+/// <summary>M.COMP-T30: MaToast, the notification card, and MaToastHost, the row that stacks and announces them.</summary>
+public sealed class MaToastTests
 {
     [Fact]
     public void A_toast_renders_a_themed_card_with_accent_stripe_title_body_and_dismiss_button() => Sta(h =>
     {
         var red = Brushes.Red;
-        var toast = new McToast { Title = "Build failed", Body = "MindAttic.Vault: 3 tests failed.", Accent = red };
+        var toast = new MaToast { Title = "Build failed", Body = "MindAttic.Vault: 3 tests failed.", Accent = red };
         h.Root.Children.Add(toast);
         h.Pump();
 
         var card = (Border)toast.Template.FindName("Card", toast);
         var stripe = (Border)toast.Template.FindName("AccentStripe", toast);
-        var open = (Button)toast.Template.FindName(McToast.PartOpenButton, toast);
-        var dismiss = (Button)toast.Template.FindName(McToast.PartDismissButton, toast);
+        var open = (Button)toast.Template.FindName(MaToast.PartOpenButton, toast);
+        var dismiss = (Button)toast.Template.FindName(MaToast.PartDismissButton, toast);
 
-        Assert.Equal(h.Window.FindResource("McSurface"), card.Background);
+        Assert.Equal(h.Window.FindResource("MaSurface"), card.Background);
         Assert.Same(red, card.BorderBrush);
         Assert.Same(red, stripe.Background);
         Assert.Equal(4, stripe.ActualWidth);
-        Assert.Equal(h.Window.FindResource("McToolButton"), dismiss.Style);
+        Assert.Equal(h.Window.FindResource("MaToolButton"), dismiss.Style);
         Assert.Equal("Build failed", ((TextBlock)toast.Template.FindName("TitleText", toast)).Text);
         var body = (TextBlock)toast.Template.FindName("BodyText", toast);
         Assert.Equal("MindAttic.Vault: 3 tests failed.", body.Text);
@@ -45,16 +45,16 @@ public sealed class McToastTests
     [Fact]
     public void The_accent_defaults_to_McAccent() => Sta(h =>
     {
-        var toast = new McToast { Title = "Hi" };
+        var toast = new MaToast { Title = "Hi" };
         h.Root.Children.Add(toast);
         h.Pump();
-        Assert.Equal(h.Window.FindResource("McAccent"), toast.Accent);
+        Assert.Equal(h.Window.FindResource("MaAccent"), toast.Accent);
     });
 
     [Fact]
     public void A_long_body_is_clipped_to_two_lines() => Sta(h =>
     {
-        var toast = new McToast { Title = "Long", Body = string.Join(" ", Enumerable.Repeat("words", 200)) };
+        var toast = new MaToast { Title = "Long", Body = string.Join(" ", Enumerable.Repeat("words", 200)) };
         h.Root.Children.Add(toast);
         h.Pump();
         var body = (TextBlock)toast.Template.FindName("BodyText", toast);
@@ -66,7 +66,7 @@ public sealed class McToastTests
     {
         object? opened = null, dismissed = null;
         var clicks = 0;
-        var toast = new McToast
+        var toast = new MaToast
         {
             Title = "Needs you",
             Command = new Command(p => opened = p), CommandParameter = "repo",
@@ -76,11 +76,11 @@ public sealed class McToastTests
         h.Root.Children.Add(toast);
         h.Pump();
 
-        ClickButton((Button)toast.Template.FindName(McToast.PartOpenButton, toast));
+        ClickButton((Button)toast.Template.FindName(MaToast.PartOpenButton, toast));
         Assert.Equal("repo", opened);
         Assert.Equal(1, clicks);
 
-        ClickButton((Button)toast.Template.FindName(McToast.PartDismissButton, toast));
+        ClickButton((Button)toast.Template.FindName(MaToast.PartDismissButton, toast));
         Assert.Equal("gone", dismissed);
         Assert.Equal(Visibility.Visible, toast.Visibility); // the command owns removal
     });
@@ -88,21 +88,21 @@ public sealed class McToastTests
     [Fact]
     public void A_standalone_toast_with_no_dismiss_command_hides_itself() => Sta(h =>
     {
-        var toast = new McToast { Title = "Saved" };
+        var toast = new MaToast { Title = "Saved" };
         h.Root.Children.Add(toast);
         h.Pump();
-        ClickButton((Button)toast.Template.FindName(McToast.PartDismissButton, toast));
+        ClickButton((Button)toast.Template.FindName(MaToast.PartDismissButton, toast));
         Assert.Equal(Visibility.Collapsed, toast.Visibility);
     });
 
     [Fact]
     public void Accessible_names_title_help_text_body_and_dismiss_names_the_toast() => Sta(h =>
     {
-        var toast = new McToast { Title = "All quiet", Body = "Nothing is working in any CLI." };
+        var toast = new MaToast { Title = "All quiet", Body = "Nothing is working in any CLI." };
         h.Root.Children.Add(toast);
         h.Pump();
-        var open = (Button)toast.Template.FindName(McToast.PartOpenButton, toast);
-        var dismiss = (Button)toast.Template.FindName(McToast.PartDismissButton, toast);
+        var open = (Button)toast.Template.FindName(MaToast.PartOpenButton, toast);
+        var dismiss = (Button)toast.Template.FindName(MaToast.PartDismissButton, toast);
         Assert.Equal("All quiet", AutomationProperties.GetName(open));
         Assert.Equal("Nothing is working in any CLI.", AutomationProperties.GetHelpText(open));
         Assert.Equal("Dismiss: All quiet", AutomationProperties.GetName(dismiss));
@@ -121,12 +121,12 @@ public sealed class McToastTests
         };
         var host = h.AddHost(items);
 
-        var toasts = FindAll<McToast>(host).ToList();
+        var toasts = FindAll<MaToast>(host).ToList();
         Assert.Equal(2, toasts.Count);
         Assert.Equal("First", toasts[0].Title);
         Assert.Equal("one", toasts[0].Body);
         Assert.Same(Brushes.Orange, toasts[0].Accent);
-        Assert.Equal(h.Window.FindResource("McAccent"), toasts[1].Accent); // no accent: the theme's
+        Assert.Equal(h.Window.FindResource("MaAccent"), toasts[1].Accent); // no accent: the theme's
         Assert.IsType<WrapPanel>(VisualTreeHelper.GetParent(toasts[0]));
     });
 
@@ -141,13 +141,13 @@ public sealed class McToastTests
         host.DismissCommand = new Command(p => { dismissed = p; items.Remove((Note)p!); });
         h.Pump();
 
-        var toast = FindAll<McToast>(host).Single();
-        ClickButton((Button)toast.Template.FindName(McToast.PartOpenButton, toast));
+        var toast = FindAll<MaToast>(host).Single();
+        ClickButton((Button)toast.Template.FindName(MaToast.PartOpenButton, toast));
         Assert.Same(note, opened);
-        ClickButton((Button)toast.Template.FindName(McToast.PartDismissButton, toast));
+        ClickButton((Button)toast.Template.FindName(MaToast.PartDismissButton, toast));
         Assert.Same(note, dismissed);
         h.Pump();
-        Assert.Empty(FindAll<McToast>(host));
+        Assert.Empty(FindAll<MaToast>(host));
     });
 
     [Fact]
@@ -155,11 +155,11 @@ public sealed class McToastTests
     {
         var items = new ObservableCollection<Note> { new("A", "", null), new("B", "", null) };
         var host = h.AddHost(items);
-        var first = FindAll<McToast>(host).First();
-        ClickButton((Button)first.Template.FindName(McToast.PartDismissButton, first));
+        var first = FindAll<MaToast>(host).First();
+        ClickButton((Button)first.Template.FindName(MaToast.PartDismissButton, first));
         h.Pump();
         Assert.Equal(["B"], items.Select(n => n.Title));
-        Assert.Single(FindAll<McToast>(host));
+        Assert.Single(FindAll<MaToast>(host));
     });
 
     [Fact]
@@ -169,7 +169,7 @@ public sealed class McToastTests
         var host = h.AddHost(items);
         Assert.Equal(string.Empty, host.LastAnnouncement);
 
-        var announcer = (TextBlock)host.Template.FindName(McToastHost.PartAnnouncer, host);
+        var announcer = (TextBlock)host.Template.FindName(MaToastHost.PartAnnouncer, host);
         Assert.Equal(AutomationLiveSetting.Polite, AutomationProperties.GetLiveSetting(announcer));
 
         items.Insert(0, new Note("Pace changed", "Now at 92% of the window.", null));
@@ -192,16 +192,16 @@ public sealed class McToastTests
     });
 
     [Fact]
-    public void McToast_elements_can_be_host_items_directly() => Sta(h =>
+    public void MaToast_elements_can_be_host_items_directly() => Sta(h =>
     {
-        var host = new McToastHost();
+        var host = new MaToastHost();
         h.Root.Children.Add(host);
         h.Pump();
-        var toast = new McToast { Title = "Direct", Body = "item" };
+        var toast = new MaToast { Title = "Direct", Body = "item" };
         host.Items.Add(toast);
         h.Pump();
         Assert.Equal("Direct. item", host.LastAnnouncement);
-        ClickButton((Button)toast.Template.FindName(McToast.PartDismissButton, toast));
+        ClickButton((Button)toast.Template.FindName(MaToast.PartDismissButton, toast));
         Assert.Empty(host.Items);
     });
 
@@ -233,9 +233,9 @@ public sealed class McToastTests
             Pump();
         }
 
-        public McToastHost AddHost(System.Collections.IEnumerable items)
+        public MaToastHost AddHost(System.Collections.IEnumerable items)
         {
-            var host = new McToastHost { ItemsSource = items };
+            var host = new MaToastHost { ItemsSource = items };
             Root.Children.Add(host);
             Pump();
             return host;

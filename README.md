@@ -2,7 +2,7 @@
 
 The shared design system behind every MindAttic site and desktop app: plain CSS/JS web components and themes served from jsDelivr, and a WPF theme and controls package for the .NET apps.
 
-[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-18.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
+[![Stack](https://img.shields.io/badge/stack-HTML%20CSS%20JS%20and%20WPF-blue)](#project-layout) [![.NET](https://img.shields.io/badge/.NET-net10.0--windows-512BD4)](#mindatticcomponentswpf) [![Package](https://img.shields.io/badge/MindAttic.Components.Wpf-19.0.0-brightgreen)](#building-and-consuming-the-net-package) [![License](https://img.shields.io/badge/license-all%20rights%20reserved-lightgrey)](#license) [![Status](https://img.shields.io/badge/status-in%20use-success)](#current-state)
 
 ![The Cyberspace backdrop component as it renders on mindattic.com: dim circuit-board panels, terminal readouts and a file browser over a dark grid](docs/web/images/cyberspace-backdrop.png)
 
@@ -25,7 +25,7 @@ The repo is organized by toolchain rather than by visual category: a JS bundle a
 - **Site build** (`web/build/`): splices components into the hand-made pages and apps listed in `web/sites.json`, touching nothing outside their marker blocks.
 - **Parity proof** (`web/tests/parity/`): shows a rebuilt page is indistinguishable from its original.
 - **Site assets** (`web/assets/`): each site's logos, icons and images, with a manifest of every served file.
-- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme that meets WCAG 2.2 AA by itself (palette brushes, button, text box, progress bar and menu styles, tooltips, scroll bars) with persistent tooltips and a live high-contrast swap, building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles), MVVM helpers (`ObservableObject`, `RelayCommand`, `CollectionSync`, `ZoomLevel`) and the `AddressBar`, `DropdownMenu`, `McBadge`, `McLineChart`, `McMessageBox`, `McModal`, `McSpinner`, `McToast` / `McToastHost` and `McWindow` controls.
+- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme that meets WCAG 2.2 AA by itself (palette brushes, button, text box, progress bar and menu styles, tooltips, scroll bars) with persistent tooltips and a live high-contrast swap, building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles), MVVM helpers (`ObservableObject`, `RelayCommand`, `CollectionSync`, `ZoomLevel`) and the `AddressBar`, `DropdownMenu`, `MaBadge`, `MaLineChart`, `MaMessageBox`, `MaModal`, `MaSpinner`, `MaToast` / `MaToastHost` and `MaWindow` controls.
 
 ## Quick start
 
@@ -38,7 +38,7 @@ node web/build/build-sites.mjs mindattic.com                       # rewrite ../
 powershell -File dotnet/tools/publish-wpf.ps1                     # only after the version bump has landed on main
 ```
 
-The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.18.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
+The first command fills the page's `MINDATTIC.COMPONENTS` marker blocks from `web/components/`; the second packs main's `MindAttic.Components.Wpf.19.0.0.nupkg` into the local NuGet feed (and refuses if that version is already there; see [Building and consuming the .NET package](#building-and-consuming-the-net-package)).
 
 ## Web components and the MindAttic.Web sites
 
@@ -104,71 +104,71 @@ Merge the theme once, in `App.xaml`:
 
 | Key | What |
 |---|---|
-| `McChrome`, `McChromeBorder`, `McSurface`, `McHover`, `McText`, `McMuted`, `McControlBorder`, `McFocus`, `McAccent`, `McOnAccent`, `McRec`, `McStar` | Palette brushes. `McRec` (red text) is 4.5:1 or better on every surface; `McOnAccent` is text on an `McAccent` fill |
-| `McFieldBorder` | A text field's outline, 3:1 or better on every surface (WCAG 1.4.11; `McTextBox` / `McTextArea` use it), so no app needs a `FieldBorder` override |
-| `McGood`, `McWarn`, `McBad`, `McChartGrid` | Status colours for data, and chart gridlines |
-| `McLink` | Link text: the accent hue lightened to 5.6:1 on `McChrome` (`McAccent` is a fill colour) |
-| `McFocusRing` | 2px `McFocus` outline just outside a control; set it as `FocusVisualStyle` |
-| `McHeading`, `McSectionLabel`, `McMutedText` | Text styles: a level-2 heading, a muted level-3 section label, trimmed muted text |
-| `McHyperlink` | A `Hyperlink` in text: `McLink`, SemiBold, no underline at rest, underlined on hover and keyboard focus, `McMuted` when disabled. Base a style on it to add a `Command` (e.g. the Orchestrator's ticket ids) |
-| `McCard` | A raised, bordered `Border` that groups content |
-| `McPillChoice` | A `ListBox` as a wrapping row of single-choice pills; the chosen one fills with `McAccent` |
-| `McPillToggle` | A `ToggleButton` pill, filled with `McAccent` while on |
-| `McStatCard`, `McSmallStat` | Stat tiles on `McTileButton` (value over caption); the small one has no size of its own and reads its tooltip as help text |
-| `McToolButton` | 34x30 icon-font toolbar button |
-| `McButton` | Bordered command button |
-| `McPrimaryButton` | The one emphasized action; re-key `McAccentHover` / set `Background` for a brand colour |
-| `McTextButton` | Borderless dialog button; content is centred unless you set `HorizontalContentAlignment` / `VerticalContentAlignment` (e.g. `Left` for a fill-width link) |
-| `McTileButton` + `McTileSubtitle` | Launcher tile; re-key `McTileHover` for a brand colour |
-| `McTextBox` | Dark single-line text box; `Controls.McTextBox.Placeholder` shows muted text while it's empty |
-| `McTextArea` | Multi-line `McTextBox` (Enter adds a line, wraps, top-aligned) whose thin scroll bars show when the text overflows |
-| `McScrollBar` (+ `McScrollBarThumb`) | Thin dark `ScrollBar` on a clear track: `McControlBorder` thumb, `McMuted` on hover, `McText` while dragged, no arrows (the text boxes use it) |
-| `McProgressBar` | Thin rounded `ProgressBar`: `McSurface` track, `McControlBorder` outline, `Foreground` fill; determinate or indeterminate |
-| `McDropdownMenu`, `McDropdownMenuItem`, `McSeparator`, `McPinToggle` | Dropdown parts (used by `DropdownMenu`) |
+| `MaChrome`, `MaChromeBorder`, `MaSurface`, `MaHover`, `MaText`, `MaMuted`, `MaControlBorder`, `MaFocus`, `MaAccent`, `MaOnAccent`, `MaRec`, `MaStar` | Palette brushes. `MaRec` (red text) is 4.5:1 or better on every surface; `MaOnAccent` is text on an `MaAccent` fill |
+| `MaFieldBorder` | A text field's outline, 3:1 or better on every surface (WCAG 1.4.11; `MaTextBox` / `MaTextArea` use it), so no app needs a `FieldBorder` override |
+| `MaGood`, `MaWarn`, `MaBad`, `MaChartGrid` | Status colours for data, and chart gridlines |
+| `MaLink` | Link text: the accent hue lightened to 5.6:1 on `MaChrome` (`MaAccent` is a fill colour) |
+| `MaFocusRing` | 2px `MaFocus` outline just outside a control; set it as `FocusVisualStyle` |
+| `MaHeading`, `MaSectionLabel`, `MaMutedText` | Text styles: a level-2 heading, a muted level-3 section label, trimmed muted text |
+| `MaHyperlink` | A `Hyperlink` in text: `MaLink`, SemiBold, no underline at rest, underlined on hover and keyboard focus, `MaMuted` when disabled. Base a style on it to add a `Command` (e.g. the Orchestrator's ticket ids) |
+| `MaCard` | A raised, bordered `Border` that groups content |
+| `MaPillChoice` | A `ListBox` as a wrapping row of single-choice pills; the chosen one fills with `MaAccent` |
+| `MaPillToggle` | A `ToggleButton` pill, filled with `MaAccent` while on |
+| `MaStatCard`, `MaSmallStat` | Stat tiles on `MaTileButton` (value over caption); the small one has no size of its own and reads its tooltip as help text |
+| `MaToolButton` | 34x30 icon-font toolbar button |
+| `MaButton` | Bordered command button |
+| `MaPrimaryButton` | The one emphasized action; re-key `MaAccentHover` / set `Background` for a brand colour |
+| `MaTextButton` | Borderless dialog button; content is centred unless you set `HorizontalContentAlignment` / `VerticalContentAlignment` (e.g. `Left` for a fill-width link) |
+| `MaTileButton` + `MaTileSubtitle` | Launcher tile; re-key `MaTileHover` for a brand colour |
+| `MaTextBox` | Dark single-line text box; `Controls.MaTextBox.Placeholder` shows muted text while it's empty |
+| `MaTextArea` | Multi-line `MaTextBox` (Enter adds a line, wraps, top-aligned) whose thin scroll bars show when the text overflows |
+| `MaScrollBar` (+ `MaScrollBarThumb`) | Thin dark `ScrollBar` on a clear track: `MaControlBorder` thumb, `MaMuted` on hover, `MaText` while dragged, no arrows (the text boxes use it) |
+| `MaProgressBar` | Thin rounded `ProgressBar`: `MaSurface` track, `MaControlBorder` outline, `Foreground` fill; determinate or indeterminate |
+| `MaDropdownMenu`, `MaDropdownMenuItem`, `MaSeparator`, `MaPinToggle` | Dropdown parts (used by `DropdownMenu`) |
 | *(implicit)* `ToolTip` | Every tooltip in the app |
-| *(implicit)* `ScrollBar`, `ScrollViewer` | Every other scroll bar is `McScrollBar` on a `McChrome` track; the corner where two bars meet is `McChrome` |
+| *(implicit)* `ScrollBar`, `ScrollViewer` | Every other scroll bar is `MaScrollBar` on a `MaChrome` track; the corner where two bars meet is `MaChrome` |
 | `Controls.AddressBar` | Back/Forward/Reload(/Home) + URL textbox for a WebView2 pane |
 | `Controls.DropdownMenu` | Pinnable action menu driven by a trigger button |
-| `Controls.McBadge` (+ `McTag`) | Outlined state pill: optional icon-font glyph and a word in a state colour; `McTag` is the plain type/category tag |
-| `Controls.McLineChart` | Percent-over-time line chart: time and percent axes, reference lines, per-point segment colours, a dotted projection |
-| `Controls.McModal` (+ `McBackdrop`) | In-window modal dialog: dimmed backdrop, themed card, heading, close button, footer |
-| `Controls.McMessageBox` | Themed `MessageBox.Show` stand-in for prompts with no app window to host an `McModal` |
-| `Controls.McSpinner` | Busy ring in `McAccent` that turns on its own thread, so it keeps turning while the UI thread is blocked |
-| `Controls.McToolTips.KeepOpen()` | Every tooltip stays up until the pointer or focus leaves or Esc is pressed (WCAG 1.4.13) |
-| `Controls.McHighContrast` | Swaps the Windows high-contrast colours into every theme brush, live, and back |
+| `Controls.MaBadge` (+ `MaTag`) | Outlined state pill: optional icon-font glyph and a word in a state colour; `MaTag` is the plain type/category tag |
+| `Controls.MaLineChart` | Percent-over-time line chart: time and percent axes, reference lines, per-point segment colours, a dotted projection |
+| `Controls.MaModal` (+ `MaBackdrop`) | In-window modal dialog: dimmed backdrop, themed card, heading, close button, footer |
+| `Controls.MaMessageBox` | Themed `MessageBox.Show` stand-in for prompts with no app window to host an `MaModal` |
+| `Controls.MaSpinner` | Busy ring in `MaAccent` that turns on its own thread, so it keeps turning while the UI thread is blocked |
+| `Controls.MaToolTips.KeepOpen()` | Every tooltip stays up until the pointer or focus leaves or Esc is pressed (WCAG 1.4.13) |
+| `Controls.MaHighContrast` | Swaps the Windows high-contrast colours into every theme brush, live, and back |
 | `Mvvm.ObservableObject`, `Mvvm.RelayCommand`, `Mvvm.CollectionSync` | View model base (`Set` / `Raise`), delegate command, and in-place `ReorderTo` / `SyncBy` for bound collections |
 | `Mvvm.ZoomLevel` | A window's 80-200% zoom with Ctrl+Plus / Ctrl+Minus / Ctrl+0 (WCAG 1.4.4) |
-| `Controls.McToast`, `Controls.McToastHost` | Notification card (accent stripe, clickable title + two-line body, dismiss button) and the row that stacks and announces them |
-| `Controls.McWindow.DarkTitleBar` | Attached property: asks Windows to draw the window's title bar dark |
+| `Controls.MaToast`, `Controls.MaToastHost` | Notification card (accent stripe, clickable title + two-line body, dismiss button) and the row that stacks and announces them |
+| `Controls.MaWindow.DarkTitleBar` | Attached property: asks Windows to draw the window's title bar dark |
 
-Every templated control restores a keyboard-focus outline (`McFocus`). Every style refers to the palette as `DynamicResource`, so re-keying a brush in your own `Application.Resources` (which win over the merged theme) restyles every library control, live. `Controls.DropdownMenu` closes its own popup before invoking an action, so it is never on screen for a screenshot or the start of a recording; see its XML docs.
+Every templated control restores a keyboard-focus outline (`MaFocus`). Every style refers to the palette as `DynamicResource`, so re-keying a brush in your own `Application.Resources` (which win over the merged theme) restyles every library control, live. `Controls.DropdownMenu` closes its own popup before invoking an action, so it is never on screen for a screenshot or the start of a recording; see its XML docs.
 
 `Controls.AddressBar` is a themed WPF address bar for a WebView2 pane: `Attach(CoreWebView2?)` binds (or rebinds) it to a live core, Enter navigates with an optional `{query}` search-template fallback, and an optional `NavigationGuard` lets a host veto Back/Forward/Reload/Navigate/Home (e.g. while recording or mid-run) with a reason string surfaced via `NavigationBlocked`.
 
-`Controls.McWindow.DarkTitleBar="True"` on a `Window` asks Windows 10 20H1 and later to draw its title bar and frame dark, so the system caption matches the `McChrome` theme. Older Windows ignores the request.
+`Controls.MaWindow.DarkTitleBar="True"` on a `Window` asks Windows 10 20H1 and later to draw its title bar and frame dark, so the system caption matches the `MaChrome` theme. Older Windows ignores the request.
 
-`Controls.McModal` is an in-window modal dialog. Put it last in the window's root `Grid`, spanning every row and column, and bind `IsOpen` (two-way by default):
+`Controls.MaModal` is an in-window modal dialog. Put it last in the window's root `Grid`, spanning every row and column, and bind `IsOpen` (two-way by default):
 
 ```xml
-<ctl:McModal IsOpen="{Binding IsSettingsOpen}" Title="Settings" DialogWidth="520"
+<ctl:MaModal IsOpen="{Binding IsSettingsOpen}" Title="Settings" DialogWidth="520"
              Grid.RowSpan="3" Grid.ColumnSpan="2">
     <StackPanel>...</StackPanel>
-    <ctl:McModal.Footer>
-        <Button Style="{StaticResource McPrimaryButton}" Content="Done" Command="{Binding ToggleSettingsCommand}" />
-    </ctl:McModal.Footer>
-</ctl:McModal>
+    <ctl:MaModal.Footer>
+        <Button Style="{StaticResource MaPrimaryButton}" Content="Done" Command="{Binding ToggleSettingsCommand}" />
+    </ctl:MaModal.Footer>
+</ctl:MaModal>
 ```
 
 Esc, the close button and a backdrop click close it (through `CloseCommand` when set, e.g. a view model whose open flag is read-only, otherwise by clearing `IsOpen`). While open, Tab cycles inside the card, access keys are scoped to it and focus can't be moved out; on close focus goes back to where it was. The title is a level-2 heading and the dialog's accessible name (unless `AutomationProperties.Name` is set), and UI Automation sees it as a dialog window. `Opened` and `Closed` are raised after each change.
 
-`ctl:McTextBox.Placeholder` on a `TextBox` styled `McTextBox` or `McTextArea` shows that text in `McMuted` while the box is empty, so a host no longer overlays its own `TextBlock`. It ignores the mouse (a click on it lands in the box) and is not part of the box's accessible name, so still set `AutomationProperties.Name`. `McTextArea` is the multi-line box: `AcceptsReturn`, wrapping, text from the top, and `McScrollBar`s that show when the text overflows. Set `TextWrapping="NoWrap"` (e.g. a read-only log) and the horizontal bar shows for long lines too. `McTextBox` hides its scroll bars unless the box sets `VerticalScrollBarVisibility` / `HorizontalScrollBarVisibility` itself.
+`ctl:MaTextBox.Placeholder` on a `TextBox` styled `MaTextBox` or `MaTextArea` shows that text in `MaMuted` while the box is empty, so a host no longer overlays its own `TextBlock`. It ignores the mouse (a click on it lands in the box) and is not part of the box's accessible name, so still set `AutomationProperties.Name`. `MaTextArea` is the multi-line box: `AcceptsReturn`, wrapping, text from the top, and `MaScrollBar`s that show when the text overflows. Set `TextWrapping="NoWrap"` (e.g. a read-only log) and the horizontal bar shows for long lines too. `MaTextBox` hides its scroll bars unless the box sets `VerticalScrollBarVisibility` / `HorizontalScrollBarVisibility` itself.
 
 ```xml
-<TextBox Style="{StaticResource McTextBox}" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"
-         ctl:McTextBox.Placeholder="Search repos and tickets   Ctrl+F" AutomationProperties.Name="Search repos and tickets" />
-<TextBox Style="{StaticResource McTextArea}" Height="64" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}"
-         ctl:McTextBox.Placeholder="Opening prompt (optional)" AutomationProperties.Name="Opening prompt (optional)" />
-<TextBox Style="{StaticResource McTextArea}" IsReadOnly="True" TextWrapping="NoWrap" FontFamily="Consolas" />
+<TextBox Style="{StaticResource MaTextBox}" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged}"
+         ctl:MaTextBox.Placeholder="Search repos and tickets   Ctrl+F" AutomationProperties.Name="Search repos and tickets" />
+<TextBox Style="{StaticResource MaTextArea}" Height="64" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}"
+         ctl:MaTextBox.Placeholder="Opening prompt (optional)" AutomationProperties.Name="Opening prompt (optional)" />
+<TextBox Style="{StaticResource MaTextArea}" IsReadOnly="True" TextWrapping="NoWrap" FontFamily="Consolas" />
 ```
 
 The accessibility and MVVM pieces every app used to copy (M.COMP-T11) are one call each in `App`:
@@ -176,14 +176,14 @@ The accessibility and MVVM pieces every app used to copy (M.COMP-T11) are one ca
 ```csharp
 public partial class App : Application
 {
-    static App() => McToolTips.KeepOpen(); // tooltips stay until dismissed (1.4.13)
+    static App() => MaToolTips.KeepOpen(); // tooltips stay until dismissed (1.4.13)
 
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
         // Follow Windows' high-contrast setting live (--high-contrast to check it without changing Windows). Name any
         // brush keys of the app's own to swap too: backgrounds, text/lines, accents.
-        McHighContrast.Track(this, force: e.Args.Contains("--high-contrast"), foregrounds: ["StateOpen", "StateClosed"]);
+        MaHighContrast.Track(this, force: e.Args.Contains("--high-contrast"), foregrounds: ["StateOpen", "StateClosed"]);
         ...
     }
 }
@@ -200,53 +200,53 @@ public ZoomLevel Zoom { get; } = new(settings.Zoom, z => { settings.Zoom = z; se
 <TextBlock Text="{Binding Zoom.Text}" ToolTip="Ctrl+0 resets the zoom" />
 ```
 
-`Controls.McMessageBox.Show` is a drop-in for `MessageBox.Show` when there is no app window to put an `McModal` in (startup, setup, an installer step): a small `McChrome` window with a dark title bar, an icon, the message and McButtons, returning a `MessageBoxResult`:
+`Controls.MaMessageBox.Show` is a drop-in for `MessageBox.Show` when there is no app window to put an `MaModal` in (startup, setup, an installer step): a small `MaChrome` window with a dark title bar, an icon, the message and MaButtons, returning a `MessageBoxResult`:
 
 ```csharp
-var choice = McMessageBox.Show("Build the workspace first?", "MindAttic Orchestrator",
+var choice = MaMessageBox.Show("Build the workspace first?", "MindAttic Orchestrator",
     MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
 ```
 
-It takes OK, OK/Cancel, Yes/No and Yes/No/Cancel and the Information, Warning, Error and Question icons (each in its theme colour, read out as its severity); an overload takes an owner window to centre on. The first button is the default (Enter, `McPrimaryButton`) unless `defaultResult` names another; Esc and the title bar's X answer Cancel when there is one, otherwise OK or No. It merges `Theme.xaml` itself when the app hasn't, and a box shown before the app has a window of its own neither becomes `Application.MainWindow` nor ends the app when it closes. The window is named by its caption with the message as its help text.
+It takes OK, OK/Cancel, Yes/No and Yes/No/Cancel and the Information, Warning, Error and Question icons (each in its theme colour, read out as its severity); an overload takes an owner window to centre on. The first button is the default (Enter, `MaPrimaryButton`) unless `defaultResult` names another; Esc and the title bar's X answer Cancel when there is one, otherwise OK or No. It merges `Theme.xaml` itself when the app hasn't, and a box shown before the app has a window of its own neither becomes `Application.MainWindow` nor ends the app when it closes. The window is named by its caption with the message as its help text.
 
-`McProgressBar` styles a stock `ProgressBar`. Determinate fills `Value`'s share of `Minimum..Maximum` (0..100 by default) from the left; `IsIndeterminate="True"` sweeps a segment across the track instead. The fill is the bar's `Foreground` (`McAccent` by default), so a host can bind it, e.g. a budget colour that turns amber then red:
+`MaProgressBar` styles a stock `ProgressBar`. Determinate fills `Value`'s share of `Minimum..Maximum` (0..100 by default) from the left; `IsIndeterminate="True"` sweeps a segment across the track instead. The fill is the bar's `Foreground` (`MaAccent` by default), so a host can bind it, e.g. a budget colour that turns amber then red:
 
 ```xml
-<ProgressBar Style="{StaticResource McProgressBar}" Maximum="1" Value="{Binding BudgetFill}"
+<ProgressBar Style="{StaticResource MaProgressBar}" Maximum="1" Value="{Binding BudgetFill}"
              Foreground="{Binding BudgetBrush}" />
-<ProgressBar Style="{StaticResource McProgressBar}" IsIndeterminate="True" />
+<ProgressBar Style="{StaticResource MaProgressBar}" IsIndeterminate="True" />
 ```
 
 It is 6px tall; set `Height` for a thicker bar.
 
-`Controls.McBadge` is a small outlined pill for a state: set `Foreground` to the state colour and the glyph, the word and the outline all follow it (the outline unless `BorderBrush` is set), so the state reads as a word and a glyph as well as a colour (WCAG 1.4.1). `Glyph` is an icon-font character (Segoe MDL2 Assets by default, `GlyphFontFamily` to change it); leave it empty for a word only. The `McTag` style is the plain variant: a squarer, neutral-outlined, normal-weight label for a type or category. The glyph is decoration and is left out of the UI Automation tree; the badge reads as text named by its content.
+`Controls.MaBadge` is a small outlined pill for a state: set `Foreground` to the state colour and the glyph, the word and the outline all follow it (the outline unless `BorderBrush` is set), so the state reads as a word and a glyph as well as a colour (WCAG 1.4.1). `Glyph` is an icon-font character (Segoe MDL2 Assets by default, `GlyphFontFamily` to change it); leave it empty for a word only. The `MaTag` style is the plain variant: a squarer, neutral-outlined, normal-weight label for a type or category. The glyph is decoration and is left out of the UI Automation tree; the badge reads as text named by its content.
 
 ```xml
-<ctl:McBadge Glyph="{Binding StateGlyph}" Content="{Binding StateLabel}" Foreground="{Binding StateBrush}" />
-<ctl:McBadge Style="{StaticResource McTag}" Content="{Binding Type}" />
+<ctl:MaBadge Glyph="{Binding StateGlyph}" Content="{Binding StateLabel}" Foreground="{Binding StateBrush}" />
+<ctl:MaBadge Style="{StaticResource MaTag}" Content="{Binding Type}" />
 ```
 
-`Controls.McSpinner` is a busy ring (a dashed circle in `McAccent`, set `Stroke` for another colour) that keeps turning while the UI thread is blocked, e.g. behind a loader while the window applies a big first result and lays out a heavy page. A storyboard spinner ticks on the window's thread and freezes with it; this one draws into a `HostVisual` whose content lives on its own dispatcher thread, which runs only while the spinner is loaded and visible and shuts down when it's hidden or unloaded. It is 44x44 unless `Width`/`Height` say otherwise; `StrokeThickness` (4) and `Period` (one turn, 1.2s) tune it, and changing any of them while it turns restarts the ring. It reads to UI Automation as a progress bar named "Loading" (or its `AutomationProperties.Name`) and is never a tab stop. `IsSpinning`, `SpinnerThread` and `Angle` are there for tests.
+`Controls.MaSpinner` is a busy ring (a dashed circle in `MaAccent`, set `Stroke` for another colour) that keeps turning while the UI thread is blocked, e.g. behind a loader while the window applies a big first result and lays out a heavy page. A storyboard spinner ticks on the window's thread and freezes with it; this one draws into a `HostVisual` whose content lives on its own dispatcher thread, which runs only while the spinner is loaded and visible and shuts down when it's hidden or unloaded. It is 44x44 unless `Width`/`Height` say otherwise; `StrokeThickness` (4) and `Period` (one turn, 1.2s) tune it, and changing any of them while it turns restarts the ring. It reads to UI Automation as a progress bar named "Loading" (or its `AutomationProperties.Name`) and is never a tab stop. `IsSpinning`, `SpinnerThread` and `Angle` are there for tests.
 
 ```xml
-<ctl:McSpinner Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
-<ctl:McSpinner Width="24" Height="24" StrokeThickness="3" AutomationProperties.Name="Loading the workspace" />
+<ctl:MaSpinner Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" />
+<ctl:MaSpinner Width="24" Height="24" StrokeThickness="3" AutomationProperties.Name="Loading the workspace" />
 ```
 
-`Controls.McLineChart` draws a `McLineChartData`: the time span (`StartUtc`..`EndUtc`), the `Points` (each `McChartPoint` carries the brush of the segment ending at it, `McAccent` by default), an `EndLabel` for the last point's dot, an optional `Projection` drawn dotted from the last point and labelled at its end, and `ReferenceLines` (`McChartReferenceLine.Level` for a target, `.Curve` for a pace line). Without a projection it draws the line as it ended; with no points, just the axes. The percent axis has a gridline every 25% and headroom over the highest point; the time axis labels both ends and every whole local hour between (stepped in UTC, so a clock change never stacks or drops a mark), and the last point's label moves aside rather than run into the projection's. Its brushes are the theme's (`McText`, `McMuted`, `McChartGrid`, `McAccent`); pair it with a caption that says the same in words.
+`Controls.MaLineChart` draws a `MaLineChartData`: the time span (`StartUtc`..`EndUtc`), the `Points` (each `MaChartPoint` carries the brush of the segment ending at it, `MaAccent` by default), an `EndLabel` for the last point's dot, an optional `Projection` drawn dotted from the last point and labelled at its end, and `ReferenceLines` (`MaChartReferenceLine.Level` for a target, `.Curve` for a pace line). Without a projection it draws the line as it ended; with no points, just the axes. The percent axis has a gridline every 25% and headroom over the highest point; the time axis labels both ends and every whole local hour between (stepped in UTC, so a clock change never stacks or drops a mark), and the last point's label moves aside rather than run into the projection's. Its brushes are the theme's (`MaText`, `MaMuted`, `MaChartGrid`, `MaAccent`); pair it with a caption that says the same in words.
 
 ```xml
-<ctl:McLineChart Data="{Binding Utilization}" Height="260" />
+<ctl:MaLineChart Data="{Binding Utilization}" Height="260" />
 ```
 
-`Controls.McToastHost` is a row of `Controls.McToast` notification cards. Give it its own row in the window, so new toasts push the page down instead of covering whatever has focus, and bind it to a collection of view models with `Title`, `Body` and (optionally) an `Accent` brush:
+`Controls.MaToastHost` is a row of `Controls.MaToast` notification cards. Give it its own row in the window, so new toasts push the page down instead of covering whatever has focus, and bind it to a collection of view models with `Title`, `Body` and (optionally) an `Accent` brush:
 
 ```xml
-<ctl:McToastHost Grid.Row="2" ItemsSource="{Binding Toasts}" Margin="24,0,24,6"
+<ctl:MaToastHost Grid.Row="2" ItemsSource="{Binding Toasts}" Margin="24,0,24,6"
                  OpenCommand="{Binding OpenToastCommand}" DismissCommand="{Binding DismissToastCommand}" />
 ```
 
-Each toast is a McSurface card outlined in its accent (McAccent by default) with a 4px stripe on the left; its title and a body clipped to two lines are one clickable button (`OpenCommand`, or a toast's own `Command` and `Click`), and a McToolButton (x) dismisses it (`DismissCommand`, both with the item as parameter; with no command the host removes the item itself). `TitlePath`, `BodyPath` and `AccentPath` rename the item properties. The card is named by its title with the body as help text, the dismiss button is "Dismiss: {Title}", the row is the "Notifications" group, and every toast added after the first load is read out politely ("{Title}. {Body}") through a hidden live region without moving focus. A `McToast` also works on its own, or as a direct item of the host.
+Each toast is a MaSurface card outlined in its accent (MaAccent by default) with a 4px stripe on the left; its title and a body clipped to two lines are one clickable button (`OpenCommand`, or a toast's own `Command` and `Click`), and a MaToolButton (x) dismisses it (`DismissCommand`, both with the item as parameter; with no command the host removes the item itself). `TitlePath`, `BodyPath` and `AccentPath` rename the item properties. The card is named by its title with the body as help text, the dismiss button is "Dismiss: {Title}", the row is the "Notifications" group, and every toast added after the first load is read out politely ("{Title}. {Body}") through a hidden live region without moving focus. A `MaToast` also works on its own, or as a direct item of the host.
 
 Consumers so far: MindAttic.Browser, JobHunt, Prose.Launcher, Prose.Writer, Automata, KdpPublish. MediaButler, ProcessLogger and MindAttic.Log.Reader are still WebView2/Blazor shells with no native WPF chrome, so their UI belongs to the web side, not this package.
 
@@ -276,7 +276,7 @@ Invoke-Pester -Path web/tests/package/pester    # tools/vendor.ps1 (from the rep
 
 `web/tests/package/README.md` describes what each group guards, live mode and the CDN checks.
 
-The WPF package (xUnit, covering the Mvvm helpers, `ZoomLevel`, `McToolTips`, `McHighContrast`, the palette's contrast, `McBadge`, `McHyperlink`, `McModal`, `McProgressBar`, `McTextBox` / `McTextArea`, the scroll bars, `DropdownMenu`, `McTextButton`, `McLineChart`, `McToast` / `McToastHost`, `McMessageBox`, `McSpinner` and the building-block styles):
+The WPF package (xUnit, covering the Mvvm helpers, `ZoomLevel`, `MaToolTips`, `MaHighContrast`, the palette's contrast, `MaBadge`, `MaHyperlink`, `MaModal`, `MaProgressBar`, `MaTextBox` / `MaTextArea`, the scroll bars, `DropdownMenu`, `MaTextButton`, `MaLineChart`, `MaToast` / `MaToastHost`, `MaMessageBox`, `MaSpinner` and the building-block styles):
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
@@ -332,7 +332,7 @@ docs/web/                                The web package's bible, stories, asset
 ## Current state
 
 - The web package is live: the four MindAttic.Web sites, MindAttic.Psst and Tutor are built from it.
-- `MindAttic.Components.Wpf` is at 18.0.0 (adds the shared `Mvvm` helpers and `ZoomLevel`, `McToolTips.KeepOpen`, `McHighContrast`, a WCAG AA palette (`McRec` 4.5:1, `McFieldBorder` 3:1, `McOnAccent`) and dynamic palette references throughout; 17.0.0 added `McSpinner`, a busy ring in `McAccent` that turns on its own thread so it keeps turning while the UI thread is blocked; 16.0.0 themed every scroll bar: an implicit dark `ScrollBar` based on `McScrollBar` and a `ScrollViewer` with a `McChrome` corner; 15.0.0 added `McMessageBox`, a themed `MessageBox.Show` for prompts with no app window; 14.0.0 added `McTextBox.Placeholder`, the multi-line `McTextArea` and `McScrollBar`; 13.0.0 added the `McHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `McToast` / `McToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `McLineChart`) and used by six desktop apps.
+- `MindAttic.Components.Wpf` is at 19.0.0 (every `Mc`-prefixed style key and control class renamed to `Ma`, for MindAttic, e.g. `McButton` -> `MaButton`, `McModal` -> `MaModal`; a breaking rename, so a consumer moves to it on its own schedule by bumping its `PackageReference` and updating its XAML/code, not automatically; 18.0.0 added the shared `Mvvm` helpers and `ZoomLevel`, `MaToolTips.KeepOpen`, `MaHighContrast`, a WCAG AA palette (`MaRec` 4.5:1, `MaFieldBorder` 3:1, `MaOnAccent`) and dynamic palette references throughout; 17.0.0 added `MaSpinner`, a busy ring in `MaAccent` that turns on its own thread so it keeps turning while the UI thread is blocked; 16.0.0 themed every scroll bar: an implicit dark `ScrollBar` based on `MaScrollBar` and a `ScrollViewer` with a `MaChrome` corner; 15.0.0 added `MaMessageBox`, a themed `MessageBox.Show` for prompts with no app window; 14.0.0 added `MaTextBox.Placeholder`, the multi-line `MaTextArea` and `MaScrollBar`; 13.0.0 added the `MaHyperlink` link style, the Orchestrator's ticket-id links; 12.0.0 added `MaToast` / `MaToastHost`, the Orchestrator ToastRow's card and row; 11.0.0 moved in the Orchestrator's own building blocks and its utilization chart, `MaLineChart`) and used by six desktop apps.
 
 ## Roadmap
 

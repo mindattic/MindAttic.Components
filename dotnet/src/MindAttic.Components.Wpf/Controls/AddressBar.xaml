@@ -2,27 +2,27 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Name="Root">
-    <Grid Background="{DynamicResource McChrome}">
+    <Grid Background="{DynamicResource MaChrome}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <StackPanel x:Name="NavButtons" Orientation="Horizontal" VerticalAlignment="Center" Margin="4,4,0,4">
-            <Button x:Name="BackButton" Style="{DynamicResource McToolButton}" Content="&#xE72B;"
+            <Button x:Name="BackButton" Style="{DynamicResource MaToolButton}" Content="&#xE72B;"
                     AutomationProperties.Name="Back" ToolTip="Back" Click="OnBackClick" IsEnabled="False" />
-            <Button x:Name="ForwardButton" Style="{DynamicResource McToolButton}" Content="&#xE72A;"
+            <Button x:Name="ForwardButton" Style="{DynamicResource MaToolButton}" Content="&#xE72A;"
                     AutomationProperties.Name="Forward" ToolTip="Forward" Click="OnForwardClick" IsEnabled="False" />
-            <Button x:Name="ReloadButton" Style="{DynamicResource McToolButton}" Content="&#xE72C;"
+            <Button x:Name="ReloadButton" Style="{DynamicResource MaToolButton}" Content="&#xE72C;"
                     AutomationProperties.Name="Reload" ToolTip="Reload" Click="OnReloadClick" />
-            <Button x:Name="HomeButton" Style="{DynamicResource McToolButton}" Content="&#xE80F;"
+            <Button x:Name="HomeButton" Style="{DynamicResource MaToolButton}" Content="&#xE80F;"
                     AutomationProperties.Name="Home" ToolTip="Home" Click="OnHomeClick"
                     Visibility="Collapsed" />
         </StackPanel>
 
         <TextBox x:Name="Address" Grid.Column="1" Margin="6,4,6,4" Padding="8,4"
                  VerticalContentAlignment="Center" FontSize="13"
-                 Style="{DynamicResource McTextBox}"
+                 Style="{DynamicResource MaTextBox}"
                  Text="{Binding AddressText, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
                  KeyDown="OnAddressKeyDown" GotKeyboardFocus="OnAddressFocused" />
     </Grid>

@@ -7,8 +7,8 @@ using Xunit;
 
 namespace MindAttic.Components.Wpf.Tests;
 
-/// <summary>M.COMP-T32: McProgressBar, the thin rounded progress bar style.</summary>
-public sealed class McProgressBarTests
+/// <summary>M.COMP-T32: MaProgressBar, the thin rounded progress bar style.</summary>
+public sealed class MaProgressBarTests
 {
     [Fact]
     public void Is_a_thin_rounded_track_with_a_coloured_fill() => Sta((window, bar) =>
@@ -17,10 +17,10 @@ public sealed class McProgressBarTests
         var fill = (Border)bar.Template.FindName("PART_Indicator", bar);
 
         Assert.Equal(6, bar.ActualHeight);
-        Assert.Equal(window.FindResource("McSurface"), track.Background);
-        Assert.Equal(window.FindResource("McControlBorder"), track.BorderBrush);
+        Assert.Equal(window.FindResource("MaSurface"), track.Background);
+        Assert.Equal(window.FindResource("MaControlBorder"), track.BorderBrush);
         Assert.True(track.CornerRadius.TopLeft > 0);
-        Assert.Equal(window.FindResource("McAccent"), fill.Background);
+        Assert.Equal(window.FindResource("MaAccent"), fill.Background);
 
         var budget = new SolidColorBrush(Colors.Orange);
         bar.Foreground = budget;
@@ -73,7 +73,7 @@ public sealed class McProgressBarTests
     [Fact]
     public void Starts_indeterminate_when_set_before_it_is_shown() => Sta((window, bar) =>
     {
-        var fresh = new ProgressBar { IsIndeterminate = true, Width = 200, Style = (Style)window.FindResource("McProgressBar") };
+        var fresh = new ProgressBar { IsIndeterminate = true, Width = 200, Style = (Style)window.FindResource("MaProgressBar") };
         ((StackPanel)window.Content).Children.Add(fresh);
         Pump();
         var sweep = (Border)fresh.Template.FindName("IndeterminateFill", fresh);
@@ -94,7 +94,7 @@ public sealed class McProgressBarTests
             try
             {
                 window = OffScreenWindow.Create(400, 200);
-                var bar = new ProgressBar { Width = 300, Style = (Style)window.FindResource("McProgressBar") };
+                var bar = new ProgressBar { Width = 300, Style = (Style)window.FindResource("MaProgressBar") };
                 window.Content = new StackPanel { Children = { bar } };
                 OffScreenWindow.Show(window);
                 Pump();

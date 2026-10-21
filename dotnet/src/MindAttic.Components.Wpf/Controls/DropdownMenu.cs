@@ -52,7 +52,7 @@ public sealed class DropdownMenu
             if (!_isPinned(action.Id)) continue;
             var button = new Button
             {
-                Style = (Style)_trigger.FindResource("McToolButton"),
+                Style = (Style)_trigger.FindResource("MaToolButton"),
                 Content = action.Icon,
                 ToolTip = action.ToolTip,
                 Tag = action.Id,
@@ -79,7 +79,7 @@ public sealed class DropdownMenu
 
         var menu = new ContextMenu
         {
-            Style = (Style)_trigger.FindResource("McDropdownMenu"),
+            Style = (Style)_trigger.FindResource("MaDropdownMenu"),
             PlacementTarget = _trigger,
             Placement = PlacementMode.Bottom,
             StaysOpen = true,
@@ -105,7 +105,7 @@ public sealed class DropdownMenu
 
             if (_pinnedHost is not null)
             {
-                var pin = new ToggleButton { Style = (Style)_trigger.FindResource("McPinToggle") };
+                var pin = new ToggleButton { Style = (Style)_trigger.FindResource("MaPinToggle") };
                 var id = action.Id;
                 ShowPinState(pin, _isPinned(id));
                 // Toggled on mouse-down and marked handled: that keeps the press from also reaching the
@@ -125,7 +125,7 @@ public sealed class DropdownMenu
 
             var item = new MenuItem
             {
-                Style = (Style)_trigger.FindResource("McDropdownMenuItem"),
+                Style = (Style)_trigger.FindResource("MaDropdownMenuItem"),
                 Header = header,
                 HorizontalContentAlignment = HorizontalAlignment.Stretch,
                 StaysOpenOnClick = true,
@@ -158,7 +158,7 @@ public sealed class DropdownMenu
     {
         pin.IsChecked = pinned;
         pin.Content = pinned ? "" : "";
-        pin.Foreground = (Brush)_trigger.FindResource(pinned ? "McAccent" : "McMuted");
+        pin.Foreground = (Brush)_trigger.FindResource(pinned ? "MaAccent" : "MaMuted");
         pin.ToolTip = pinned ? "Unpin from toolbar" : "Pin to toolbar";
     }
 

@@ -15,7 +15,7 @@ public sealed class TestWindowHygieneTests
     /// <summary>Every WPF window type the tests could build: System.Windows.Window, its framework subclasses and any
     /// the library adds.</summary>
     private static readonly string[] WindowTypes =
-        new[] { typeof(System.Windows.Window).Assembly, typeof(MindAttic.Components.Wpf.Controls.McModal).Assembly }
+        new[] { typeof(System.Windows.Window).Assembly, typeof(MindAttic.Components.Wpf.Controls.MaModal).Assembly }
             .SelectMany(a => { try { return a.GetTypes(); } catch (System.Reflection.ReflectionTypeLoadException e) { return e.Types.OfType<Type>().ToArray(); } })
             .Where(t => typeof(System.Windows.Window).IsAssignableFrom(t))
             .Select(t => t.Name).Distinct().ToArray();
@@ -76,7 +76,7 @@ public sealed class TestWindowHygieneTests
             "        var window = OffScreenWindow.Create(600, 300, new Grid { Children = { element } });",
             "            OffScreenWindow.Show(window);",
             "        public Window Window { get; }",
-            "        Assert.Equal(h.Window.FindResource(\"McText\"), badge.Foreground);",
+            "        Assert.Equal(h.Window.FindResource(\"MaText\"), badge.Foreground);",
             "        h.Show(badge);",
             "        Assert.True(now.Left >= Plot.Left);",
             "        var psi = new ProcessStartInfo(\"python\") { UseShellExecute = false, CreateNoWindow = true };",

@@ -15,41 +15,41 @@ namespace MindAttic.Components.Wpf.Controls;
 /// which the render thread composes however busy the window's thread is. That thread runs only while the spinner is
 /// loaded and visible, and shuts down when it's hidden or unloaded.
 /// <code>
-/// &lt;ctl:McSpinner Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" /&gt;
-/// &lt;ctl:McSpinner Width="24" Height="24" StrokeThickness="3" /&gt;
+/// &lt;ctl:MaSpinner Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" /&gt;
+/// &lt;ctl:MaSpinner Width="24" Height="24" StrokeThickness="3" /&gt;
 /// </code>
 /// <para>
-/// The implicit <c>McSpinner</c> style in Theme.xaml draws the ring in <c>McAccent</c>; set <see cref="Stroke"/> for
+/// The implicit <c>MaSpinner</c> style in Theme.xaml draws the ring in <c>MaAccent</c>; set <see cref="Stroke"/> for
 /// another colour. It is 44x44 unless <c>Width</c>/<c>Height</c> say otherwise (the ring fits the smaller side). The
 /// ring's look is fixed when it starts turning; changing <see cref="Stroke"/>, <see cref="StrokeThickness"/>,
 /// <see cref="Period"/> or the size while it turns restarts it. It reads to UI Automation as a progress bar named
 /// "Loading" (or its <c>AutomationProperties.Name</c>), and is never a tab stop.
 /// </para>
 /// </summary>
-public sealed class McSpinner : FrameworkElement
+public sealed class MaSpinner : FrameworkElement
 {
     /// <summary>The size used when <c>Width</c>/<c>Height</c> aren't set.</summary>
     public const double DefaultSize = 44;
 
     public static readonly DependencyProperty StrokeProperty = DependencyProperty.Register(
-        nameof(Stroke), typeof(Brush), typeof(McSpinner),
+        nameof(Stroke), typeof(Brush), typeof(MaSpinner),
         new FrameworkPropertyMetadata(Brushes.Gray, FrameworkPropertyMetadataOptions.AffectsRender, Restart));
 
     public static readonly DependencyProperty StrokeThicknessProperty = DependencyProperty.Register(
-        nameof(StrokeThickness), typeof(double), typeof(McSpinner),
+        nameof(StrokeThickness), typeof(double), typeof(MaSpinner),
         new FrameworkPropertyMetadata(4.0, FrameworkPropertyMetadataOptions.AffectsRender, Restart));
 
     public static readonly DependencyProperty PeriodProperty = DependencyProperty.Register(
-        nameof(Period), typeof(Duration), typeof(McSpinner),
+        nameof(Period), typeof(Duration), typeof(MaSpinner),
         new FrameworkPropertyMetadata(new Duration(TimeSpan.FromSeconds(1.2)), Restart));
 
-    static McSpinner()
+    static MaSpinner()
     {
-        WidthProperty.OverrideMetadata(typeof(McSpinner), new FrameworkPropertyMetadata(double.NaN, Restart));
-        HeightProperty.OverrideMetadata(typeof(McSpinner), new FrameworkPropertyMetadata(double.NaN, Restart));
+        WidthProperty.OverrideMetadata(typeof(MaSpinner), new FrameworkPropertyMetadata(double.NaN, Restart));
+        HeightProperty.OverrideMetadata(typeof(MaSpinner), new FrameworkPropertyMetadata(double.NaN, Restart));
     }
 
-    /// <summary>The ring's colour; <c>McAccent</c> under the theme.</summary>
+    /// <summary>The ring's colour; <c>MaAccent</c> under the theme.</summary>
     public Brush Stroke { get => (Brush)GetValue(StrokeProperty); set => SetValue(StrokeProperty, value); }
 
     /// <summary>The ring's line width; 4 by default.</summary>
@@ -62,7 +62,7 @@ public sealed class McSpinner : FrameworkElement
     private Dispatcher? worker;
     private RotateTransform? turn; // created on, and only touched from, the worker thread
 
-    public McSpinner()
+    public MaSpinner()
     {
         IsVisibleChanged += (_, _) => { if (IsVisible) Start(); else Stop(); };
         Unloaded += (_, _) => Stop();
@@ -87,11 +87,11 @@ public sealed class McSpinner : FrameworkElement
     protected override Size MeasureOverride(Size availableSize) =>
         new(double.IsNaN(Width) ? DefaultSize : Width, double.IsNaN(Height) ? DefaultSize : Height);
 
-    protected override AutomationPeer OnCreateAutomationPeer() => new McSpinnerAutomationPeer(this);
+    protected override AutomationPeer OnCreateAutomationPeer() => new MaSpinnerAutomationPeer(this);
 
     private static void Restart(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var spinner = (McSpinner)d;
+        var spinner = (MaSpinner)d;
         if (!spinner.IsSpinning) return;
         spinner.Stop();
         spinner.Start();
@@ -120,7 +120,7 @@ public sealed class McSpinner : FrameworkElement
             ready.Set();
             Dispatcher.Run();
             source.Dispose();
-        }) { IsBackground = true, Name = "McSpinner" };
+        }) { IsBackground = true, Name = "MaSpinner" };
         thread.SetApartmentState(ApartmentState.STA);
         thread.Start();
         ready.Wait();
@@ -155,9 +155,9 @@ public sealed class McSpinner : FrameworkElement
 
     /// <summary>Reads as an indeterminate progress bar named "Loading" unless <c>AutomationProperties.Name</c> says
     /// otherwise.</summary>
-    private sealed class McSpinnerAutomationPeer(McSpinner owner) : FrameworkElementAutomationPeer(owner)
+    private sealed class MaSpinnerAutomationPeer(MaSpinner owner) : FrameworkElementAutomationPeer(owner)
     {
-        protected override string GetClassNameCore() => nameof(McSpinner);
+        protected override string GetClassNameCore() => nameof(MaSpinner);
 
         protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.ProgressBar;
 

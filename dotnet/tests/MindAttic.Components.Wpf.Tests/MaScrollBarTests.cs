@@ -10,7 +10,7 @@ using Xunit;
 namespace MindAttic.Components.Wpf.Tests;
 
 /// <summary>M.COMP-T37: the implicit dark ScrollBar and ScrollViewer styles.</summary>
-public sealed class McScrollBarTests
+public sealed class MaScrollBarTests
 {
     [Fact]
     public void A_vertical_scroll_bar_is_a_slim_thumb_on_chrome() => Sta(window =>
@@ -19,11 +19,11 @@ public sealed class McScrollBarTests
         var bar = (ScrollBar)viewer.Template.FindName("PART_VerticalScrollBar", viewer);
 
         Assert.Equal(Visibility.Visible, bar.Visibility);
-        Assert.Equal(window.FindResource("McChrome"), bar.Background);
+        Assert.Equal(window.FindResource("MaChrome"), bar.Background);
         Assert.Equal(10, bar.ActualWidth);
         var thumb = bar.Track.Thumb;
         Assert.NotNull(thumb);
-        Assert.Equal(window.FindResource("McControlBorder"), ThumbBorder(thumb).Background);
+        Assert.Equal(window.FindResource("MaControlBorder"), ThumbBorder(thumb).Background);
         Assert.Null(FindChild<RepeatButton>(bar, b => b.Command == ScrollBar.LineUpCommand)); // no arrow buttons
     });
 
@@ -43,7 +43,7 @@ public sealed class McScrollBarTests
         Assert.Equal(Visibility.Visible, bar.Visibility);
         Assert.Equal(10, bar.ActualHeight);
         Assert.True(bar.ActualWidth > 100);
-        Assert.Equal(window.FindResource("McControlBorder"), ThumbBorder(bar.Track.Thumb).Background);
+        Assert.Equal(window.FindResource("MaControlBorder"), ThumbBorder(bar.Track.Thumb).Background);
     });
 
     [Fact]
@@ -59,8 +59,8 @@ public sealed class McScrollBarTests
             .Where(s => s.TargetName == "Bd" &&s.Property == Border.BackgroundProperty)
             .Select(s => s.Value is DynamicResourceExtension d ? window.FindResource(d.ResourceKey) : s.Value).SingleOrDefault();
 
-        Assert.Equal(window.FindResource("McMuted"), Setter(UIElement.IsMouseOverProperty));
-        Assert.Equal(window.FindResource("McText"), Setter(Thumb.IsDraggingProperty));
+        Assert.Equal(window.FindResource("MaMuted"), Setter(UIElement.IsMouseOverProperty));
+        Assert.Equal(window.FindResource("MaText"), Setter(Thumb.IsDraggingProperty));
     });
 
     [Fact]
@@ -76,7 +76,7 @@ public sealed class McScrollBarTests
         Host(window).Children.Add(viewer);
         Pump();
         var corner = (Rectangle)viewer.Template.FindName("Corner", viewer);
-        Assert.Equal(window.FindResource("McChrome"), corner.Fill);
+        Assert.Equal(window.FindResource("MaChrome"), corner.Fill);
     });
 
     [Fact]
@@ -96,7 +96,7 @@ public sealed class McScrollBarTests
     [Fact]
     public void Templated_controls_scroll_bars_are_themed_too() => Sta(window =>
     {
-        // A multi-line text box (as McTextArea is) and a list box: their scroll bars live inside
+        // A multi-line text box (as MaTextArea is) and a list box: their scroll bars live inside
         // their own templates, and still pick up the implicit style.
         var text = new TextBox
         {
@@ -113,18 +113,18 @@ public sealed class McScrollBarTests
         {
             var bar = FindChild<ScrollBar>(control, b => b.Orientation == Orientation.Vertical);
             Assert.NotNull(bar);
-            Assert.Equal(window.FindResource("McChrome"), bar!.Background);
+            Assert.Equal(window.FindResource("MaChrome"), bar!.Background);
             Assert.Equal(10, bar.ActualWidth);
-            Assert.Equal(window.FindResource("McControlBorder"), ThumbBorder(bar.Track.Thumb).Background);
+            Assert.Equal(window.FindResource("MaControlBorder"), ThumbBorder(bar.Track.Thumb).Background);
         }
     });
 
     [Fact]
-    public void McTextArea_shares_the_thumb_over_its_own_surface() => Sta(window =>
+    public void MaTextArea_shares_the_thumb_over_its_own_surface() => Sta(window =>
     {
         var area = new TextBox
         {
-            Width = 200, Height = 80, Style = (Style)window.FindResource("McTextArea"),
+            Width = 200, Height = 80, Style = (Style)window.FindResource("MaTextArea"),
             Text = string.Join("\n", Enumerable.Range(1, 40)),
         };
         Host(window).Children.Add(area);
@@ -133,8 +133,8 @@ public sealed class McScrollBarTests
         var bar = FindChild<ScrollBar>(area, b => b.Orientation == Orientation.Vertical && b.IsVisible);
         Assert.NotNull(bar);
         Assert.Equal(10, bar!.ActualWidth);
-        Assert.Equal(Brushes.Transparent, bar.Background); // the box's McSurface shows through
-        Assert.Equal(window.FindResource("McControlBorder"), ThumbBorder(bar.Track.Thumb).Background);
+        Assert.Equal(Brushes.Transparent, bar.Background); // the box's MaSurface shows through
+        Assert.Equal(window.FindResource("MaControlBorder"), ThumbBorder(bar.Track.Thumb).Background);
     });
 
     // ---- harness ----

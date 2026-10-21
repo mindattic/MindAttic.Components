@@ -10,16 +10,16 @@ using System.Windows.Media;
 namespace MindAttic.Components.Wpf.Controls;
 
 /// <summary>
-/// A row of <see cref="McToast"/> cards (a wrapping row by default, so full-width toasts stack).
+/// A row of <see cref="MaToast"/> cards (a wrapping row by default, so full-width toasts stack).
 /// Give it its own row in the window so new toasts push the page down instead of covering
 /// whatever has keyboard focus (WCAG 2.4.11).
 /// <para>
 /// Bind <see cref="ItemsControl.ItemsSource"/> to a collection of view models: each item becomes a
-/// <see cref="McToast"/> whose Title, Body and Accent come from <see cref="TitlePath"/>,
+/// <see cref="MaToast"/> whose Title, Body and Accent come from <see cref="TitlePath"/>,
 /// <see cref="BodyPath"/> and <see cref="AccentPath"/> ("Title", "Body", "Accent" by default; an
-/// item without an Accent keeps McAccent). <see cref="OpenCommand"/> and <see cref="DismissCommand"/>
+/// item without an Accent keeps MaAccent). <see cref="OpenCommand"/> and <see cref="DismissCommand"/>
 /// run with the item as their parameter. With no <see cref="DismissCommand"/>, dismissing removes
-/// the item itself (from Items, or from an editable ItemsSource list). McToast elements can be
+/// the item itself (from Items, or from an editable ItemsSource list). MaToast elements can be
 /// added directly as items too.
 /// </para>
 /// <para>
@@ -29,41 +29,41 @@ namespace MindAttic.Components.Wpf.Controls;
 /// </para>
 /// </summary>
 [TemplatePart(Name = PartAnnouncer, Type = typeof(TextBlock))]
-public class McToastHost : ItemsControl
+public class MaToastHost : ItemsControl
 {
     public const string PartAnnouncer = "PART_Announcer";
 
     public static readonly DependencyProperty OpenCommandProperty = DependencyProperty.Register(
-        nameof(OpenCommand), typeof(ICommand), typeof(McToastHost), new FrameworkPropertyMetadata(null));
+        nameof(OpenCommand), typeof(ICommand), typeof(MaToastHost), new FrameworkPropertyMetadata(null));
 
     public static readonly DependencyProperty DismissCommandProperty = DependencyProperty.Register(
-        nameof(DismissCommand), typeof(ICommand), typeof(McToastHost), new FrameworkPropertyMetadata(null));
+        nameof(DismissCommand), typeof(ICommand), typeof(MaToastHost), new FrameworkPropertyMetadata(null));
 
     public static readonly DependencyProperty TitlePathProperty = DependencyProperty.Register(
-        nameof(TitlePath), typeof(string), typeof(McToastHost), new FrameworkPropertyMetadata("Title"));
+        nameof(TitlePath), typeof(string), typeof(MaToastHost), new FrameworkPropertyMetadata("Title"));
 
     public static readonly DependencyProperty BodyPathProperty = DependencyProperty.Register(
-        nameof(BodyPath), typeof(string), typeof(McToastHost), new FrameworkPropertyMetadata("Body"));
+        nameof(BodyPath), typeof(string), typeof(MaToastHost), new FrameworkPropertyMetadata("Body"));
 
     public static readonly DependencyProperty AccentPathProperty = DependencyProperty.Register(
-        nameof(AccentPath), typeof(string), typeof(McToastHost), new FrameworkPropertyMetadata("Accent"));
+        nameof(AccentPath), typeof(string), typeof(MaToastHost), new FrameworkPropertyMetadata("Accent"));
 
     private static readonly DependencyPropertyKey LastAnnouncementPropertyKey = DependencyProperty.RegisterReadOnly(
-        nameof(LastAnnouncement), typeof(string), typeof(McToastHost), new FrameworkPropertyMetadata(string.Empty));
+        nameof(LastAnnouncement), typeof(string), typeof(MaToastHost), new FrameworkPropertyMetadata(string.Empty));
 
     public static readonly DependencyProperty LastAnnouncementProperty = LastAnnouncementPropertyKey.DependencyProperty;
 
     private TextBlock? _announcer;
 
-    static McToastHost()
+    static MaToastHost()
     {
-        DefaultStyleKeyProperty.OverrideMetadata(typeof(McToastHost), new FrameworkPropertyMetadata(typeof(McToastHost)));
-        FocusableProperty.OverrideMetadata(typeof(McToastHost), new FrameworkPropertyMetadata(false));
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(MaToastHost), new FrameworkPropertyMetadata(typeof(MaToastHost)));
+        FocusableProperty.OverrideMetadata(typeof(MaToastHost), new FrameworkPropertyMetadata(false));
     }
 
-    public McToastHost()
+    public MaToastHost()
     {
-        AddHandler(McToast.DismissedEvent, new RoutedEventHandler(OnToastDismissed));
+        AddHandler(MaToast.DismissedEvent, new RoutedEventHandler(OnToastDismissed));
     }
 
     /// <summary>Run with the item when a toast's card is clicked (e.g. open what it's about).</summary>
@@ -125,33 +125,33 @@ public class McToastHost : ItemsControl
         if (_announcer is not null && !string.IsNullOrEmpty(LastAnnouncement)) _announcer.Text = LastAnnouncement;
     }
 
-    protected override bool IsItemItsOwnContainerOverride(object item) => item is McToast;
+    protected override bool IsItemItsOwnContainerOverride(object item) => item is MaToast;
 
-    protected override DependencyObject GetContainerForItemOverride() => new McToast();
+    protected override DependencyObject GetContainerForItemOverride() => new MaToast();
 
     protected override void PrepareContainerForItemOverride(DependencyObject element, object item)
     {
         base.PrepareContainerForItemOverride(element, item);
-        if (element is not McToast toast || ReferenceEquals(toast, item)) return;
+        if (element is not MaToast toast || ReferenceEquals(toast, item)) return;
 
-        Bind(toast, McToast.TitleProperty, item, TitlePath);
-        Bind(toast, McToast.BodyProperty, item, BodyPath);
-        // Only bind the accent when the item has one, so an item without it keeps the style's McAccent.
-        if (Evaluate(item, AccentPath) is Brush) Bind(toast, McToast.AccentProperty, item, AccentPath);
+        Bind(toast, MaToast.TitleProperty, item, TitlePath);
+        Bind(toast, MaToast.BodyProperty, item, BodyPath);
+        // Only bind the accent when the item has one, so an item without it keeps the style's MaAccent.
+        if (Evaluate(item, AccentPath) is Brush) Bind(toast, MaToast.AccentProperty, item, AccentPath);
 
-        toast.SetBinding(McToast.CommandProperty, new Binding(nameof(OpenCommand)) { Source = this });
-        toast.SetCurrentValue(McToast.CommandParameterProperty, item);
-        toast.SetBinding(McToast.DismissCommandProperty, new Binding(nameof(DismissCommand)) { Source = this });
-        toast.SetCurrentValue(McToast.DismissCommandParameterProperty, item);
+        toast.SetBinding(MaToast.CommandProperty, new Binding(nameof(OpenCommand)) { Source = this });
+        toast.SetCurrentValue(MaToast.CommandParameterProperty, item);
+        toast.SetBinding(MaToast.DismissCommandProperty, new Binding(nameof(DismissCommand)) { Source = this });
+        toast.SetCurrentValue(MaToast.DismissCommandParameterProperty, item);
     }
 
     protected override void ClearContainerForItemOverride(DependencyObject element, object item)
     {
         base.ClearContainerForItemOverride(element, item);
-        if (element is not McToast toast || ReferenceEquals(toast, item)) return;
+        if (element is not MaToast toast || ReferenceEquals(toast, item)) return;
         BindingOperations.ClearAllBindings(toast);
-        toast.ClearValue(McToast.CommandParameterProperty);
-        toast.ClearValue(McToast.DismissCommandParameterProperty);
+        toast.ClearValue(MaToast.CommandParameterProperty);
+        toast.ClearValue(MaToast.DismissCommandParameterProperty);
     }
 
     protected override void OnItemsChanged(NotifyCollectionChangedEventArgs e)
@@ -161,13 +161,13 @@ public class McToastHost : ItemsControl
         foreach (var item in e.NewItems) Announce(Describe(item));
     }
 
-    protected override AutomationPeer OnCreateAutomationPeer() => new McToastHostAutomationPeer(this);
+    protected override AutomationPeer OnCreateAutomationPeer() => new MaToastHostAutomationPeer(this);
 
     /// <summary>"{Title}. {Body}" for an item (or just the title when there's no body).</summary>
     private string Describe(object? item)
     {
         string title, body;
-        if (item is McToast toast)
+        if (item is MaToast toast)
         {
             title = toast.Title;
             body = toast.Body;
@@ -184,7 +184,7 @@ public class McToastHost : ItemsControl
 
     private void OnToastDismissed(object sender, RoutedEventArgs e)
     {
-        if (e.OriginalSource is not McToast toast || DismissCommand is not null || toast.DismissCommand is not null) return;
+        if (e.OriginalSource is not MaToast toast || DismissCommand is not null || toast.DismissCommand is not null) return;
         var item = ItemContainerGenerator.ItemFromContainer(toast);
         if (item == DependencyProperty.UnsetValue) item = toast;
         if (ItemsSource is null)
@@ -226,11 +226,11 @@ public class McToastHost : ItemsControl
     }
 
     /// <summary>A named group whose children are the toasts' own peers (each named by its title).</summary>
-    private sealed class McToastHostAutomationPeer(McToastHost owner) : FrameworkElementAutomationPeer(owner)
+    private sealed class MaToastHostAutomationPeer(MaToastHost owner) : FrameworkElementAutomationPeer(owner)
     {
         protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Group;
 
-        protected override string GetClassNameCore() => nameof(McToastHost);
+        protected override string GetClassNameCore() => nameof(MaToastHost);
 
         protected override string GetNameCore()
         {

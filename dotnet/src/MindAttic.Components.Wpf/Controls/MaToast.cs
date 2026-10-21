@@ -8,62 +8,62 @@ using System.Windows.Media;
 namespace MindAttic.Components.Wpf.Controls;
 
 /// <summary>
-/// A themed notification card: an <see cref="Accent"/> outline and left stripe on McSurface, a
+/// A themed notification card: an <see cref="Accent"/> outline and left stripe on MaSurface, a
 /// <see cref="Title"/> and a body clipped to two lines (<see cref="Body"/>), both inside one
-/// clickable button, plus a dismiss (x) McToolButton.
+/// clickable button, plus a dismiss (x) MaToolButton.
 /// <para>
 /// Clicking the card runs <see cref="Command"/> and raises <see cref="Click"/>; the dismiss
 /// button runs <see cref="DismissCommand"/> and raises <see cref="Dismissed"/>. A toast with no
 /// <see cref="DismissCommand"/> whose <see cref="Dismissed"/> nobody handles hides itself. Inside
-/// a <see cref="McToastHost"/> the host supplies both commands and removes dismissed items.
+/// a <see cref="MaToastHost"/> the host supplies both commands and removes dismissed items.
 /// </para>
 /// <para>
 /// The card's accessible name is the <see cref="Title"/> with the <see cref="Body"/> as its help
 /// text, and the dismiss button is named "Dismiss: {Title}". Its look is the implicit
-/// <c>McToast</c> style in Theme.xaml, so the theme must be merged.
+/// <c>MaToast</c> style in Theme.xaml, so the theme must be merged.
 /// </para>
 /// </summary>
 [TemplatePart(Name = PartOpenButton, Type = typeof(ButtonBase))]
 [TemplatePart(Name = PartDismissButton, Type = typeof(ButtonBase))]
-public class McToast : Control
+public class MaToast : Control
 {
     public const string PartOpenButton = "PART_OpenButton";
     public const string PartDismissButton = "PART_DismissButton";
 
     public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
-        nameof(Title), typeof(string), typeof(McToast), new FrameworkPropertyMetadata(string.Empty));
+        nameof(Title), typeof(string), typeof(MaToast), new FrameworkPropertyMetadata(string.Empty));
 
     public static readonly DependencyProperty BodyProperty = DependencyProperty.Register(
-        nameof(Body), typeof(string), typeof(McToast), new FrameworkPropertyMetadata(string.Empty));
+        nameof(Body), typeof(string), typeof(MaToast), new FrameworkPropertyMetadata(string.Empty));
 
     public static readonly DependencyProperty AccentProperty = DependencyProperty.Register(
-        nameof(Accent), typeof(Brush), typeof(McToast), new FrameworkPropertyMetadata(null));
+        nameof(Accent), typeof(Brush), typeof(MaToast), new FrameworkPropertyMetadata(null));
 
     public static readonly DependencyProperty CommandProperty = DependencyProperty.Register(
-        nameof(Command), typeof(ICommand), typeof(McToast), new FrameworkPropertyMetadata(null));
+        nameof(Command), typeof(ICommand), typeof(MaToast), new FrameworkPropertyMetadata(null));
 
     public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register(
-        nameof(CommandParameter), typeof(object), typeof(McToast), new FrameworkPropertyMetadata(null));
+        nameof(CommandParameter), typeof(object), typeof(MaToast), new FrameworkPropertyMetadata(null));
 
     public static readonly DependencyProperty DismissCommandProperty = DependencyProperty.Register(
-        nameof(DismissCommand), typeof(ICommand), typeof(McToast), new FrameworkPropertyMetadata(null));
+        nameof(DismissCommand), typeof(ICommand), typeof(MaToast), new FrameworkPropertyMetadata(null));
 
     public static readonly DependencyProperty DismissCommandParameterProperty = DependencyProperty.Register(
-        nameof(DismissCommandParameter), typeof(object), typeof(McToast), new FrameworkPropertyMetadata(null));
+        nameof(DismissCommandParameter), typeof(object), typeof(MaToast), new FrameworkPropertyMetadata(null));
 
     public static readonly RoutedEvent ClickEvent = EventManager.RegisterRoutedEvent(
-        nameof(Click), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(McToast));
+        nameof(Click), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MaToast));
 
     public static readonly RoutedEvent DismissedEvent = EventManager.RegisterRoutedEvent(
-        nameof(Dismissed), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(McToast));
+        nameof(Dismissed), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MaToast));
 
     private ButtonBase? _openButton;
     private ButtonBase? _dismissButton;
 
-    static McToast()
+    static MaToast()
     {
-        DefaultStyleKeyProperty.OverrideMetadata(typeof(McToast), new FrameworkPropertyMetadata(typeof(McToast)));
-        FocusableProperty.OverrideMetadata(typeof(McToast), new FrameworkPropertyMetadata(false));
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(MaToast), new FrameworkPropertyMetadata(typeof(MaToast)));
+        FocusableProperty.OverrideMetadata(typeof(MaToast), new FrameworkPropertyMetadata(false));
     }
 
     /// <summary>The first line, in semibold. Also the card's accessible name.</summary>
@@ -80,7 +80,7 @@ public class McToast : Control
         set => SetValue(BodyProperty, value);
     }
 
-    /// <summary>The outline and left stripe colour (McAccent by default), e.g. a status colour.</summary>
+    /// <summary>The outline and left stripe colour (MaAccent by default), e.g. a status colour.</summary>
     public Brush? Accent
     {
         get => (Brush?)GetValue(AccentProperty);
@@ -159,7 +159,7 @@ public class McToast : Control
         if (_dismissButton is not null) _dismissButton.Click += OnDismissButtonClick;
     }
 
-    protected override AutomationPeer OnCreateAutomationPeer() => new McToastAutomationPeer(this);
+    protected override AutomationPeer OnCreateAutomationPeer() => new MaToastAutomationPeer(this);
 
     private void OnOpenButtonClick(object sender, RoutedEventArgs e)
     {
@@ -173,16 +173,16 @@ public class McToast : Control
         Dismiss();
     }
 
-    private sealed class McToastAutomationPeer(McToast owner) : FrameworkElementAutomationPeer(owner)
+    private sealed class MaToastAutomationPeer(MaToast owner) : FrameworkElementAutomationPeer(owner)
     {
         protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Group;
 
-        protected override string GetClassNameCore() => nameof(McToast);
+        protected override string GetClassNameCore() => nameof(MaToast);
 
         protected override string GetNameCore()
         {
             var name = base.GetNameCore();
-            return string.IsNullOrEmpty(name) ? ((McToast)Owner).Title ?? string.Empty : name;
+            return string.IsNullOrEmpty(name) ? ((MaToast)Owner).Title ?? string.Empty : name;
         }
     }
 }

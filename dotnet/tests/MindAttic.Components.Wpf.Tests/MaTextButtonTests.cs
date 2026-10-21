@@ -7,8 +7,8 @@ using Xunit;
 
 namespace MindAttic.Components.Wpf.Tests;
 
-/// <summary>M.COMP-T36: McTextButton honours HorizontalContentAlignment / VerticalContentAlignment.</summary>
-public sealed class McTextButtonTests
+/// <summary>M.COMP-T36: MaTextButton honours HorizontalContentAlignment / VerticalContentAlignment.</summary>
+public sealed class MaTextButtonTests
 {
     [Fact]
     public void Content_is_centred_by_default() => Sta(() =>
@@ -51,7 +51,7 @@ public sealed class McTextButtonTests
     {
         var button = new Button { Content = "short", HorizontalAlignment = HorizontalAlignment.Stretch, Width = 400 };
         var window = OffScreenWindow.Create(600, 200, new Grid { Children = { button } });
-        button.Style = (Style)window.FindResource("McTextButton");
+        button.Style = (Style)window.FindResource("MaTextButton");
         configure?.Invoke(button);
         OffScreenWindow.Show(window);
         Pump();

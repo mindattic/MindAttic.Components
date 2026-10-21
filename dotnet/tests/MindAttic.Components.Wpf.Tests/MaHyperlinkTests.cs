@@ -9,15 +9,15 @@ using Xunit;
 
 namespace MindAttic.Components.Wpf.Tests;
 
-/// <summary>M.COMP-T35: McHyperlink, the themed link style for a Hyperlink inside text.</summary>
-public sealed class McHyperlinkTests
+/// <summary>M.COMP-T35: MaHyperlink, the themed link style for a Hyperlink inside text.</summary>
+public sealed class MaHyperlinkTests
 {
     [Fact]
     public void At_rest_a_link_is_McLink_SemiBold_and_not_underlined() => Sta(h =>
     {
         var link = h.AddLink("M.ORCH-T499");
 
-        Assert.Same(h.Window.FindResource("McLink"), link.Foreground);
+        Assert.Same(h.Window.FindResource("MaLink"), link.Foreground);
         Assert.Equal(FontWeights.SemiBold, link.FontWeight);
         Assert.False(IsUnderlined(link.TextDecorations));
     });
@@ -43,7 +43,7 @@ public sealed class McHyperlinkTests
     public void Mouse_hover_underlines_the_link() => Sta(h =>
     {
         // IsMouseOver is read-only, so check the style's own trigger.
-        var style = (Style)h.Window.FindResource("McHyperlink");
+        var style = (Style)h.Window.FindResource("MaHyperlink");
         var hover = Assert.Single(style.Triggers.OfType<Trigger>(), t => t.Property == ContentElement.IsMouseOverProperty);
         Assert.Equal(true, hover.Value);
         var setter = Assert.IsType<Setter>(Assert.Single(hover.Setters));
@@ -57,17 +57,17 @@ public sealed class McHyperlinkTests
         var link = h.AddLink("M.ORCH-T499");
         link.IsEnabled = false;
         h.Pump();
-        Assert.Same(h.Window.FindResource("McMuted"), link.Foreground);
+        Assert.Same(h.Window.FindResource("MaMuted"), link.Foreground);
     });
 
-    /// <summary>M.COMP-T16 still holds with the style: a styled link inside an open McModal
+    /// <summary>M.COMP-T16 still holds with the style: a styled link inside an open MaModal
     /// takes focus (and its underline) without throwing, and focus stays trapped.</summary>
     [Fact]
     public void A_styled_link_inside_an_McModal_takes_focus() => Sta(h =>
     {
         var outside = h.AddLink("Help");
-        var inside = new Hyperlink(new Run("Docs")) { Focusable = true, Style = (Style)h.Window.FindResource("McHyperlink") };
-        var modal = new McModal { Title = "Settings", Content = new TextBlock(inside) };
+        var inside = new Hyperlink(new Run("Docs")) { Focusable = true, Style = (Style)h.Window.FindResource("MaHyperlink") };
+        var modal = new MaModal { Title = "Settings", Content = new TextBlock(inside) };
         h.Grid.Children.Add(modal);
         h.Pump();
 
@@ -105,7 +105,7 @@ public sealed class McHyperlinkTests
 
         public Hyperlink AddLink(string text)
         {
-            var link = new Hyperlink(new Run(text)) { Focusable = true, Style = (Style)Window.FindResource("McHyperlink") };
+            var link = new Hyperlink(new Run(text)) { Focusable = true, Style = (Style)Window.FindResource("MaHyperlink") };
             Root.Children.Add(new TextBlock(link));
             Pump();
             return link;

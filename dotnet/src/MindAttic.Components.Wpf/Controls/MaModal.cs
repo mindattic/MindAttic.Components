@@ -9,7 +9,7 @@ namespace MindAttic.Components.Wpf.Controls;
 
 /// <summary>
 /// An in-window modal dialog: a dimmed backdrop over the whole host area with a centred, themed
-/// card (McChrome, McChromeBorder outline, drop shadow) holding a <see cref="Title"/> (a level-2
+/// card (MaChrome, MaChromeBorder outline, drop shadow) holding a <see cref="Title"/> (a level-2
 /// heading), a close button, the <see cref="ContentControl.Content"/> and an optional
 /// <see cref="Footer"/> for buttons.
 /// <para>
@@ -23,58 +23,58 @@ namespace MindAttic.Components.Wpf.Controls;
 /// <para>
 /// Its accessible name is <c>AutomationProperties.Name</c> when set, otherwise the
 /// <see cref="Title"/>; screen readers see it as a dialog window. Its look is the implicit
-/// <c>McModal</c> style in Theme.xaml, so the theme must be merged.
+/// <c>MaModal</c> style in Theme.xaml, so the theme must be merged.
 /// </para>
 /// </summary>
 [TemplatePart(Name = PartBackdrop, Type = typeof(FrameworkElement))]
 [TemplatePart(Name = PartCard, Type = typeof(FrameworkElement))]
 [TemplatePart(Name = PartCloseButton, Type = typeof(ButtonBase))]
-public class McModal : ContentControl
+public class MaModal : ContentControl
 {
     public const string PartBackdrop = "PART_Backdrop";
     public const string PartCard = "PART_Card";
     public const string PartCloseButton = "PART_CloseButton";
 
     public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register(
-        nameof(IsOpen), typeof(bool), typeof(McModal),
+        nameof(IsOpen), typeof(bool), typeof(MaModal),
         new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnIsOpenChanged));
 
     public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
-        nameof(Title), typeof(string), typeof(McModal), new FrameworkPropertyMetadata(string.Empty));
+        nameof(Title), typeof(string), typeof(MaModal), new FrameworkPropertyMetadata(string.Empty));
 
     public static readonly DependencyProperty FooterProperty = DependencyProperty.Register(
-        nameof(Footer), typeof(object), typeof(McModal), new FrameworkPropertyMetadata(null));
+        nameof(Footer), typeof(object), typeof(MaModal), new FrameworkPropertyMetadata(null));
 
     public static readonly DependencyProperty DialogWidthProperty = DependencyProperty.Register(
-        nameof(DialogWidth), typeof(double), typeof(McModal), new FrameworkPropertyMetadata(480d));
+        nameof(DialogWidth), typeof(double), typeof(MaModal), new FrameworkPropertyMetadata(480d));
 
     public static readonly DependencyProperty CloseCommandProperty = DependencyProperty.Register(
-        nameof(CloseCommand), typeof(ICommand), typeof(McModal), new FrameworkPropertyMetadata(null));
+        nameof(CloseCommand), typeof(ICommand), typeof(MaModal), new FrameworkPropertyMetadata(null));
 
     public static readonly RoutedEvent OpenedEvent = EventManager.RegisterRoutedEvent(
-        nameof(Opened), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(McModal));
+        nameof(Opened), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MaModal));
 
     public static readonly RoutedEvent ClosedEvent = EventManager.RegisterRoutedEvent(
-        nameof(Closed), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(McModal));
+        nameof(Closed), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MaModal));
 
     private FrameworkElement? _backdrop;
     private ButtonBase? _closeButton;
     private IInputElement? _returnFocusTo;
 
-    static McModal()
+    static MaModal()
     {
-        DefaultStyleKeyProperty.OverrideMetadata(typeof(McModal), new FrameworkPropertyMetadata(typeof(McModal)));
-        VisibilityProperty.OverrideMetadata(typeof(McModal), new FrameworkPropertyMetadata(Visibility.Collapsed));
-        FocusableProperty.OverrideMetadata(typeof(McModal), new FrameworkPropertyMetadata(false));
-        KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(McModal),
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(MaModal), new FrameworkPropertyMetadata(typeof(MaModal)));
+        VisibilityProperty.OverrideMetadata(typeof(MaModal), new FrameworkPropertyMetadata(Visibility.Collapsed));
+        FocusableProperty.OverrideMetadata(typeof(MaModal), new FrameworkPropertyMetadata(false));
+        KeyboardNavigation.TabNavigationProperty.OverrideMetadata(typeof(MaModal),
             new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
-        KeyboardNavigation.ControlTabNavigationProperty.OverrideMetadata(typeof(McModal),
+        KeyboardNavigation.ControlTabNavigationProperty.OverrideMetadata(typeof(MaModal),
             new FrameworkPropertyMetadata(KeyboardNavigationMode.Cycle));
-        KeyboardNavigation.DirectionalNavigationProperty.OverrideMetadata(typeof(McModal),
+        KeyboardNavigation.DirectionalNavigationProperty.OverrideMetadata(typeof(MaModal),
             new FrameworkPropertyMetadata(KeyboardNavigationMode.Contained));
     }
 
-    public McModal()
+    public MaModal()
     {
         AccessKeyManager.AddAccessKeyPressedHandler(this, OnAccessKeyPressed);
     }
@@ -94,8 +94,8 @@ public class McModal : ContentControl
         set => SetValue(TitleProperty, value);
     }
 
-    /// <summary>Optional footer content, right-aligned under a rule (usually a row of McButton /
-    /// McPrimaryButton). The footer is hidden when this is null.</summary>
+    /// <summary>Optional footer content, right-aligned under a rule (usually a row of MaButton /
+    /// MaPrimaryButton). The footer is hidden when this is null.</summary>
     public object? Footer
     {
         get => GetValue(FooterProperty);
@@ -159,7 +159,7 @@ public class McModal : ContentControl
         if (_closeButton is not null) _closeButton.Click += OnCloseButtonClick;
     }
 
-    protected override AutomationPeer OnCreateAutomationPeer() => new McModalAutomationPeer(this);
+    protected override AutomationPeer OnCreateAutomationPeer() => new MaModalAutomationPeer(this);
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
@@ -209,7 +209,7 @@ public class McModal : ContentControl
 
     private static void OnIsOpenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        var modal = (McModal)d;
+        var modal = (MaModal)d;
         if ((bool)e.NewValue) modal.Open();
         else modal.Close();
     }
@@ -251,18 +251,18 @@ public class McModal : ContentControl
             _closeButton?.Focus();
     }
 
-    private sealed class McModalAutomationPeer(McModal owner) : FrameworkElementAutomationPeer(owner)
+    private sealed class MaModalAutomationPeer(MaModal owner) : FrameworkElementAutomationPeer(owner)
     {
         protected override AutomationControlType GetAutomationControlTypeCore() => AutomationControlType.Window;
 
-        protected override string GetClassNameCore() => nameof(McModal);
+        protected override string GetClassNameCore() => nameof(MaModal);
 
         protected override bool IsDialogCore() => true;
 
         protected override string GetNameCore()
         {
             var name = base.GetNameCore();
-            return string.IsNullOrEmpty(name) ? ((McModal)Owner).Title ?? string.Empty : name;
+            return string.IsNullOrEmpty(name) ? ((MaModal)Owner).Title ?? string.Empty : name;
         }
     }
 }
