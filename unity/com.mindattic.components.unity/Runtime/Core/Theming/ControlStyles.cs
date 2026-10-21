@@ -134,6 +134,25 @@ namespace MindAttic.Components.Unity.Core
         /// <summary>The keyboard/gamepad focus ring: the accent (the web's <c>:focus-visible</c>).</summary>
         public static ThemeColor FocusRing(ThemePalette p) => p.Accent;
 
+        /// <summary>
+        /// A status pill's colours (<c>MaStatusPill</c>): a <c>bg2</c> fill, an outline in the kind's colour and the
+        /// label in <c>text</c>, so the words read at full contrast whatever the kind; the dot is <see cref="StatusDot"/>.
+        /// </summary>
+        public static ControlColors Status(ThemePalette p, StatusKind kind) =>
+            new ControlColors(p.Bg2, kind == StatusKind.Neutral ? p.Border : StatusDot(p, kind), p.Text);
+
+        /// <summary>The dot colour of a status of the given kind (success, warning, danger, or muted <c>text2</c>).</summary>
+        public static ThemeColor StatusDot(ThemePalette p, StatusKind kind)
+        {
+            switch (kind)
+            {
+                case StatusKind.Ok: return p.Success;
+                case StatusKind.Warn: return p.Warning;
+                case StatusKind.Error: return p.Danger;
+                default: return p.Text2;
+            }
+        }
+
         /// <summary>The stripe colour of a toast of the given kind.</summary>
         public static ThemeColor Toast(ThemePalette p, ToastKind kind)
         {

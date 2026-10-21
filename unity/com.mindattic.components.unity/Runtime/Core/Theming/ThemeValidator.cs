@@ -29,6 +29,10 @@ namespace MindAttic.Components.Unity.Core
             Check(issues, p, ThemeTokenNames.Accent, ThemeTokenNames.Bg2, NonText);
             Check(issues, p, ThemeTokenNames.TagText, ThemeTokenNames.TagBg, Text);
             Check(issues, p, ThemeTokenNames.Danger, ThemeTokenNames.Bg2, NonText);
+            // Status pills: the dot (and outline) of every kind on the pill's bg2 fill (1.4.11 non-text contrast).
+            Check(issues, p, ThemeTokenNames.Success, ThemeTokenNames.Bg2, NonText);
+            Check(issues, p, ThemeTokenNames.Warning, ThemeTokenNames.Bg2, NonText);
+            Check(issues, p, ThemeTokenNames.Text2, ThemeTokenNames.Bg2, NonText);
             return issues;
         }
 

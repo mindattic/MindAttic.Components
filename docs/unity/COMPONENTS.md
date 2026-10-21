@@ -8,7 +8,7 @@
 
 | Assembly | Namespace | What |
 |---|---|---|
-| `MindAttic.Components.Unity.Core` | `MindAttic.Components.Unity.Core` | Engine-free (`noEngineReferences`): the token model (`ThemeColor`, `ThemePalette`, `ThemeTokenNames`, `ThemeMetrics`), `CssTokenParser` (reads any `web/themes` stylesheet), `ControlStyles` (every control's colours per state), `Contrast` + `ThemeValidator` (WCAG AA), `NavigationGraph`, `MenuStackModel<T>`, `FocusTrapModel<,>`, `MenuDefinition` + `MenuValidator`, `ToastQueue`, `Motion` |
+| `MindAttic.Components.Unity.Core` | `MindAttic.Components.Unity.Core` | Engine-free (`noEngineReferences`): the token model (`ThemeColor`, `ThemePalette`, `ThemeTokenNames`, `ThemeMetrics`), `CssTokenParser` (reads any `web/themes` stylesheet), `ControlStyles` (every control's colours per state), `Contrast` + `ThemeValidator` (WCAG AA), `NavigationGraph`, `MenuStackModel<T>`, `FocusTrapModel<,>`, `MenuDefinition` + `MenuValidator`, `ToastQueue`, `BannerQueue`, `MinimapFit` + `MapRect`, `StatusKind`, `Motion` |
 | `MindAttic.Components.Unity` | `MindAttic.Components.Unity` | The components, the theme provider, the canvas/EventSystem helpers and the back router |
 | `MindAttic.Components.Unity.Editor` | `MindAttic.Components.Unity.Editor` | GameObject > MindAttic UI menu, the ThemeTokens inspector, the prefab builder, menu validation, the TMP Essentials importer |
 
@@ -102,7 +102,9 @@ Every component is a `MaElement` (a MonoBehaviour) with a static `Create(parent,
 | `MaTag` | `Create(parent, text, tone)` | Pill; `TagTone` Neutral/Accent/Success/Warning/Danger |
 | `MaText` | `Create(parent, text, style, alignment)` | `TextStyle` Title/Heading/Body/Label/Muted/Caption/Section/Control/Code |
 | `MaPanel` | `Create(parent, style)` | `PanelStyle` Surface (card with shadow), Raised, Inset, Bar |
-
+| `MaStatusPill` | `Create(parent, text, kind = Neutral, pulse = null)` | HUD status: a dot in the `StatusKind` colour (Ok success, Warn warning, Error danger, Neutral muted) and the label in body text; `Set(text, kind)` (cheap every frame), `Text`, `Kind`, `Pulse` (the dot breathes; default on for Warn, still with reduce motion) |
+| `MaBanner` | `Create(parent, width = 1100)` | Timed title + muted subtitle card, centred; `Show(title, subtitle, seconds = 3, replace = false)` fades in, holds, fades out (instant with reduce motion); later ones queue unless `replace`; `Dismiss`, `Clear`, `IsShowing`, `Current`, `PendingCount`; never blocks the pointer |
+| `MaMinimap` | `Create(parent, size = 320, resolution = 160, padding = 8)` | Inset panel drawing caller-supplied world rects and points: `Clear()`, `AddRect(MapRect, colour, fit = true)`, `AddPoint(x, y, colour, radiusPx, fit = false)`, `SetViewport(MapRect?)`, `Apply()`; `AutoFit` (default) fits the bounds of what was added with `fit` plus `padding` texels, `FitTo(bounds)` pins them; `Panned` gives the world point under a click or drag; `Fit` (the `MinimapFit`), `Texture`, `Backdrop`, `ViewportColor` |
 The icons (`MaIcon`: Close, Check, Copy, Chevron*, Back, Plus, Minus, Menu, Info, Warning, Play, Pause, User, Settings, Dot, Exit) and every rounded shape are drawn at runtime from signed distance fields (`MaIcons`, `MaSprites`); the package ships no textures.
 
 ## Menus
@@ -140,7 +142,7 @@ A Danger confirm starts with focus on the safe button. A busy dialog without `on
 ## Recipes for the MindAttic games
 
 - **Multiplayer front end (Unity.Multiplayer UM-T48)**: a `MenuStack` with Host / Join by IP (`AddTextbox`) / Join by code (`AddTextbox(...).AsCode(6)`) / Quit; the lobby is a screen with `AddCode("Join code", code)`, `AddList()` rows (`AddRow(name, playerColour, ping)`, `AddTag("Host", TagTone.Accent)`, `AddAction(MaIcon.Close, Kick, "Kick")`), per-player `AddToggle`s and an `AddRow()` of Leave/Start, with `BackHandler` confirming the leave; connecting is `MaModal.Busy(..., onCancel)`; a disconnect reason is `MaModal.Alert`; the in-game menu is a second stack with `ConfigureAsPauseMenu(root)`.
-- **HUD and pause (Unity.Cursory UC-T11)**: `MaToolbar.Create(canvas)` along the top (`AddIconButton`, `AddText`, `AddFlexibleSpace`), `MaToast` for events, and a pause stack as above.
+- **HUD and pause (Unity.Cursory UC-T11, UC-T23)**: `MaToolbar.Create(canvas)` along the top (`AddIconButton`, `AddText`, `AddFlexibleSpace`) with a `MaStatusPill` for the connection (`Set("Live", StatusKind.Ok)`, `Set("Connecting...", StatusKind.Warn)`), a `MaBanner` for the level's title when it changes, a `MaMinimap` in a corner fed the level's walls, goals and bodies (`fit: true`), the players as points and the camera as the viewport, panning the camera on `Panned`, `MaToast` for events, and a pause stack as above.
 
 ## Prefabs and editor tools
 
@@ -150,7 +152,7 @@ A Danger confirm starts with focus on the safe button. A busy dialog without `on
 
 ## Sample
 
-Package Manager > MindAttic Components > Samples > Gallery imports `Gallery.unity`: every component in both themes (a toolbar button switches), a multiplayer front end with a lobby, the inputs, progress, dialogs and toasts, and a pause menu on Esc.
+Package Manager > MindAttic Components > Samples > Gallery imports `Gallery.unity`: every component in both themes (a toolbar button switches), a multiplayer front end with a lobby, the inputs, progress, dialogs and toasts, the HUD widgets (status pills, a level banner, a minimap that pans on click), and a pause menu on Esc.
 
 ![The Gallery's buttons and tags in the light theme](images/gallery-buttons-light.png)
 
@@ -159,7 +161,7 @@ Package Manager > MindAttic Components > Samples > Gallery imports `Gallery.unit
 ```powershell
 dotnet test unity/tests/Core.Tests                         # engine-free Core (net10 NUnit; Core.Build checks netstandard2.1 / C# 9)
 powershell -File unity/tests/run-editmode.ps1              # editor: CSS-to-ThemeTokens, theme assets, prefabs, GameObject menu, validation
-powershell -File unity/tests/run-playmode.ps1              # runtime: construction, theming, menu stack, navigation, modal focus, toasts
+powershell -File unity/tests/run-playmode.ps1              # runtime: construction, theming, menu stack, navigation, modal focus, toasts, HUD widgets
 ```
 
 The Unity suites run in batch mode on Unity 6000.4.3f1 in `unity/tests/UnityHost`, a bare project whose manifest references the package by `file:` path, lists it in `testables` and adds the Input System (active input handling: both) and the engine modules most games have (animation, audio, physics, physics 2D), so a name that clashes with a `UnityEngine` type in a real game (`UnityEngine.Motion` from the animation module, M.COMP-T44) fails the suites here first. Its `Library/`, logs and the imported TMP Essentials are git-ignored; the scripts import TMP Essentials on a clean checkout before the first run.

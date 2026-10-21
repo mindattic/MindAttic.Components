@@ -38,6 +38,23 @@ namespace MindAttic.Components.Unity.Core
             return 1f - (float)Math.Exp(-3.0 * deltaTime / d);
         }
 
+        /// <summary>The lowest opacity a <see cref="Pulse"/> dips to.</summary>
+        public const float PulseMin = 0.35f;
+
+        /// <summary>
+        /// A soft breathing opacity (1 down to <see cref="PulseMin"/> and back, once per <paramref name="period"/>
+        /// seconds) at clock <paramref name="time"/>, for something in progress (a "Connecting..." status dot). With
+        /// reduce motion, or a period of 0, it holds at 1.
+        /// </summary>
+        public static float Pulse(double time, float period, bool reduceMotion)
+        {
+            if (reduceMotion || !(period > 0)) return 1f;
+            double phase = time / period;
+            phase -= Math.Floor(phase);
+            float wave = (float)(0.5 + 0.5 * Math.Cos(phase * 2 * Math.PI)); // 1 at the start of each period
+            return PulseMin + (1f - PulseMin) * wave;
+        }
+
         /// <summary>A CSS <c>cubic-bezier(x1, y1, x2, y2)</c> timing function at <paramref name="t"/>.</summary>
         public static float CubicBezier(float x1, float y1, float x2, float y2, float t)
         {

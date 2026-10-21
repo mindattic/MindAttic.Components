@@ -112,6 +112,15 @@ namespace MindAttic.Components.Unity.Editor
         [MenuItem(Root + "Tag", false, Priority + 40)]
         static void Tag(MenuCommand cmd) => Make(cmd, "Create Tag", p => MaTag.Create(p, "Tag"));
 
+        [MenuItem(Root + "Status Pill", false, Priority + 40)]
+        static void StatusPill(MenuCommand cmd) => Make(cmd, "Create Status Pill", p => MaStatusPill.Create(p, "Live", StatusKind.Ok));
+
+        [MenuItem(Root + "Banner", false, Priority + 40)]
+        static void Banner(MenuCommand cmd) => Make(cmd, "Create Banner", p => MaBanner.Create(p));
+
+        [MenuItem(Root + "Minimap", false, Priority + 40)]
+        static void Minimap(MenuCommand cmd) => Make(cmd, "Create Minimap", p => MaMinimap.Create(p));
+
         [MenuItem(Root + "Text", false, Priority + 40)]
         static void Text(MenuCommand cmd) => Make(cmd, "Create Text", p => MaText.Create(p, "Text"));
 

@@ -45,6 +45,7 @@ namespace MindAttic.Components.Unity.Samples.Gallery
             main.AddButton("Inputs", () => Stack.Push(Inputs()));
             main.AddButton("Progress", () => Stack.Push(Progress()));
             main.AddButton("Dialogs and toasts", () => Stack.Push(Dialogs()));
+            main.AddButton("HUD widgets", () => Stack.Push(Hud()));
             main.AddToggle("Reduce motion", MaTheme.ReduceMotion, v => MaTheme.ReduceMotion = v);
             main.AddButton("Quit", () => MaModal.Confirm("Quit the gallery?", "Nothing is saved; it's a gallery.",
                 ok => { if (ok) Application.Quit(); }, "Quit", "Stay", ButtonVariant.Danger), ButtonVariant.Danger, MaIcon.Exit);
@@ -123,6 +124,42 @@ namespace MindAttic.Components.Unity.Samples.Gallery
             };
             return s;
         }
+
+        // ---- HUD widgets (status pill, banner, minimap) ---------------------------------------------------
+
+        MenuScreen Hud()
+        {
+            var s = Stack.CreateScreen("HUD widgets", "Status pills, a timed banner and a minimap");
+            s.Width = 760;
+            s.AddSection("Status pills");
+            var pills = s.AddRow(equalWidths: false);
+            pills.Alignment = TextAnchor.MiddleLeft;
+            pills.Add(MaStatusPill.Create(null, "Live", StatusKind.Ok));
+            pills.Add(MaStatusPill.Create(null, "Connecting...", StatusKind.Warn));
+            pills.Add(MaStatusPill.Create(null, "Offline", StatusKind.Error));
+            pills.Add(MaStatusPill.Create(null, "Spectating"));
+            s.AddSection("Banner");
+            int level = 1;
+            s.AddButton("Show a level banner", () => Banner.Show("Level " + ++level, "Push every block onto its goal"));
+            s.AddSection("Minimap (click it to pan)");
+            var map = s.Add(MaMinimap.Create(null, 260, 130));
+            var walls = new Color(0.67f, 0.67f, 0.67f, 0.8f);
+            map.AddRect(new MapRect(1000, 1000, 600, 12), walls);
+            map.AddRect(new MapRect(1000, 1288, 600, 12), walls);
+            map.AddRect(new MapRect(1000, 1000, 12, 300), walls);
+            map.AddRect(new MapRect(1588, 1000, 12, 300), walls);
+            map.AddRect(MapRect.FromCenter(1450, 1150, 80, 80), new Color(0.11f, 0.62f, 0.46f, 0.8f));
+            map.AddRect(MapRect.FromCenter(1200, 1150, 40, 40), new Color(0.90f, 0.45f, 0.30f));
+            map.AddPoint(1300, 1220, new Color(0.42f, 0.64f, 0.91f), 2);
+            map.SetViewport(new MapRect(1100, 1080, 300, 170));
+            map.Apply();
+            map.Panned += w => MaToast.Show("Pan to " + Mathf.RoundToInt(w.x) + ", " + Mathf.RoundToInt(w.y));
+            return s;
+        }
+
+        MaBanner _banner;
+
+        MaBanner Banner => _banner != null ? _banner : (_banner = MaBanner.Create(MaCanvas.Create("Banner Canvas", 50)));
 
         // ---- Every control -----------------------------------------------------------------------------
 
