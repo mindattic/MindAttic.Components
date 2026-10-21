@@ -235,7 +235,9 @@ html[data-theme=""neon""] { --text:#eeeeee; }";
             var normal = ControlStyles.Button(ThemePalette.Dark, ButtonVariant.Primary, ControlState.Normal);
             var off = ControlStyles.Button(ThemePalette.Dark, ButtonVariant.Primary, ControlState.Disabled);
             Assert.That(off.Fill.A, Is.EqualTo(normal.Fill.A * ControlStyles.DisabledAlpha).Within(0.01));
-            Assert.That(off.Text.A, Is.EqualTo(normal.Text.A * ControlStyles.DisabledAlpha).Within(0.01));
+            Assert.That(off.Border.A, Is.EqualTo(normal.Border.A * ControlStyles.DisabledAlpha).Within(0.01));
+            // The label fades too, but only as far as it still reads at 3:1 on the faded fill (M.COMP-T47).
+            Assert.That(off.Text.A, Is.GreaterThanOrEqualTo(normal.Text.A * ControlStyles.DisabledAlpha - 0.01).And.LessThan(1f));
         }
 
         [Test]

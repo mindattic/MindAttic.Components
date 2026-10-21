@@ -58,8 +58,64 @@ namespace MindAttic.Components.Unity.Core
         /// <summary>Opacity of a disabled control.</summary>
         public const float DisabledAlpha = 0.45f;
 
-        /// <summary>A button's colours.</summary>
-        public static ControlColors Button(ThemePalette p, ButtonVariant variant, ControlState state)
+        /// <summary>
+        /// A button's colours. A <paramref name="selected"/> button (the chosen answer in a vote, the current tab) is
+        /// drawn in its variant's filled look (Primary on the accent, Danger on red, Secondary and Ghost lit in bg3)
+        /// and stays that way when disabled, label at full contrast, so a choice that can no longer change still
+        /// reads as chosen rather than broken. Any other disabled button fades its fill and border, while its label
+        /// keeps at least 3:1 against what it fades to (<see cref="DisabledText"/>).
+        /// </summary>
+        public static ControlColors Button(ThemePalette p, ButtonVariant variant, ControlState state, bool selected = false)
+        {
+            if (selected) return SelectedButton(p, variant, state);
+            var c = Base(p, variant, state);
+            if (state != ControlState.Disabled) return c;
+            var faded = c.Faded(DisabledAlpha);
+            return new ControlColors(faded.Fill, faded.Border, DisabledText(p, c.Text, faded.Fill));
+        }
+
+        /// <summary>The minimum contrast a disabled label keeps against its faded fill (1.4.11's 3:1).</summary>
+        public const double DisabledTextContrast = 3.0;
+
+        /// <summary>
+        /// A disabled label: <paramref name="text"/> faded like the rest of the control when that still reads at
+        /// <see cref="DisabledTextContrast"/> against <paramref name="fadedFill"/> (seen over <c>bg</c>); otherwise the
+        /// faintest of <c>text</c> or <c>bg</c> (whichever contrasts more) that does. Fading <c>on-accent</c> over a
+        /// faded accent fill is what left a disabled Primary button's label unreadable.
+        /// </summary>
+        public static ThemeColor DisabledText(ThemePalette p, ThemeColor text, ThemeColor fadedFill)
+        {
+            var under = fadedFill.Over(p.Bg.WithAlpha(1));
+            var faded = text.WithAlpha(text.A * DisabledAlpha);
+            if (Contrast.Ratio(faded, under) >= DisabledTextContrast) return faded;
+            var ink = Contrast.Ratio(p.Text, under) >= Contrast.Ratio(p.Bg, under) ? p.Text : p.Bg;
+            for (float a = DisabledAlpha; a < 1f; a += 0.05f)
+            {
+                var c = ink.WithAlpha(a);
+                if (Contrast.Ratio(c, under) >= DisabledTextContrast) return c;
+            }
+            return ink.WithAlpha(1);
+        }
+
+        static ControlColors SelectedButton(ThemePalette p, ButtonVariant variant, ControlState state)
+        {
+            bool live = state == ControlState.Hover || state == ControlState.Pressed;
+            switch (variant)
+            {
+                case ButtonVariant.Primary:
+                case ButtonVariant.Danger:
+                    // The filled look; hover and press still answer while it can be clicked.
+                    return live ? Base(p, variant, state) : variant == ButtonVariant.Primary
+                        ? new ControlColors(p.Accent, p.Accent, p.OnAccent)
+                        : new ControlColors(p.Danger, p.Danger, p.OnAccent);
+                case ButtonVariant.Ghost:
+                    return live ? Base(p, variant, state) : new ControlColors(p.Bg3, p.Accent, p.Accent);
+                default:
+                    return live ? Base(p, variant, state) : new ControlColors(p.Bg3, p.Accent, p.Text);
+            }
+        }
+
+        static ControlColors Base(ThemePalette p, ButtonVariant variant, ControlState state)
         {
             ControlColors c;
             switch (variant)
@@ -97,7 +153,7 @@ namespace MindAttic.Components.Unity.Core
                     }
                     break;
             }
-            return state == ControlState.Disabled ? c.Faded(DisabledAlpha) : c;
+            return c;
         }
 
         /// <summary>

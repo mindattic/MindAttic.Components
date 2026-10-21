@@ -23,6 +23,7 @@ namespace MindAttic.Components.Unity
         [SerializeField] ButtonVariant variant = ButtonVariant.Secondary;
         [SerializeField] MaIcon iconId = MaIcon.None;
         [SerializeField] Sprite iconSprite;
+        [SerializeField] bool selected;
 
         /// <summary>Creates a button under <paramref name="parent"/>.</summary>
         public static MaButton Create(Component parent, string label, Action onClick = null,
@@ -133,6 +134,28 @@ namespace MindAttic.Components.Unity
                 relay.Refresh();
                 NotifyNavigationChanged();
             }
+        }
+
+        /// <summary>
+        /// Marks the button as the chosen one (a vote's answer, the current tab): drawn in its variant's filled look,
+        /// and kept that way with its label at full contrast when it is also not <see cref="Interactable"/>.
+        /// </summary>
+        public bool Selected
+        {
+            get => selected;
+            set
+            {
+                if (selected == value) return;
+                selected = value;
+                Refresh(true);
+            }
+        }
+
+        /// <summary>Sets <see cref="Selected"/> and returns this button.</summary>
+        public MaButton WithSelected(bool value = true)
+        {
+            Selected = value;
+            return this;
         }
 
         /// <summary>The click event (persistent listeners from the inspector work too).</summary>
@@ -248,7 +271,7 @@ namespace MindAttic.Components.Unity
         {
             if (surface == null || relay == null) return;
             var state = relay.State;
-            surface.SetColors(ControlStyles.Button(MaTheme.Palette, variant, state), relay.ShowFocusRing, state == ControlState.Pressed, instant);
+            surface.SetColors(ControlStyles.Button(MaTheme.Palette, variant, state, selected), relay.ShowFocusRing, state == ControlState.Pressed, instant);
         }
 
         void UpdateIcon()

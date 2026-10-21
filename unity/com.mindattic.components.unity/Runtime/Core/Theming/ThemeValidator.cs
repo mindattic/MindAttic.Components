@@ -33,7 +33,38 @@ namespace MindAttic.Components.Unity.Core
             Check(issues, p, ThemeTokenNames.Success, ThemeTokenNames.Bg2, NonText);
             Check(issues, p, ThemeTokenNames.Warning, ThemeTokenNames.Bg2, NonText);
             Check(issues, p, ThemeTokenNames.Text2, ThemeTokenNames.Bg2, NonText);
+            CheckButtons(issues, p);
             return issues;
+        }
+
+        /// <summary>
+        /// Every button variant's label on its own fill, as drawn on a <c>bg</c> card and a <c>bg2</c> group: at rest
+        /// and selected (including selected and disabled: the chosen answer after a vote) it needs 4.5:1; a plain
+        /// disabled label needs 3:1 against its faded fill.
+        /// </summary>
+        static void CheckButtons(List<string> issues, ThemePalette p)
+        {
+            foreach (ButtonVariant v in new[] { ButtonVariant.Primary, ButtonVariant.Secondary, ButtonVariant.Danger, ButtonVariant.Ghost })
+            {
+                foreach (var surface in new[] { (ThemeTokenNames.Bg, p.Bg), (ThemeTokenNames.Bg2, p.Bg2) })
+                {
+                    CheckColors(issues, p, v + " button", ControlStyles.Button(p, v, ControlState.Normal), surface, Text);
+                    CheckColors(issues, p, "selected " + v + " button", ControlStyles.Button(p, v, ControlState.Normal, true), surface, Text);
+                    CheckColors(issues, p, "selected disabled " + v + " button", ControlStyles.Button(p, v, ControlState.Disabled, true), surface, Text);
+                    CheckColors(issues, p, "disabled " + v + " button", ControlStyles.Button(p, v, ControlState.Disabled), surface, ControlStyles.DisabledTextContrast);
+                }
+            }
+        }
+
+        static void CheckColors(List<string> issues, ThemePalette p, string what, ControlColors c, (string Name, ThemeColor Color) surface, double min)
+        {
+            var under = c.Fill.Over(surface.Color.WithAlpha(1));
+            double ratio = Contrast.Ratio(c.Text, under);
+            if (ratio + 1e-9 < min)
+            {
+                issues.Add(string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                    "{0}: {1} label on --{2} is {3:0.00}:1, needs {4:0.0}:1", p.Name, what, surface.Name, ratio, min));
+            }
         }
 
         static void Check(List<string> issues, ThemePalette p, string fg, string bg, double min)

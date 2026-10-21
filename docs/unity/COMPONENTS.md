@@ -73,7 +73,7 @@ var ocean = ThemeTokens.FromCss(File.ReadAllText(path), "ocean");
 MaTheme.Apply(ocean);
 ```
 
-A `ThemeProvider` component sets the theme and reduce motion from the inspector. `Runtime/Themes/Dark.asset` and `Light.asset` are ready-made assets to duplicate. The inspector checks the palette against WCAG 2.2 AA (`ThemeValidator`) and copies it as CSS for a matching web theme.
+A `ThemeProvider` component sets the theme and reduce motion from the inspector. `Runtime/Themes/Dark.asset` and `Light.asset` are ready-made assets to duplicate. The inspector checks the palette against WCAG 2.2 AA (`ThemeValidator`: text on every surface, on-accent text, status dots, and every button variant's label on its fill at rest, selected, selected-and-disabled at 4.5:1 and disabled at 3:1) and copies it as CSS for a matching web theme.
 
 `ThemeMetrics` is the size scale, in canvas units at 1920x1080 (the web's pixel sizes doubled): spacing 4/8/16/24/32/48, radii 12/16/24, control height 60, menu width 640, type 20/24/26/32/46, transitions 0.15 s and 0.28 s with the web's `cubic-bezier(0.4, 0, 0.2, 1)`.
 
@@ -83,7 +83,7 @@ Every component is a `MaElement` (a MonoBehaviour) with a static `Create(parent,
 
 | Component | Create | Notes |
 |---|---|---|
-| `MaButton` | `Create(parent, label, onClick, variant = Secondary, icon = None)` | `Label`, `Variant` (`Primary`, `Secondary`, `Danger`, `Ghost`), `Icon`/`IconSprite`, `Interactable`, `OnClick`, `Click()`, fluent `WithVariant`, `WithIcon`, `OnClicked`, `WithWidth`, `Stretch`, `WithTooltip` |
+| `MaButton` | `Create(parent, label, onClick, variant = Secondary, icon = None)` | `Label`, `Variant` (`Primary`, `Secondary`, `Danger`, `Ghost`), `Icon`/`IconSprite`, `Interactable`, `Selected` (the chosen one, e.g. a vote's answer: drawn filled and kept that way, label at AA, when also disabled), `OnClick`, `Click()`, fluent `WithVariant`, `WithIcon`, `WithSelected`, `OnClicked`, `WithWidth`, `Stretch`, `WithTooltip`. A disabled button fades, but its label keeps 3:1 on the faded fill |
 | `MaIconButton` | `Create(parent, icon, onClick, tooltip, variant)` | Square; `Tooltip`, `WithSize` |
 | `MaToggle` | `Create(parent, label, value, onChanged)` | A switch; the whole row is the control; Left/Right set it; `Value`, `ValueChanged`, `SetValueWithoutNotify` |
 | `MaTextbox` | `Create(parent, label, placeholder, onSubmit, onChanged)` | `Text`, `Placeholder`, `Label`, `ReadOnly`, `IsEditing`, `Focus()`, `WithContentType`, `WithCharacterLimit`, `AsCode(length)` (letters/digits, upper case) |
