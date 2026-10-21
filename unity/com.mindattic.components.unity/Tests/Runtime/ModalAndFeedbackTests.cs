@@ -163,6 +163,33 @@ namespace MindAttic.Components.Unity.Tests
         }
 
         [UnityTest]
+        public IEnumerator Code_display_keeps_a_long_code_and_its_copy_button_whole_in_a_menu()
+        {
+            // M.COMP-T48: a grouped join code in a menu screen (Unity.Multiplayer's lobby) showed as "R2D-8MK-E..." beside "C...".
+            var stack = MenuStack.Create(canvas, false);
+            MenuScreen screen = stack.CreateScreen("Lobby");
+            MaCodeDisplay code = screen.AddCode("Join code", "R2D-8MK-EQ4");
+            stack.Push(screen);
+            yield return null;
+            yield return null;
+            Canvas.ForceUpdateCanvases();
+
+            var button = code.CopyButton.RectTransform;
+            float wanted = UnityEngine.UI.LayoutUtility.GetPreferredWidth(button);
+            Assert.That(button.rect.width, Is.GreaterThanOrEqualTo(wanted - 0.5f), "the Copy button keeps its full width");
+            Assert.That(code.CodeFits, Is.True, "the whole code shows in its box");
+            Assert.That(code.CodeFontSize, Is.LessThan(MaTheme.Metrics.FontCode), "it shrank to fit rather than being cut off");
+            Assert.That(code.CodeFontSize, Is.GreaterThanOrEqualTo(MaTheme.Metrics.FontCode * 0.5f - 0.01f));
+
+            code.Code = "AB12";
+            yield return null;
+            Canvas.ForceUpdateCanvases();
+            Assert.That(code.CodeFits, Is.True);
+            Assert.That(code.CodeFontSize, Is.EqualTo(MaTheme.Metrics.FontCode).Within(0.5f), "a short code keeps the style's size");
+            Object.Destroy(stack.gameObject);
+        }
+
+        [UnityTest]
         public IEnumerator Tooltip_shows_on_demand_and_on_keyboard_focus()
         {
             var b = MaIconButton.Create(canvas, MaIcon.Copy, null, "Copy the code");

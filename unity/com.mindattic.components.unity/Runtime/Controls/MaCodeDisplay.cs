@@ -44,9 +44,12 @@ namespace MindAttic.Components.Unity
             d.box = MaPanel.Create(row, PanelStyle.Inset, "Code Box");
             MaUi.HRow(d.box.gameObject, 0, MaUi.Pad(m.SpaceLg, 0), TextAnchor.MiddleCenter, expandWidth: true);
             float h = m.ControlHeight + 16;
-            MaUi.Layout(d.box.gameObject, minH: h, prefH: h, flexW: 1);
+            // The box asks for no width of its own and takes what the Copy button leaves (prefW 0, flexW 1), so a long code in a
+            // narrow menu never squeezes the button to "C..."; the code shrinks to fit the box instead (FitCode).
+            MaUi.Layout(d.box.gameObject, minH: h, prefW: 0, prefH: h, flexW: 1);
             d.codeText = MaUi.Text(d.box.transform, code, TextStyle.Code, "Code");
             d.codeText.alignment = TextAlignmentOptions.Center;
+            d.FitCode();
             d.copyButton = MaButton.Create(row, d.copyLabel, d.Copy, ButtonVariant.Secondary, MaIcon.Copy);
             d.copyButton.LayoutElement.minHeight = d.copyButton.LayoutElement.preferredHeight = h;
             d.Code = code;
@@ -114,7 +117,38 @@ namespace MindAttic.Components.Unity
         public override void ApplyTheme(ThemeTokens theme)
         {
             if (codeText != null) MaUi.Style(codeText, TextStyle.Code, theme);
+            FitCode();
         }
+
+        /// <summary>
+        /// Lets the code text shrink, down to half its style size, rather than run out of its box when the box is narrow.
+        /// Called right after the Code style is applied, so the current size is the style's.
+        /// </summary>
+        void FitCode()
+        {
+            if (codeText == null) return;
+            float size = codeText.fontSize;
+            codeText.enableAutoSizing = true;
+            codeText.fontSizeMax = size;
+            codeText.fontSizeMin = size * 0.5f;
+            codeText.textWrappingMode = TextWrappingModes.NoWrap;
+        }
+
+        /// <summary>True when the whole code shows inside its box at the current layout (for tests and layout checks).</summary>
+        public bool CodeFits
+        {
+            get
+            {
+                if (codeText == null) return false;
+                codeText.ForceMeshUpdate();
+                // Not cut off with an ellipsis, and inside the box (TMP's bounds count the spacing after the last letter, which
+                // may run into the box's padding).
+                return !codeText.isTextTruncated && codeText.textBounds.size.x <= box.RectTransform.rect.width;
+            }
+        }
+
+        /// <summary>The size the code is drawn at now (smaller than the style's when it had to shrink to fit).</summary>
+        public float CodeFontSize => codeText != null ? codeText.fontSize : 0f;
 
         /// <inheritdoc />
         public override MenuItemDefinition Describe() =>
