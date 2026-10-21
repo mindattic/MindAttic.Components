@@ -227,10 +227,18 @@ namespace MindAttic.Components.Unity
             return Track(element);
         }
 
-        /// <summary>Removes every item.</summary>
+        /// <summary>
+        /// Removes every item. They are hidden at once (Unity destroys objects at the end of the frame), so a screen
+        /// cleared and refilled in the same frame navigates, lays out and describes only its new items.
+        /// </summary>
         public void Clear()
         {
-            for (int i = items.childCount - 1; i >= 0; i--) MaUi.Destroy(items.GetChild(i).gameObject);
+            for (int i = items.childCount - 1; i >= 0; i--)
+            {
+                var child = items.GetChild(i).gameObject;
+                child.SetActive(false);
+                MaUi.Destroy(child);
+            }
             MarkNavigationDirty();
         }
 

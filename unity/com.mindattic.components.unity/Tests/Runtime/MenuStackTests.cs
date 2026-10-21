@@ -183,5 +183,28 @@ namespace MindAttic.Components.Unity.Tests
             Assert.That(empty.Validate(), Has.Some.Contains("stuck"));
             Assert.That(empty.DescribeMenu().Items, Has.Count.EqualTo(1));
         }
+
+        [UnityTest]
+        public IEnumerator Clear_then_refill_in_one_frame_shows_and_navigates_only_the_new_items()
+        {
+            var stack = MenuStack.Create(canvas);
+            var main = stack.CreateScreen("Main");
+            main.AddButton("Old one", null);
+            main.AddButton("Old two", null);
+            stack.Push(main);
+            yield return null;
+
+            main.Clear();
+            var fresh = main.AddButton("New", null);
+            main.RebuildNavigation();
+
+            var rows = main.NavRows();
+            Assert.That(rows.Count, Is.EqualTo(1), "only the new item is navigable");
+            Assert.That(rows[0][0], Is.SameAs(fresh.Button));
+            Assert.That(main.DescribeMenu().Items.Count, Is.EqualTo(1));
+            Assert.That(main.GetComponentsInChildren<MaButton>(false), Has.None.Matches<MaButton>(b => b.Label.StartsWith("Old")));
+            yield return null;
+            Assert.That(main.Items.childCount, Is.EqualTo(1), "the old items are gone by the next frame");
+        }
     }
 }
