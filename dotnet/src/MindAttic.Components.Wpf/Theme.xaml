@@ -38,6 +38,9 @@
     <SolidColorBrush x:Key="MaGood" Color="#FF2FBF71" />
     <SolidColorBrush x:Key="MaWarn" Color="#FFF5A524" />
     <SolidColorBrush x:Key="MaBad" Color="#FFFF7A7D" />
+    <!-- The fourth status: anything that's neither good, warning nor bad (idle, waiting, unknown).
+         Purple, 6.4:1 on MaChrome and 5.3:1 on MaSurface (M.COMP-T50). -->
+    <SolidColorBrush x:Key="MaOther" Color="#FFB48CFF" />
     <!-- MaHyperlink's text: the accent hue lightened for reading, 5.6:1 on MaChrome and 4.9:1 on
          MaSurface (MaAccent itself is a fill colour, under 3:1 as text). -->
     <SolidColorBrush x:Key="MaLink" Color="#FF7A93F0" />
@@ -835,6 +838,144 @@
         <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+
+    <!-- Implicit: every Controls.MaStatusLight, an 8px dot filled with the theme brush for its
+         Status (Good MaGood, Warning MaWarn, Bad MaBad, Other MaOther); its tooltip is its
+         Description (the label, or the status word). M.COMP-T50. -->
+    <Style TargetType="{x:Type ctl:MaStatusLight}">
+        <Setter Property="Width" Value="8" />
+        <Setter Property="Height" Value="8" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Foreground" Value="{DynamicResource MaOther}" />
+        <Setter Property="ToolTip" Value="{Binding Description, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaStatusLight}">
+                    <Ellipse x:Name="PART_Dot" Fill="{TemplateBinding Foreground}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Status" Value="Good">
+                <Setter Property="Foreground" Value="{DynamicResource MaGood}" />
+            </Trigger>
+            <Trigger Property="Status" Value="Warning">
+                <Setter Property="Foreground" Value="{DynamicResource MaWarn}" />
+            </Trigger>
+            <Trigger Property="Status" Value="Bad">
+                <Setter Property="Foreground" Value="{DynamicResource MaBad}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Implicit: every Controls.MaTabControl, a tab strip over its content. The tabs sit in a
+         TabPanel (PART_HeaderPanel: Tab enters once, Left/Right cycle) on a MaChromeBorder rule; the
+         selected tab's content (PART_SelectedContentHost) fills the rest, collapsed when
+         ShowContent is false. M.COMP-T50. -->
+    <Style TargetType="{x:Type ctl:MaTabControl}">
+        <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaChromeBorder}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaTabControl}">
+                    <Grid KeyboardNavigation.TabNavigation="Local" SnapsToDevicePixels="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition x:Name="ContentRow" Height="*" />
+                        </Grid.RowDefinitions>
+                        <Border Grid.Row="0" BorderBrush="{DynamicResource MaChromeBorder}" BorderThickness="0,0,0,1">
+                            <TabPanel x:Name="PART_HeaderPanel" IsItemsHost="True" Background="Transparent"
+                                      KeyboardNavigation.TabIndex="1" />
+                        </Border>
+                        <Border x:Name="ContentArea" Grid.Row="1" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
+                                KeyboardNavigation.TabNavigation="Local" KeyboardNavigation.DirectionalNavigation="Contained"
+                                KeyboardNavigation.TabIndex="2">
+                            <ContentPresenter x:Name="PART_SelectedContentHost" ContentSource="SelectedContent"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="ShowContent" Value="False">
+                            <Setter TargetName="ContentArea" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="ContentRow" Property="Height" Value="0" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Implicit: every Controls.MaTabItem. A flat MaMuted label on the chrome: an optional
+         MaStatusLight (PART_StatusLight, collapsed while Status is null), the header, then the
+         Trailing text in TrailingForeground (PART_Trailing, 11px, collapsed while empty). Hover
+         tints it MaHover; the selected tab lifts onto MaSurface in MaText with a 2px underline in
+         its own Accent (PART_Underline); keyboard focus draws MaFocusRing. M.COMP-T50. -->
+    <Style TargetType="{x:Type ctl:MaTabItem}">
+        <Setter Property="Foreground" Value="{DynamicResource MaMuted}" />
+        <Setter Property="Accent" Value="{DynamicResource MaAccent}" />
+        <Setter Property="TrailingForeground" Value="{DynamicResource MaMuted}" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource MaFocusRing}" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="Margin" Value="0,0,2,0" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaTabItem}">
+                    <Grid SnapsToDevicePixels="True">
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="4,4,0,0" Padding="{TemplateBinding Padding}">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <ctl:MaStatusLight x:Name="PART_StatusLight" Margin="0,0,7,0"
+                                                   Status="{Binding Status, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={x:Static ctl:MaStatus.Other}}"
+                                                   Label="{TemplateBinding StatusLabel}" />
+                                <ContentPresenter x:Name="HeaderHost" ContentSource="Header" RecognizesAccessKey="True"
+                                                  VerticalAlignment="Center" />
+                                <TextBlock x:Name="PART_Trailing" Text="{TemplateBinding Trailing}" Foreground="{TemplateBinding TrailingForeground}"
+                                           FontSize="11" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                        <Border x:Name="PART_Underline" Height="2" VerticalAlignment="Bottom" CornerRadius="1"
+                                Background="{TemplateBinding Accent}" Visibility="Hidden" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Status" Value="{x:Null}">
+                            <Setter TargetName="PART_StatusLight" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Trailing" Value="{x:Null}">
+                            <Setter TargetName="PART_Trailing" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Trailing" Value="">
+                            <Setter TargetName="PART_Trailing" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaHover}" />
+                            <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaSurface}" />
+                            <Setter TargetName="PART_Underline" Property="Visibility" Value="Visible" />
+                            <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+                            <Setter Property="Panel.ZIndex" Value="1" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <!-- Implicit: the look of every Controls.MaToast. A MaSurface card outlined in its Accent with

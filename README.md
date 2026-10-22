@@ -108,7 +108,7 @@ Merge the theme once, in `App.xaml`:
 |---|---|
 | `MaChrome`, `MaChromeBorder`, `MaSurface`, `MaHover`, `MaText`, `MaMuted`, `MaControlBorder`, `MaFocus`, `MaAccent`, `MaOnAccent`, `MaRec`, `MaStar` | Palette brushes. `MaRec` (red text) is 4.5:1 or better on every surface; `MaOnAccent` is text on an `MaAccent` fill |
 | `MaFieldBorder` | A text field's outline, 3:1 or better on every surface (WCAG 1.4.11; `MaTextBox` / `MaTextArea` use it), so no app needs a `FieldBorder` override |
-| `MaGood`, `MaWarn`, `MaBad`, `MaChartGrid` | Status colours for data, and chart gridlines |
+| `MaGood`, `MaWarn`, `MaBad`, `MaOther`, `MaChartGrid` | Status colours for data (green, orange, red, purple), and chart gridlines |
 | `MaLink` | Link text: the accent hue lightened to 5.6:1 on `MaChrome` (`MaAccent` is a fill colour) |
 | `MaFocusRing` | 2px `MaFocus` outline just outside a control; set it as `FocusVisualStyle` |
 | `MaHeading`, `MaSectionLabel`, `MaMutedText` | Text styles: a level-2 heading, a muted level-3 section label, trimmed muted text |
@@ -135,6 +135,8 @@ Merge the theme once, in `App.xaml`:
 | `Controls.MaLineChart` | Percent-over-time line chart: time and percent axes, reference lines, per-point segment colours, a dotted projection |
 | `Controls.MaModal` (+ `MaBackdrop`) | In-window modal dialog: dimmed backdrop, themed card, heading, close button, footer |
 | `Controls.MaMessageBox` | Themed `MessageBox.Show` stand-in for prompts with no app window to host an `MaModal` |
+| `Controls.MaStatusLight` | 8px status dot: `Status` Good / Warning / Bad / Other draws in `MaGood` / `MaWarn` / `MaBad` / `MaOther`; its accessible name and tooltip are `Label` or the status word |
+| `Controls.MaTabControl` + `Controls.MaTabItem` | Themed `TabControl` tab strip: flat tabs, the selected one on `MaSurface` underlined in its own `Accent`; per tab an optional leading `Status` light and a muted `Trailing` text (e.g. "23% left"), both read as the tab's UI Automation item status; `ShowContent="False"` for a bare strip. Keyboard (Tab once, Left/Right, Home/End, Ctrl+Tab) and automation come from `TabControl`. Base an `ItemContainerStyle` on `{StaticResource {x:Type ctl:MaTabItem}}` |
 | `Controls.MaSpinner` | Busy ring in `MaAccent` that turns on its own thread, so it keeps turning while the UI thread is blocked |
 | `Controls.MaToolTips.KeepOpen()` | Every tooltip stays up until the pointer or focus leaves or Esc is pressed (WCAG 1.4.13) |
 | `Controls.MaHighContrast` | Swaps the Windows high-contrast colours into every theme brush, live, and back |

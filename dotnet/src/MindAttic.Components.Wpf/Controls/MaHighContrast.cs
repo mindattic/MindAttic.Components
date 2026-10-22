@@ -23,7 +23,7 @@ public static class MaHighContrast
     public static IReadOnlyList<string> Foregrounds { get; } =
     [
         "MaText", "MaMuted", "MaRec", "MaStar", "MaChromeBorder", "MaControlBorder", "MaFieldBorder",
-        "MaGood", "MaWarn", "MaBad", "MaLink", "MaChartGrid",
+        "MaGood", "MaWarn", "MaBad", "MaOther", "MaLink", "MaChartGrid",
     ];
 
     /// <summary>The theme's accent and focus brushes (Highlight).</summary>
