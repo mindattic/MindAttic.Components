@@ -12,22 +12,23 @@ namespace MindAttic.Components.Wpf.Controls;
 /// system colour for its role: backgrounds by Window, text and lines by WindowText, the accent and focus by Highlight
 /// and text on the accent by HighlightText. Turned off, the replacements are removed and anything they covered is put
 /// back. The theme's styles use DynamicResource, so every library control follows live, with no restart. An app adds
-/// its own brush keys through the optional lists. Lifted from Workflow Desktop's Theme/HighContrast (M.COMP-T11).
+/// its own brush keys through the optional lists. It wins over either <see cref="MaTheme"/> palette, which are merged
+/// dictionaries under these entries (M.COMP-T53). Lifted from Workflow Desktop's Theme/HighContrast (M.COMP-T11).
 /// </summary>
 public static class MaHighContrast
 {
     /// <summary>The theme's background brushes (filled with the system Window colour).</summary>
-    public static IReadOnlyList<string> Backgrounds { get; } = ["MaChrome", "MaSurface", "MaHover"];
+    public static IReadOnlyList<string> Backgrounds { get; } = ["MaChrome", "MaSurface", "MaHover", "MaHoverStrong", "MaAccentDisabled"];
 
     /// <summary>The theme's text, line and status brushes (WindowText).</summary>
     public static IReadOnlyList<string> Foregrounds { get; } =
     [
         "MaText", "MaMuted", "MaRec", "MaStar", "MaChromeBorder", "MaControlBorder", "MaFieldBorder",
-        "MaGood", "MaWarn", "MaBad", "MaOther", "MaLink", "MaChartGrid",
+        "MaGood", "MaWarn", "MaBad", "MaOther", "MaLink", "MaChartGrid", "MaDisabledText", "MaOnAccentDisabled",
     ];
 
     /// <summary>The theme's accent and focus brushes (Highlight).</summary>
-    public static IReadOnlyList<string> Accents { get; } = ["MaAccent", "MaAccentHover", "MaFocus", "MaTileHover"];
+    public static IReadOnlyList<string> Accents { get; } = ["MaAccent", "MaAccentHover", "MaAccentBorder", "MaFocus", "MaTileHover"];
 
     /// <summary>Text on the accent (HighlightText).</summary>
     public const string OnAccent = "MaOnAccent";

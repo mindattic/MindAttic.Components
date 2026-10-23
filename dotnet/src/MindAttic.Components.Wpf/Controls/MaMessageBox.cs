@@ -46,7 +46,7 @@ public class MaMessageBox : Window
                 Source = new Uri("pack://application:,,,/MindAttic.Components.Wpf;component/Theme.xaml"),
             });
 
-        MaWindow.SetDarkTitleBar(this, true);
+        MaWindow.SetThemedTitleBar(this, true);
         SetResourceReference(BackgroundProperty, "MaChrome");
         SetResourceReference(ForegroundProperty, "MaText");
         FontSize = 13;

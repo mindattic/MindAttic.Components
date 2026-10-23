@@ -238,5 +238,29 @@ public sealed class MaLineChart : FrameworkElement
         return (candidates.FirstOrDefault(Fits, candidates[1]), null);
     }
 
-    private Brush Brush(string key, Brush fallback) => TryFindResource(key) as Brush ?? fallback;
+    // The theme brushes as resource references, so a theme switch or high contrast redraws the chart (M.COMP-T53).
+    private static readonly DependencyProperty TextBrushProperty = ThemeBrush("TextBrush");
+    private static readonly DependencyProperty MutedBrushProperty = ThemeBrush("MutedBrush");
+    private static readonly DependencyProperty GridBrushProperty = ThemeBrush("GridBrush");
+    private static readonly DependencyProperty AccentBrushProperty = ThemeBrush("AccentBrush");
+
+    private static DependencyProperty ThemeBrush(string name) => DependencyProperty.Register(name, typeof(object), typeof(MaLineChart),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+
+    /// <summary>Follows the theme's MaText, MaMuted, MaChartGrid and MaAccent live.</summary>
+    public MaLineChart()
+    {
+        SetResourceReference(TextBrushProperty, "MaText");
+        SetResourceReference(MutedBrushProperty, "MaMuted");
+        SetResourceReference(GridBrushProperty, "MaChartGrid");
+        SetResourceReference(AccentBrushProperty, "MaAccent");
+    }
+
+    private Brush Brush(string key, Brush fallback) => GetValue(key switch
+    {
+        "MaText" => TextBrushProperty,
+        "MaMuted" => MutedBrushProperty,
+        "MaChartGrid" => GridBrushProperty,
+        _ => AccentBrushProperty,
+    }) as Brush ?? fallback;
 }

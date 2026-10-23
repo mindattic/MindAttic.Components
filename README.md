@@ -144,6 +144,10 @@ Merge the theme once, in `App.xaml`:
 | `Mvvm.ZoomLevel` | A window's 80-200% zoom with Ctrl+Plus / Ctrl+Minus / Ctrl+0 (WCAG 1.4.4) |
 | `Controls.MaToast`, `Controls.MaToastHost` | Notification card (accent stripe, clickable title + two-line body, dismiss button) and the row that stacks and announces them |
 | `Controls.MaWindow.DarkTitleBar` | Attached property: asks Windows to draw the window's title bar dark |
+| `Controls.MaWindow.ThemedTitleBar` | Attached property: the title bar follows the theme in force (dark or light), live |
+| `Controls.MaTheme` (+ `Themes/Light.xaml`, `MaThemeMode`) | Light and dark themes switched live: `MaTheme.Set(MaThemeMode.Light)` / `Set(MaThemeMode.Dark)` (or `Set(resources, mode)` for a window's dictionary), `MaTheme.Current` to save, `MaTheme.Parse(saved)` to load (Dark when unknown), `MaTheme.Changed`; the `MaThemeMode` resource is the theme in force |
+| `Controls.MaThemeToggle` | The sun/moon switch: an `MaToolButton` showing a moon in light mode and a sun in dark mode that switches to the other theme; named "Switch to light theme" / "Switch to dark theme" for screen readers and its tooltip; `Theme`, `TargetTheme`, `Glyph`, `SwitchText`, and a bubbling `ThemeChanged` event to save the choice |
+| `MaHoverStrong`, `MaDisabledText`, `MaAccentBorder`, `MaAccentDisabled`, `MaOnAccentDisabled` | The last hand-set colours in the styles, now palette keys so they follow the theme |
 | `MaBodyScroll`, `MaPaneScroll` (+ `Controls.MaScrollArea.Gutter`) | A page body's / side pane's `ScrollViewer`: vertical only, not a tab stop, content padded by the gutter (24,0,24,16 / 20,16,20,20); while the bar shows it sits inside the right gutter instead of pushing the content in |
 | `MaList`, `MaRowList`, `MaTileList` (+ `Controls.MaList.*`) | `ItemsControl` lists, not tab stops: plain vertical, vertical rows 8px apart, and a wrap of tiles 10px apart (equal columns with `MaList.MinItemWidth`, else a flow); `MaList.Spacing` / `RowSpacing` / `UniformRows` / `Balanced` tune them |
 | `Controls.MaStackPanel`, `Controls.MaTileGrid` | The lists' panels: a stack with a `Spacing`, and equal-column / flowing tiles (`MinItemWidth`, `Spacing`, `RowSpacing`, `UniformRows`, `Balanced`); `MaTileGrid` also works on its own (a row of stat tiles) |
@@ -155,6 +159,21 @@ Merge the theme once, in `App.xaml`:
 | `Controls.MaPicker` + `Controls.MaPickerItem` | A themed `ComboBox` for choosing a person or login: each option and the closed box show the name, an optional leading `MaStatusLight` and a muted trailing text, bound with `StatusMemberPath` / `StatusLabelMemberPath` / `TrailingMemberPath` (or set on direct `MaPickerItem`s); `Placeholder` while nothing is chosen; `SelectedStatus` / `SelectedTrailing` read the choice. Keyboard and automation come from `ComboBox` |
 
 Every templated control restores a keyboard-focus outline (`MaFocus`). Every style refers to the palette as `DynamicResource`, so re-keying a brush in your own `Application.Resources` (which win over the merged theme) restyles every library control, live. `Controls.DropdownMenu` closes its own popup before invoking an action, so it is never on screen for a screenshot or the start of a recording; see its XML docs.
+
+### Light and dark themes
+
+Dark is the default: Theme.xaml on its own. `MaTheme.Set(MaThemeMode.Light)` merges `Themes/Light.xaml` (every palette key in a light colour, at the same contrast standard: text 4.5:1, outlines, focus and status marks 3:1 on `MaChrome` and `MaSurface`, white on the accent 4.5:1) just after Theme.xaml, and `MaThemeMode.Dark` takes it back out. Every style uses `DynamicResource`, so every control, the tab strip, picker, charts, toasts and modals follow at once, without a restart. Your own re-keyed brushes still win over either palette, and so does `MaHighContrast`: while Windows high contrast is on the system colours show, and the chosen theme returns when it's turned off.
+
+```csharp
+MaTheme.Set(MaTheme.Parse(settings.Theme));   // at startup
+settings.Theme = MaTheme.Current.ToString();  // to save, e.g. from MaThemeToggle.ThemeChanged
+```
+
+```xml
+<ctl:MaThemeToggle ThemeChanged="OnThemeChanged" />
+```
+
+A theme toggle switches the nearest dictionary that carries the theme (`MaTheme.ScopeOf`): usually the Application's. Set `ctl:MaWindow.ThemedTitleBar="True"` instead of `DarkTitleBar` so the caption follows too.
 
 A dashboard page can be built from library pieces only (M.COMP-T52): a `MaBodyScroll` body, `MaRowList` / `MaTileList` lists of `MaListCard` / `MaRowCard` / `MaAccentCard` items, `MaAccentTile` tiles and `MaStatValue` stats. The lists own the gaps, so their items carry no margin; a list is never a tab stop (its items are). Set a scroll area's `ctl:MaScrollArea.Gutter`, not its `Padding`, which the style computes from it.
 

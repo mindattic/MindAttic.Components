@@ -158,7 +158,7 @@ public sealed class DropdownMenu
     {
         pin.IsChecked = pinned;
         pin.Content = pinned ? "" : "";
-        pin.Foreground = (Brush)_trigger.FindResource(pinned ? "MaAccent" : "MaMuted");
+        pin.SetResourceReference(Control.ForegroundProperty, pinned ? "MaAccent" : "MaMuted"); // follows a theme switch
         pin.ToolTip = pinned ? "Unpin from toolbar" : "Pin to toolbar";
     }
 

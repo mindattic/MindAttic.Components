@@ -2,8 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:ctl="clr-namespace:MindAttic.Components.Wpf.Controls">
 
-    <!-- The MindAttic dark chrome palette. Merge this dictionary into Application.Resources (or a
-         Window's) to pick up every style below, plus an implicit dark ToolTip for the whole app.
+    <!-- The MindAttic dark chrome palette, the default theme. Merge this dictionary into Application.Resources
+         (or a Window's) to pick up every style below, plus an implicit ToolTip for the whole app.
+         ctl:MaTheme.Set(MaThemeMode.Light) merges Themes/Light.xaml (the same keys in light colours) over
+         it, live, and MaThemeMode.Dark takes it back out (M.COMP-T53).
          Every style references these brushes as DynamicResource, so an app can re-key one in its own
          resources (which win over a merged dictionary) and every library control follows, live; that
          is how ctl:MaHighContrast swaps in the Windows high-contrast colours (M.COMP-T11). -->
@@ -44,8 +46,19 @@
     <!-- MaHyperlink's text: the accent hue lightened for reading, 5.6:1 on MaChrome and 4.9:1 on
          MaSurface (MaAccent itself is a fill colour, under 3:1 as text). -->
     <SolidColorBrush x:Key="MaLink" Color="#FF7A93F0" />
-    <!-- MaLineChart's gridlines and hour ticks. -->
-    <SolidColorBrush x:Key="MaChartGrid" Color="#FF696969" />
+    <!-- MaLineChart's gridlines and hour ticks: 3.1:1 on MaChrome (it was #696969, just under 3:1; M.COMP-T53). -->
+    <SolidColorBrush x:Key="MaChartGrid" Color="#FF6B6B6B" />
+    <!-- A stronger hover tint (MaPinToggle inside a highlighted menu item). -->
+    <SolidColorBrush x:Key="MaHoverStrong" Color="#FF363842" />
+    <!-- A disabled MaButton's text (disabled controls are exempt from WCAG contrast). -->
+    <SolidColorBrush x:Key="MaDisabledText" Color="#FF7A7C85" />
+    <!-- MaPrimaryButton's outline, and its fill and text while disabled. -->
+    <SolidColorBrush x:Key="MaAccentBorder" Color="#FF8FA3F0" />
+    <SolidColorBrush x:Key="MaAccentDisabled" Color="#FF3A4A5C" />
+    <SolidColorBrush x:Key="MaOnAccentDisabled" Color="#FF9AA7B4" />
+    <!-- Which palette is in force: Dark here, Light while ctl:MaTheme merges Themes/Light.xaml over this
+         dictionary (M.COMP-T53). MaThemeToggle and MaWindow.ThemedTitleBar follow it. -->
+    <ctl:MaThemeMode x:Key="MaThemeMode">Dark</ctl:MaThemeMode>
 
     <!-- A 34x34 icon-font button (Segoe Fluent Icons / Segoe MDL2 Assets) with a flat hover highlight
          and a dimmed disabled state. Used for toolbar-style icon buttons. -->
@@ -146,7 +159,7 @@
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaChrome}" />
                             <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MaChromeBorder}" />
-                            <Setter Property="Foreground" Value="#FF7A7C85" />
+                            <Setter Property="Foreground" Value="{DynamicResource MaDisabledText}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -159,7 +172,7 @@
     <Style x:Key="MaPrimaryButton" TargetType="{x:Type Button}" BasedOn="{StaticResource MaButton}">
         <Setter Property="Foreground" Value="{DynamicResource MaOnAccent}" />
         <Setter Property="Background" Value="{DynamicResource MaAccent}" />
-        <Setter Property="BorderBrush" Value="#FF8FA3F0" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaAccentBorder}" />
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Template">
             <Setter.Value>
@@ -178,9 +191,9 @@
                             <Setter TargetName="Bd" Property="BorderThickness" Value="2" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Bd" Property="Background" Value="#FF3A4A5C" />
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="#FF3A4A5C" />
-                            <Setter Property="Foreground" Value="#FF9AA7B4" />
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaAccentDisabled}" />
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MaAccentDisabled}" />
+                            <Setter Property="Foreground" Value="{DynamicResource MaOnAccentDisabled}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -583,7 +596,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="#FF363842" />
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource MaHoverStrong}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -847,6 +860,13 @@
         <Setter Property="FontSize" Value="11" />
         <Setter Property="FontWeight" Value="Normal" />
         <Setter Property="VerticalAlignment" Value="Top" />
+    </Style>
+
+    <!-- Implicit: every Controls.MaThemeToggle, an MaToolButton showing its Glyph (a sun in dark mode,
+         a moon in light mode) with its SwitchText ("Switch to light theme") as the tooltip. M.COMP-T53. -->
+    <Style TargetType="{x:Type ctl:MaThemeToggle}" BasedOn="{StaticResource MaToolButton}">
+        <Setter Property="Content" Value="{Binding Glyph, RelativeSource={RelativeSource Self}}" />
+        <Setter Property="ToolTip" Value="{Binding SwitchText, RelativeSource={RelativeSource Self}}" />
     </Style>
 
     <!-- Implicit: every Controls.MaStatusLight, an 8px dot filled with the theme brush for its
