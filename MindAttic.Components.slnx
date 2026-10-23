@@ -1,8 +1,10 @@
 <Solution>
   <Folder Name="/dotnet/">
+    <Project Path="dotnet/src/MindAttic.Components.Tokens/MindAttic.Components.Tokens.csproj" />
     <Project Path="dotnet/src/MindAttic.Components.Wpf/MindAttic.Components.Wpf.csproj" />
   </Folder>
   <Folder Name="/dotnet/tests/">
+    <Project Path="dotnet/tests/MindAttic.Components.Tokens.Tests/MindAttic.Components.Tokens.Tests.csproj" />
     <Project Path="dotnet/tests/MindAttic.Components.Wpf.Tests/MindAttic.Components.Wpf.Tests.csproj" />
   </Folder>
   <Folder Name="/unity/tests/">

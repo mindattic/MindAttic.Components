@@ -358,6 +358,10 @@ The full guide, with the API and recipes for the multiplayer front end and the H
 
 ![The Unity Gallery's confirm dialog over a menu in the dark theme](docs/unity/images/gallery-confirm-dark.png)
 
+## MindAttic.Components.Tokens
+
+The design tokens with no UI framework attached (`net10.0`, 1.0.0): `MaPalette.Dark` and `MaPalette.Light` hold every colour under the same `Ma*` names the WPF theme uses (`palette["MaAccent"]` or `palette.Accent`), as `MaColor` values with `ToHex()` (`#AARRGGBB`), `ToCssHex()` and the WCAG 2.2 `ContrastRatio`. They are the one source of the palette: `dotnet/tests/MindAttic.Components.Tokens.Tests` holds `Theme.xaml` and `Themes/Light.xaml` to them key for key and checks both palettes' AA contrast, so a colour changed in one place but not the other fails the build. The per-framework packages stay thin over it: `MindAttic.Components.Wpf` now, MAUI and Blazor when that work starts. It isn't published to `C:\LocalNuGet` yet (`publish-wpf.ps1` packs only the WPF package); a consumer references the project until one needs the package.
+
 ## Building and consuming the .NET package
 
 Publish only with `dotnet/tools/publish-wpf.ps1`, never a bare `dotnet pack -o C:\LocalNuGet`. Every ticket that bumps the package publishes this way, and only after its commit has landed on main:
@@ -388,6 +392,12 @@ The WPF package (xUnit, covering the Mvvm helpers, `ZoomLevel`, `MaToolTips`, `M
 
 ```powershell
 dotnet test dotnet/tests/MindAttic.Components.Wpf.Tests
+```
+
+The design tokens (the palettes, `MaColor`, and the WPF XAML palettes held to them):
+
+```powershell
+dotnet test dotnet/tests/MindAttic.Components.Tokens.Tests
 ```
 
 The Unity package: the engine-free Core with plain `dotnet test`, then the EditMode and PlayMode suites in batch mode on Unity 6000.4.3f1 (`unity/tests/UnityHost` is the host project; the scripts import TextMesh Pro's Essential Resources on a clean checkout):
@@ -426,6 +436,8 @@ powershell -File web/tools/codex.ps1 digest                     # regenerate its
 
 ```text
 dotnet/
+  src/MindAttic.Components.Tokens/       Framework-neutral design tokens (the dark and light Ma* palettes)
+  tests/MindAttic.Components.Tokens.Tests/ xUnit: the tokens, and Theme.xaml / Light.xaml held to them
   src/MindAttic.Components.Wpf/          WPF theme (Theme.xaml) + controls, published to C:\LocalNuGet
   tests/MindAttic.Components.Wpf.Tests/  xUnit tests for the controls
   tests/publish/                         Pester tests for the publish script

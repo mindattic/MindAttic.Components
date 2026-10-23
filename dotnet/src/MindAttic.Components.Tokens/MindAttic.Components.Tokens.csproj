@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <PackageId>MindAttic.Components.Tokens</PackageId>
+    <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
+    <Version>1.0.0</Version>
+    <Description>The MindAttic design tokens with no UI framework attached: the dark and light colour
+      palettes under the same Ma* names the WPF theme uses (MaChrome, MaSurface, MaText, MaAccent, MaGood,
+      ...), as MaColor values (ARGB, #AARRGGBB hex, WCAG 2.2 relative luminance and contrast ratio).
+      MindAttic.Components.Wpf's Theme.xaml and Themes/Light.xaml are held to these values by tests, so
+      the per-framework packages (WPF now, MAUI and Blazor later) stay thin wrappers over one source.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>
