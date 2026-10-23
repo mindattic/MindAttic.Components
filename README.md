@@ -26,7 +26,7 @@ The repo is organized by toolchain rather than by visual category: a JS bundle a
 - **Site build** (`web/build/`): splices components into the hand-made pages and apps listed in `web/sites.json`, touching nothing outside their marker blocks.
 - **Parity proof** (`web/tests/parity/`): shows a rebuilt page is indistinguishable from its original.
 - **Site assets** (`web/assets/`): each site's logos, icons and images, with a manifest of every served file.
-- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme that meets WCAG 2.2 AA by itself (palette brushes, button, text box, progress bar and menu styles, tooltips, scroll bars) with persistent tooltips and a live high-contrast swap, building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles), MVVM helpers (`ObservableObject`, `RelayCommand`, `CollectionSync`, `ZoomLevel`) and the `AddressBar`, `DropdownMenu`, `MaBadge`, `MaLineChart`, `MaMessageBox`, `MaModal`, `MaSpinner`, `MaToast` / `MaToastHost` and `MaWindow` controls.
+- **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme that meets WCAG 2.2 AA by itself (palette brushes, button, text box, progress bar and menu styles, tooltips, scroll bars) with persistent tooltips and a live high-contrast swap, building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles), MVVM helpers (`ObservableObject`, `RelayCommand`, `CollectionSync`, `ZoomLevel`), page building blocks (body scroll areas, row and tile lists, list cards, accent bars, dividers) and the `AddressBar`, `DropdownMenu`, `MaAccentTile`, `MaBadge`, `MaLineChart`, `MaMessageBox`, `MaModal`, `MaPicker`, `MaSpinner`, `MaToast` / `MaToastHost` and `MaWindow` controls.
 - **Unity package** (`unity/com.mindattic.components.unity`): themed uGUI + TextMesh Pro menus and controls for Unity 6 (`MenuStack`/`MenuScreen`, modals, toasts, tooltips, buttons, toggles, text fields, selects, sliders, progress, toolbars, a join-code display, roster lists), the dark and light web palettes as `ThemeTokens`, keyboard/gamepad navigation, built from code or prefabs. See [MindAttic.Components.Unity](#mindatticcomponentsunity).
 
 ## Quick start
@@ -144,8 +144,68 @@ Merge the theme once, in `App.xaml`:
 | `Mvvm.ZoomLevel` | A window's 80-200% zoom with Ctrl+Plus / Ctrl+Minus / Ctrl+0 (WCAG 1.4.4) |
 | `Controls.MaToast`, `Controls.MaToastHost` | Notification card (accent stripe, clickable title + two-line body, dismiss button) and the row that stacks and announces them |
 | `Controls.MaWindow.DarkTitleBar` | Attached property: asks Windows to draw the window's title bar dark |
+| `MaBodyScroll`, `MaPaneScroll` (+ `Controls.MaScrollArea.Gutter`) | A page body's / side pane's `ScrollViewer`: vertical only, not a tab stop, content padded by the gutter (24,0,24,16 / 20,16,20,20); while the bar shows it sits inside the right gutter instead of pushing the content in |
+| `MaList`, `MaRowList`, `MaTileList` (+ `Controls.MaList.*`) | `ItemsControl` lists, not tab stops: plain vertical, vertical rows 8px apart, and a wrap of tiles 10px apart (equal columns with `MaList.MinItemWidth`, else a flow); `MaList.Spacing` / `RowSpacing` / `UniformRows` / `Balanced` tune them |
+| `Controls.MaStackPanel`, `Controls.MaTileGrid` | The lists' panels: a stack with a `Spacing`, and equal-column / flowing tiles (`MinItemWidth`, `Spacing`, `RowSpacing`, `UniformRows`, `Balanced`); `MaTileGrid` also works on its own (a row of stat tiles) |
+| `MaListCard`, `MaRowCard`, `MaAccentCard`, `MaInsetCard` | `Border` cards for list items: `MaCard` without its margin (the list owns the gaps), a dense 10,8 row, a padding-less card led by an `MaAccentBar`, and a sunk `MaChrome` panel inside a card |
+| `MaAccentBar`, `MaVeil`, `MaSidePane`, `MaStatusBar`, `MaDivider`, `MaCover` | `Border` parts: a 5px left colour bar, an 82% `MaSurface` veil over a locked card, a side pane with a left rule, a status bar with a top rule, a 1px rule, a full-window `MaChrome` cover (loader) |
+| `MaStatValue` | A stat tile's 24px SemiBold value with tabular figures |
+| `Controls.MaTile.IsSelected` / `SelectedBrush` | On any `MaTileButton`-based tile (`MaStatCard`, `MaSmallStat`, `MaAccentTile`): a 2px outline in `SelectedBrush` (`MaFocus` by default) and "Selected" as its UI Automation item status |
+| `Controls.MaAccentTile` | An `MaTileButton` tile with a 4px bar down its left edge in its own `Accent` (`AccentWidth`); free content padded inside the bar |
+| `Controls.MaPicker` + `Controls.MaPickerItem` | A themed `ComboBox` for choosing a person or login: each option and the closed box show the name, an optional leading `MaStatusLight` and a muted trailing text, bound with `StatusMemberPath` / `StatusLabelMemberPath` / `TrailingMemberPath` (or set on direct `MaPickerItem`s); `Placeholder` while nothing is chosen; `SelectedStatus` / `SelectedTrailing` read the choice. Keyboard and automation come from `ComboBox` |
 
 Every templated control restores a keyboard-focus outline (`MaFocus`). Every style refers to the palette as `DynamicResource`, so re-keying a brush in your own `Application.Resources` (which win over the merged theme) restyles every library control, live. `Controls.DropdownMenu` closes its own popup before invoking an action, so it is never on screen for a screenshot or the start of a recording; see its XML docs.
+
+A dashboard page can be built from library pieces only (M.COMP-T52): a `MaBodyScroll` body, `MaRowList` / `MaTileList` lists of `MaListCard` / `MaRowCard` / `MaAccentCard` items, `MaAccentTile` tiles and `MaStatValue` stats. The lists own the gaps, so their items carry no margin; a list is never a tab stop (its items are). Set a scroll area's `ctl:MaScrollArea.Gutter`, not its `Padding`, which the style computes from it.
+
+```xml
+<ScrollViewer Style="{StaticResource MaBodyScroll}">
+    <StackPanel>
+        <ItemsControl Style="{StaticResource MaTileList}" ItemsSource="{Binding Tiles}"
+                      ctl:MaList.MinItemWidth="240" ctl:MaList.UniformRows="True">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <ctl:MaAccentTile Accent="{Binding Accent}" ctl:MaTile.IsSelected="{Binding IsSelected}"
+                                      Command="{Binding DataContext.SelectCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      CommandParameter="{Binding}" AutomationProperties.Name="{Binding Name}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding Subtitle}" Style="{StaticResource MaTileSubtitle}" />
+                        </StackPanel>
+                    </ctl:MaAccentTile>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <ItemsControl Style="{StaticResource MaRowList}" ItemsSource="{Binding Queue}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate><Border Style="{StaticResource MaRowCard}">...</Border></DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </StackPanel>
+</ScrollViewer>
+<!-- a card led by a state bar -->
+<Border Style="{StaticResource MaAccentCard}">
+    <DockPanel>
+        <Border Style="{StaticResource MaAccentBar}" Background="{Binding StateBrush}" />
+        <StackPanel Margin="14,12">...</StackPanel>
+    </DockPanel>
+</Border>
+<!-- a stat that filters the page while chosen -->
+<Button Style="{StaticResource MaSmallStat}" ctl:MaTile.IsSelected="{Binding IsWaitingFocus}" ctl:MaTile.SelectedBrush="{DynamicResource MaWarn}">
+    <StackPanel>
+        <TextBlock Text="{Binding WaitingCount}" Style="{StaticResource MaStatValue}" Foreground="{DynamicResource MaWarn}" />
+        <TextBlock Text="Need you" Style="{StaticResource MaTileSubtitle}" />
+    </StackPanel>
+</Button>
+```
+
+`Controls.MaPicker` chooses one of several people or logins, e.g. who a ticket is assigned to. Each option, and the chosen one in the closed box, shows its name (`DisplayMemberPath`), an optional `MaStatusLight` (`StatusMemberPath`: an `MaStatus` or its word, with `StatusLabelMemberPath` for the light's words) and a muted trailing text (`TrailingMemberPath`, e.g. "23% left", "week 97%"); a view model's changes show live. List `MaPickerItem`s (`Status`, `StatusLabel`, `Trailing`, `TrailingForeground`) instead for fixed options. It is a `ComboBox`: Tab stops on it once, Up/Down/Home/End change the choice while it's closed, Alt+Down or F4 opens it, typing a name jumps to it, Enter takes and Esc cancels. A screen reader sees a combo box (expand/collapse, selection) whose options are named by their display member, with "status, trailing" (e.g. "Good, 23% left") as each option's item status and the chosen option's as the picker's own. The chosen option is SemiBold with an `MaAccent` bar, the highlighted one `MaHover`, the focused one outlined in `MaFocus`.
+
+```xml
+<ctl:MaPicker ItemsSource="{Binding People}" SelectedItem="{Binding Assignee}" DisplayMemberPath="Name"
+              StatusMemberPath="Health" TrailingMemberPath="LeftText" Placeholder="Unassigned"
+              AutomationProperties.Name="Assigned to" Width="260" />
+```
 
 `Controls.AddressBar` is a themed WPF address bar for a WebView2 pane: `Attach(CoreWebView2?)` binds (or rebinds) it to a live core, Enter navigates with an optional `{query}` search-template fallback, and an optional `NavigationGuard` lets a host veto Back/Forward/Reload/Navigate/Home (e.g. while recording or mid-run) with a reason string surfaced via `NavigationBlocked`.
 

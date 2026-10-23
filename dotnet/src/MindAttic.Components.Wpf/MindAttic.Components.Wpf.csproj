@@ -5,7 +5,7 @@
     <UseWPF>true</UseWPF>
     <PackageId>MindAttic.Components.Wpf</PackageId>
     <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
-    <Version>20.0.0</Version>
+    <Version>21.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the
@@ -34,6 +34,12 @@
       for prompts when no app window is open to host an MaModal.
       MaSpinner is a busy ring in MaAccent that turns on its own thread, so it keeps turning while
       the UI thread is blocked.
+      Page building blocks: MaBodyScroll/MaPaneScroll scroll areas whose bar sits inside the right gutter
+      (MaScrollArea.Gutter), MaList/MaRowList/MaTileList ItemsControl lists on MaStackPanel/MaTileGrid,
+      MaListCard/MaRowCard/MaAccentCard/MaInsetCard cards, MaAccentBar/MaVeil/MaSidePane/MaStatusBar/
+      MaDivider/MaCover borders, the MaStatValue text, MaTile.IsSelected for chosen tiles, MaAccentTile
+      (a tile with a left bar in its own Accent) and MaPicker, a drop-down for choosing a person or login
+      whose options show a name, a status light and a muted trailing text.
       MindAttic.Components.Wpf.Mvvm: ObservableObject, RelayCommand, CollectionSync (in-place
       ReorderTo/SyncBy) and ZoomLevel (80-200% with Ctrl+Plus/Minus/0). MaToolTips.KeepOpen makes
       tooltips stay up until dismissed, and MaHighContrast swaps the Windows high-contrast colours

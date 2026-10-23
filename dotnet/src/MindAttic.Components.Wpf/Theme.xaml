@@ -189,13 +189,16 @@
     </Style>
 
     <!-- A large launcher-style tile: content (usually a title plus a MaTileSubtitle) on a bordered
-         card that fills with MaTileHover on hover. -->
+         card that fills with MaTileHover on hover. ctl:MaTile.IsSelected outlines it 2px in
+         ctl:MaTile.SelectedBrush (MaFocus unless set) for a chosen tile, e.g. a stat filtering the page
+         (M.COMP-T52); every tile style below is based on it, so they all have it. -->
     <Style x:Key="MaTileButton" TargetType="{x:Type Button}">
         <Setter Property="Height" Value="64" />
         <Setter Property="Margin" Value="0,0,0,10" />
         <Setter Property="Background" Value="{DynamicResource MaSurface}" />
         <Setter Property="Foreground" Value="{DynamicResource MaText}" />
         <Setter Property="BorderBrush" Value="{DynamicResource MaControlBorder}" />
+        <Setter Property="ctl:MaTile.SelectedBrush" Value="{DynamicResource MaFocus}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -226,6 +229,12 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="ctl:MaTile.IsSelected" Value="True">
+                <Setter Property="BorderBrush" Value="{Binding Path=(ctl:MaTile.SelectedBrush), RelativeSource={RelativeSource Self}}" />
+                <Setter Property="BorderThickness" Value="2" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <!-- A tile's second line. Muted at rest; follows the tile's hover up to white so it stays
@@ -1107,6 +1116,358 @@
                                    Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
                                    Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" />
                     </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ==== Page building blocks (M.COMP-T52): scroll areas, lists, cards and tiles, so a dashboard needs no raw
+         ScrollViewer, ItemsControl or Border of its own. ==== -->
+
+    <!-- A page body that scrolls: vertical only, not a tab stop, its content padded by ctl:MaScrollArea.Gutter
+         (24,0,24,16: the window's 24px side gutters). While the vertical bar shows it sits inside the right gutter
+         instead of pushing the content in, so the cards still end where the header and toolbar end. Based on the
+         implicit ScrollViewer (dark corner and scroll bars). Set the gutter, not Padding. -->
+    <Style x:Key="MaBodyScroll" TargetType="{x:Type ScrollViewer}" BasedOn="{StaticResource {x:Type ScrollViewer}}">
+        <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="ctl:MaScrollArea.Gutter" Value="24,0,24,16" />
+        <Setter Property="Padding">
+            <Setter.Value>
+                <MultiBinding Converter="{x:Static ctl:MaScrollArea.PaddingConverter}">
+                    <Binding Path="(ctl:MaScrollArea.Gutter)" RelativeSource="{RelativeSource Self}" />
+                    <Binding Path="ComputedVerticalScrollBarVisibility" RelativeSource="{RelativeSource Self}" />
+                </MultiBinding>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- MaBodyScroll for a side pane (a detail pane beside the body): a 20px gutter all round. -->
+    <Style x:Key="MaPaneScroll" TargetType="{x:Type ScrollViewer}" BasedOn="{StaticResource MaBodyScroll}">
+        <Setter Property="ctl:MaScrollArea.Gutter" Value="20,16,20,20" />
+    </Style>
+
+    <!-- Lists for an ItemsControl. None is a tab stop (its items are); each lays its items out in a library panel set
+         from ctl:MaList on the list. MaList: a plain vertical list, no gaps (ctl:MaList.Spacing to add one). -->
+    <Style x:Key="MaList" TargetType="{x:Type ItemsControl}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="ctl:MaList.Spacing" Value="0" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <ctl:MaStackPanel Spacing="{Binding Path=(ctl:MaList.Spacing), RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Vertical rows 8px apart (ctl:MaList.Spacing), none after the last: a list of cards (MaListCard / MaRowCard). -->
+    <Style x:Key="MaRowList" TargetType="{x:Type ItemsControl}" BasedOn="{StaticResource MaList}">
+        <Setter Property="ctl:MaList.Spacing" Value="8" />
+    </Style>
+
+    <!-- A wrap of tiles in an MaTileGrid, 10px apart both ways (ctl:MaList.Spacing / RowSpacing). With
+         ctl:MaList.MinItemWidth the tiles sit in equal columns that fill the width (UniformRows, Balanced too);
+         without, they flow at their own widths and wrap. Use MaListCard / MaAccentCard / MaAccentTile items. -->
+    <Style x:Key="MaTileList" TargetType="{x:Type ItemsControl}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="ctl:MaList.Spacing" Value="10" />
+        <Setter Property="ctl:MaList.RowSpacing" Value="10" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <ctl:MaTileGrid Spacing="{Binding Path=(ctl:MaList.Spacing), RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                    RowSpacing="{Binding Path=(ctl:MaList.RowSpacing), RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                    MinItemWidth="{Binding Path=(ctl:MaList.MinItemWidth), RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                    UniformRows="{Binding Path=(ctl:MaList.UniformRows), RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"
+                                    Balanced="{Binding Path=(ctl:MaList.Balanced), RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}" />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Cards for a list's items: MaCard without its bottom margin, since the list owns the gaps. -->
+    <Style x:Key="MaListCard" TargetType="{x:Type Border}" BasedOn="{StaticResource MaCard}">
+        <Setter Property="Margin" Value="0" />
+    </Style>
+
+    <!-- A dense table-like row (columns of id, repo, summary, actions): MaListCard with 10,8 padding. -->
+    <Style x:Key="MaRowCard" TargetType="{x:Type Border}" BasedOn="{StaticResource MaListCard}">
+        <Setter Property="Padding" Value="10,8" />
+    </Style>
+
+    <!-- A card that leads with an MaAccentBar running to its edges: MaListCard with no padding (pad the content). -->
+    <Style x:Key="MaAccentCard" TargetType="{x:Type Border}" BasedOn="{StaticResource MaListCard}">
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <!-- A panel inside a card (a card's own sub-list): sunk onto MaChrome, 10,8 padding, 10px below what's above. -->
+    <Style x:Key="MaInsetCard" TargetType="{x:Type Border}" BasedOn="{StaticResource MaCard}">
+        <Setter Property="Background" Value="{DynamicResource MaChrome}" />
+        <Setter Property="Padding" Value="10,8" />
+        <Setter Property="Margin" Value="0,10,0,0" />
+    </Style>
+
+    <!-- A colour bar down a card's left edge (a state or a person's colour; a cue, never the only one): 5px, docked
+         left, rounded to fit an MaAccentCard's corners. MaAccent unless Background is set. -->
+    <Style x:Key="MaAccentBar" TargetType="{x:Type Border}">
+        <Setter Property="Width" Value="5" />
+        <Setter Property="DockPanel.Dock" Value="Left" />
+        <Setter Property="CornerRadius" Value="5,0,0,5" />
+        <Setter Property="Background" Value="{DynamicResource MaAccent}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+    </Style>
+
+    <!-- A translucent veil over a card while it's locked (e.g. a move in flight): MaSurface at 82%, the card's corners.
+         Put it, and a spinner with words, in a Grid over the card's content. Set CornerRadius="0" over a row. -->
+    <Style x:Key="MaVeil" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="{DynamicResource MaSurface}" />
+        <Setter Property="Opacity" Value="0.82" />
+        <Setter Property="CornerRadius" Value="6" />
+    </Style>
+
+    <!-- A side pane beside the body (a detail pane): the window's MaChrome, set off by an MaChromeBorder rule on its
+         left. Give it a Width and an MaPaneScroll. -->
+    <Style x:Key="MaSidePane" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="{DynamicResource MaChrome}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaChromeBorder}" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+    </Style>
+
+    <!-- The window's status bar: an MaChromeBorder rule along its top, 24,6 padding (the window's side gutters). -->
+    <Style x:Key="MaStatusBar" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaChromeBorder}" />
+        <Setter Property="BorderThickness" Value="0,1,0,0" />
+        <Setter Property="Padding" Value="24,6" />
+    </Style>
+
+    <!-- A 1px MaChromeBorder rule between two groups (decorative: not in the UI Automation content view). Set
+         Width="1" and Height="Auto" (and a Margin) for a vertical one. -->
+    <Style x:Key="MaDivider" TargetType="{x:Type Border}">
+        <Setter Property="Height" Value="1" />
+        <Setter Property="Background" Value="{DynamicResource MaChromeBorder}" />
+        <Setter Property="Margin" Value="0,8" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="IsHitTestVisible" Value="False" />
+    </Style>
+
+    <!-- A cover over the whole window (a first-load loader): opaque MaChrome on top of every row. Span every row and
+         column; bind its Visibility, and name it (AutomationProperties.Name, LiveSetting) for screen readers. -->
+    <Style x:Key="MaCover" TargetType="{x:Type Border}">
+        <Setter Property="Background" Value="{DynamicResource MaChrome}" />
+        <Setter Property="Panel.ZIndex" Value="100" />
+    </Style>
+
+    <!-- A stat tile's big number: 24px SemiBold with tabular figures, so a changing count doesn't jitter. Pair it with
+         an MaTileSubtitle caption on an MaStatCard / MaSmallStat; set Foreground for a state colour. -->
+    <Style x:Key="MaStatValue" TargetType="{x:Type TextBlock}">
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Typography.NumeralAlignment" Value="Tabular" />
+    </Style>
+
+    <!-- Implicit: every Controls.MaAccentTile. MaTileButton (hover fill, focus outline, ctl:MaTile.IsSelected) with a
+         4px bar in its Accent (PART_AccentBar, AccentWidth) down the left edge and its content padded inside it. No
+         width or margin of its own (an MaTileList sizes and spaces the tiles); at least 64px tall. -->
+    <Style TargetType="{x:Type ctl:MaAccentTile}" BasedOn="{StaticResource MaTileButton}">
+        <Setter Property="Accent" Value="{DynamicResource MaAccent}" />
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="MinHeight" Value="64" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="12,8" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{StaticResource MaFocusRing}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaAccentTile}">
+                    <Border x:Name="Shell" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" SnapsToDevicePixels="True">
+                        <DockPanel>
+                            <Border x:Name="PART_AccentBar" DockPanel.Dock="Left" Width="{TemplateBinding AccentWidth}"
+                                    Background="{TemplateBinding Accent}" CornerRadius="3,0,0,3" />
+                            <ContentPresenter Margin="{TemplateBinding Padding}" RecognizesAccessKey="True"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </DockPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Shell" Property="Background" Value="{DynamicResource MaTileHover}" />
+                            <Setter TargetName="Shell" Property="BorderBrush" Value="{DynamicResource MaTileHover}" />
+                            <Setter Property="Foreground" Value="{DynamicResource MaOnAccent}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Shell" Property="Opacity" Value="0.85" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Shell" Property="BorderBrush" Value="{DynamicResource MaFocus}" />
+                            <Setter TargetName="Shell" Property="BorderThickness" Value="2" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Implicit: every Controls.MaPicker. Closed, a MaSurface box outlined in MaFieldBorder (MaText on hover, 2px
+         MaFocus with keyboard focus): the chosen option's status light (PART_SelectedStatusLight), its name, its muted
+         trailing text (PART_SelectedTrailing) and a chevron, or the muted Placeholder (PART_Placeholder) while nothing
+         is chosen. Open, an MaChrome list of MaPickerItems under it (PART_Popup). -->
+    <Style TargetType="{x:Type ctl:MaPicker}">
+        <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+        <Setter Property="Background" Value="{DynamicResource MaSurface}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaFieldBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10,4" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="IsEditable" Value="False" />
+        <Setter Property="MaxDropDownHeight" Value="320" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaPicker}">
+                    <Grid x:Name="Root" SnapsToDevicePixels="True">
+                        <ToggleButton x:Name="Toggle" Focusable="False" ClickMode="Press" IsTabStop="False"
+                                      Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                            <ToggleButton.Template>
+                                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" SnapsToDevicePixels="True" />
+                                </ControlTemplate>
+                            </ToggleButton.Template>
+                        </ToggleButton>
+                        <DockPanel Margin="{TemplateBinding Padding}" IsHitTestVisible="False">
+                            <TextBlock x:Name="Chevron" DockPanel.Dock="Right" Text="&#xE70D;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets"
+                                       FontSize="10" Foreground="{DynamicResource MaMuted}" Margin="10,0,0,0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="PART_SelectedTrailing" DockPanel.Dock="Right" Text="{TemplateBinding SelectedTrailing}"
+                                       Foreground="{DynamicResource MaMuted}" FontSize="11" Margin="10,0,0,0" VerticalAlignment="Center"
+                                       Typography.NumeralAlignment="Tabular" />
+                            <ctl:MaStatusLight x:Name="PART_SelectedStatusLight" DockPanel.Dock="Left" Margin="0,0,8,0"
+                                               Status="{Binding SelectedStatus, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={x:Static ctl:MaStatus.Other}}"
+                                               Label="{TemplateBinding SelectedStatusLabel}" />
+                            <Grid VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <TextBlock x:Name="PART_Placeholder" Text="{TemplateBinding Placeholder}" Foreground="{DynamicResource MaMuted}"
+                                           TextTrimming="CharacterEllipsis" Visibility="Collapsed" />
+                                <ContentPresenter x:Name="SelectionBox" Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                                  ContentStringFormat="{TemplateBinding SelectionBoxItemStringFormat}"
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                            </Grid>
+                        </DockPanel>
+                        <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" Focusable="False" PopupAnimation="None"
+                               IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}">
+                            <Border x:Name="DropDown" Background="{DynamicResource MaChrome}" BorderBrush="{DynamicResource MaChromeBorder}"
+                                    BorderThickness="1" CornerRadius="6" Padding="4" Margin="0,4,0,0" SnapsToDevicePixels="True"
+                                    MinWidth="{Binding ActualWidth, ElementName=Root}" MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                <ScrollViewer CanContentScroll="False" Focusable="False">
+                                    <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="SelectedStatus" Value="{x:Null}">
+                            <Setter TargetName="PART_SelectedStatusLight" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="SelectedTrailing" Value="{x:Null}">
+                            <Setter TargetName="PART_SelectedTrailing" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="SelectedTrailing" Value="">
+                            <Setter TargetName="PART_SelectedTrailing" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="SelectedItem" Value="{x:Null}">
+                            <Setter TargetName="PART_Placeholder" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Toggle" Property="BorderBrush" Value="{DynamicResource MaText}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                            <Setter TargetName="Toggle" Property="BorderBrush" Value="{DynamicResource MaFocus}" />
+                            <Setter TargetName="Toggle" Property="BorderThickness" Value="2" />
+                        </Trigger>
+                        <Trigger Property="IsDropDownOpen" Value="True">
+                            <Setter TargetName="Chevron" Property="Text" Value="&#xE70E;" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Implicit: every Controls.MaPickerItem. The name in MaText, led by an optional MaStatusLight (PART_StatusLight,
+         collapsed while Status is null) and followed by the muted Trailing text (PART_Trailing, collapsed while empty).
+         Highlighted: MaHover; keyboard focus: an MaFocus outline; chosen: SemiBold with a 3px MaAccent bar at the left
+         (PART_SelectedBar). -->
+    <Style TargetType="{x:Type ctl:MaPickerItem}">
+        <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+        <Setter Property="TrailingForeground" Value="{DynamicResource MaMuted}" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="MinHeight" Value="32" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaPickerItem}">
+                    <Grid SnapsToDevicePixels="True">
+                        <Border x:Name="Bd" Background="Transparent" BorderBrush="Transparent" BorderThickness="1" CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <DockPanel VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <TextBlock x:Name="PART_Trailing" DockPanel.Dock="Right" Text="{TemplateBinding Trailing}"
+                                           Foreground="{TemplateBinding TrailingForeground}" FontSize="11" FontWeight="Normal"
+                                           Margin="16,0,0,0" VerticalAlignment="Center" Typography.NumeralAlignment="Tabular" />
+                                <ctl:MaStatusLight x:Name="PART_StatusLight" DockPanel.Dock="Left" Margin="0,0,8,0"
+                                                   Status="{Binding Status, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={x:Static ctl:MaStatus.Other}}"
+                                                   Label="{TemplateBinding StatusLabel}" />
+                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
+                            </DockPanel>
+                        </Border>
+                        <Border x:Name="PART_SelectedBar" Width="3" HorizontalAlignment="Left" Margin="1,7" CornerRadius="1.5"
+                                Background="{DynamicResource MaAccent}" Visibility="Hidden" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Status" Value="{x:Null}">
+                            <Setter TargetName="PART_StatusLight" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Trailing" Value="{x:Null}">
+                            <Setter TargetName="PART_Trailing" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Trailing" Value="">
+                            <Setter TargetName="PART_Trailing" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaHover}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MaFocus}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="PART_SelectedBar" Property="Visibility" Value="Visible" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
