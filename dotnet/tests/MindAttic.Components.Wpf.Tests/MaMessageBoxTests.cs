@@ -147,8 +147,8 @@ public sealed class MaMessageBoxTests
     });
 
     [Fact]
-    public void The_package_is_version_19() =>
-        Assert.Equal(19, typeof(MaMessageBox).Assembly.GetName().Version!.Major);
+    public void The_package_is_version_20() =>
+        Assert.Equal(20, typeof(MaMessageBox).Assembly.GetName().Version!.Major);
 
     // ---- harness ----
 
