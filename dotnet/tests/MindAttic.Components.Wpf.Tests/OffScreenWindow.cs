@@ -12,10 +12,16 @@ internal static class OffScreenWindow
 {
     public const double Offset = -20000;
 
+    // This project is a separate assembly from the library, so building a pack:// Uri directly here (rather than
+    // through a library API) needs MindAttic.Components.Wpf loaded first for its own [ModuleInitializer] to have
+    // registered the scheme (M.COMP-T114; the library no longer needs every call site to touch
+    // PackUriHelper.UriSchemePack itself, but a caller outside the assembly still needs to load it).
+    private static void EnsurePackSchemeRegistered() => _ = typeof(MaTheme);
+
     /// <summary>A themed window set up as above, not yet shown (so a test can look up a style first).</summary>
     public static Window Create(double width = 400, double height = 200, object? content = null)
     {
-        _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// outside an Application
+        EnsurePackSchemeRegistered();
         var window = new Window
         {
             Content = content, Width = width, Height = height, Left = Offset, Top = Offset,
@@ -42,7 +48,7 @@ internal static class OffScreenWindow
     public static MaMessageBox ShowMessageBox(string message, string caption = "", MessageBoxButton buttons = MessageBoxButton.OK,
         MessageBoxImage image = MessageBoxImage.None, MessageBoxResult defaultResult = MessageBoxResult.None)
     {
-        _ = System.IO.Packaging.PackUriHelper.UriSchemePack;
+        EnsurePackSchemeRegistered();
         var box = new MaMessageBox(message, caption, buttons, image, defaultResult)
         {
             Left = Offset, Top = Offset, WindowStartupLocation = WindowStartupLocation.Manual,

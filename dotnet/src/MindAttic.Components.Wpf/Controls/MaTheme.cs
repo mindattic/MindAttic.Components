@@ -44,14 +44,10 @@ public static class MaTheme
     /// <summary>The resource key whose value is the <see cref="MaThemeMode"/> in force where it's looked up.</summary>
     public const string ModeKey = "MaThemeMode";
 
-    // Deliberately write-only: the value isn't read anywhere, but touching the helper registers the pack:// scheme as
-    // a side effect, and field initializers run in declaration order as part of this type's own static constructor, so
-    // this has to come before LightPaletteUri's. Don't remove it as unused — without it, the first type (tests, tools)
-    // to touch MaTheme with no WPF Application yet registered throws UriFormatException building that Uri (M.COMP-T54;
-    // MindAttic.Orchestrator carried its own copy of this fix in Palette for M.ORCH-T703).
-    private static readonly string PackSchemeRegistered = System.IO.Packaging.PackUriHelper.UriSchemePack;
-
     /// <summary>The light palette dictionary.</summary>
+    // LightPaletteUri's own initializer builds a pack:// Uri before any WPF Application may exist (tests, tools);
+    // PackSchemeRegistration's module initializer registers the scheme before this (or anything else in the
+    // assembly) runs, so no field here needs to touch it itself (M.COMP-T114; was M.COMP-T54's own fix).
     public static Uri LightPaletteUri { get; } = new("pack://application:,,,/MindAttic.Components.Wpf;component/Themes/Light.xaml");
 
     private const string ThemeSuffix = "component/Theme.xaml", LightSuffix = "component/Themes/Light.xaml";
