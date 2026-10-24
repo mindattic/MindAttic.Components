@@ -478,7 +478,7 @@ docs/unity/                              The Unity package's guide and screensho
 - [docs/web/ASSETS.md](docs/web/ASSETS.md) and [docs/web/PIPELINES.md](docs/web/PIPELINES.md): assets and delivery pipelines
 - [docs/web/AMENDMENTS.md](docs/web/AMENDMENTS.md) and [docs/web/CHANGELOG.md](docs/web/CHANGELOG.md)
 - [docs/unity/COMPONENTS.md](docs/unity/COMPONENTS.md): the Unity package
-- [docs/USER_STORIES.md](docs/USER_STORIES.md): stories and tickets (generated from MindAttic.Workflow; change them with the workflow CLI)
+- [docs/USER_STORIES.md](docs/USER_STORIES.md): stories and tickets (generated from MindAttic.Tickets; change them with the tickets CLI)
 - [web/themes/README.md](web/themes/README.md) and [web/tests/package/README.md](web/tests/package/README.md)
 - [AGENTS.md](AGENTS.md): entry point for coding agents
 
