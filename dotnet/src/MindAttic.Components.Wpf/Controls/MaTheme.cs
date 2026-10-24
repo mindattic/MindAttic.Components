@@ -44,6 +44,12 @@ public static class MaTheme
     /// <summary>The resource key whose value is the <see cref="MaThemeMode"/> in force where it's looked up.</summary>
     public const string ModeKey = "MaThemeMode";
 
+    // Touching the helper registers the pack:// scheme. Field initializers run in declaration order as part of this
+    // type's own static constructor, so this has to come before LightPaletteUri's: otherwise the first type (tests,
+    // tools) to touch MaTheme with no WPF Application yet registered throws UriFormatException building that Uri
+    // (M.COMP-T54; MindAttic.Orchestrator carried its own copy of this fix in Palette for M.ORCH-T703).
+    private static readonly string PackSchemeRegistered = System.IO.Packaging.PackUriHelper.UriSchemePack;
+
     /// <summary>The light palette dictionary.</summary>
     public static Uri LightPaletteUri { get; } = new("pack://application:,,,/MindAttic.Components.Wpf;component/Themes/Light.xaml");
 
@@ -68,7 +74,6 @@ public static class MaTheme
         var merged = resources.MergedDictionaries;
         if (theme == MaThemeMode.Light)
         {
-            _ = System.IO.Packaging.PackUriHelper.UriSchemePack; // registers pack:// when there's no Application yet
             var light = new ResourceDictionary { Source = LightPaletteUri };
             // Just after Theme.xaml, so an app dictionary merged after the theme still wins over the light palette.
             var at = -1;
