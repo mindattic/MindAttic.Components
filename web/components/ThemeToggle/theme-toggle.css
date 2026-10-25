@@ -1,0 +1,39 @@
+/* MindAttic.Components - ThemeToggle/theme-toggle.css
+   A sun/moon light-dark switch. Put class="ma-theme-toggle" on a <button>; theme-toggle.js
+   (MindAtticThemeToggle.init) wires it to set data-theme on <html> and remember the choice.
+   Themed by the shared tokens every web/themes palette defines (--bg2, --border, --accent,
+   --text, --text3); a page sets anything it does differently in its own CSS on top. */
+.ma-theme-toggle{
+  position:relative;width:34px;height:34px;box-sizing:border-box;
+  border-radius:8px;border:2px solid var(--border);background:var(--bg2);
+  color:var(--text);cursor:pointer;padding:0;flex-shrink:0;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:border-color 0.15s, background-color 0.15s;
+}
+.ma-theme-toggle:hover{border-color:var(--accent);}
+.ma-theme-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+/* Both icons are stacked; the active theme decides which is shown. The hidden one scales and
+   fades out, the shown one scales and fades in, so the swap reads as a cross-rotate. */
+.ma-theme-toggle__icon{
+  position:absolute;width:16px;height:16px;fill:none;stroke:currentColor;
+  stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  transition:opacity 0.28s cubic-bezier(0.4,0,0.2,1), transform 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+.ma-theme-toggle__sun{color:#f5b301;}
+.ma-theme-toggle__moon{color:var(--accent);}
+
+/* Dark theme active -> offer the sun (switch to light). Light active -> offer the moon. */
+[data-theme="light"] .ma-theme-toggle__sun{opacity:0;transform:scale(0.4) rotate(-90deg);}
+[data-theme="light"] .ma-theme-toggle__moon{opacity:1;transform:scale(1) rotate(0);}
+[data-theme="dark"] .ma-theme-toggle__moon,
+:root:not([data-theme="light"]) .ma-theme-toggle__moon{opacity:0;transform:scale(0.4) rotate(90deg);}
+[data-theme="dark"] .ma-theme-toggle__sun,
+:root:not([data-theme="light"]) .ma-theme-toggle__sun{opacity:1;transform:scale(1) rotate(0);}
+
+@media(prefers-reduced-motion:reduce){
+  .ma-theme-toggle__icon{transition:opacity 0.15s;}
+  [data-theme="light"] .ma-theme-toggle__sun,
+  [data-theme="dark"] .ma-theme-toggle__moon,
+  :root:not([data-theme="light"]) .ma-theme-toggle__moon{transform:none;}
+}

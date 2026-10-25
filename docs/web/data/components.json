@@ -1,11 +1,11 @@
 {
-  "$comment": "L5 canon-as-data: the MindAttic.Components web/ component catalog (formerly MindAttic.Web.Shared's). codex front-matter equivalent: { codex:1, project:MindAttic.Components (web), code:MAU, layer:data, status:living, updated:2026-10-13 }. Schema: _schema/component.schema.json. Paths are relative to web/. Prose (BIBLE/README) cites these by id; do not restate fields. Folders verified on disk 2026-10-13 (32 components).",
+  "$comment": "L5 canon-as-data: the MindAttic.Components web/ component catalog (formerly MindAttic.Web.Shared's). codex front-matter equivalent: { codex:1, project:MindAttic.Components (web), code:MAU, layer:data, status:living, updated:2026-10-25 }. Schema: _schema/component.schema.json. Paths are relative to web/. Prose (BIBLE/README) cites these by id; do not restate fields. Folders verified on disk 2026-10-25 (33 components).",
   "codex": 1,
   "project": "MindAttic.Components (web)",
   "code": "MAU",
   "layer": "data",
   "status": "living",
-  "updated": "2026-10-13",
+  "updated": "2026-10-25",
   "components": [
     {
       "id": "component.cyberspace",
@@ -286,6 +286,15 @@
       "type": "css-only",
       "folder": "components/SkipLink",
       "summary": ".ma-skip-link: keyboard skip-to-content link.",
+      "feeds": []
+    },
+    {
+      "id": "component.themetoggle",
+      "name": "ThemeToggle",
+      "type": "css-js",
+      "folder": "components/ThemeToggle",
+      "doc": "components/ThemeToggle/ThemeToggle.md",
+      "summary": ".ma-theme-toggle: a sun/moon button that flips data-theme between dark and light and remembers the choice (localStorage ma-theme); pairs with the Dark/Light themes.",
       "feeds": []
     }
   ]

@@ -21,7 +21,7 @@ Try it: the web package is served as is from `cdn.jsdelivr.net/gh/mindattic/Mind
 
 The repo is organized by toolchain rather than by visual category: a JS bundle and a compiled .NET assembly are not the same kind of artifact and do not share a build or distribution path.
 
-- **Web components** (`web/components/`): 32 self-contained CSS/HTML/JS components, from fonts and buttons to the animated Cyberspace backdrop and the Hyperspace n-dimensional shape library.
+- **Web components** (`web/components/`): 33 self-contained CSS/HTML/JS components, from fonts and buttons to the sun/moon theme toggle, the animated Cyberspace backdrop and the Hyperspace n-dimensional shape library.
 - **Whole-page themes** (`web/themes/`): 16 palette themes with animated effects, plus the Cyberspace theme.
 - **Site build** (`web/build/`): splices components into the hand-made pages and apps listed in `web/sites.json`, touching nothing outside their marker blocks.
 - **Parity proof** (`web/tests/parity/`): shows a rebuilt page is indistinguishable from its original.
@@ -66,6 +66,7 @@ The sites are hand-made, so a component only replaces part of a page once it is 
 | ProgressBar | ryandebraal.com | `.ma-progress` + `__fill`; `--edge` for a thin bar along a container's bottom |
 | FormRow | ryandebraal.com | `.ma-form-section__title`, `__rows`, `.ma-form-row`, `__label`, `__value` |
 | Avatar, SkipLink | ryandebraal.com | `.ma-avatar` (`--ma-avatar-size`), `.ma-skip-link` |
+| ThemeToggle | RusNet | `.ma-theme-toggle`: sun/moon button that flips `data-theme` dark/light and remembers it (`localStorage` `ma-theme`); pairs with the Dark/Light themes |
 | UserLogin, UserCircle, UserTimeout | Tutor | Auth visuals: CSS spliced into `app.css`, scripts copied to `wwwroot/js/` |
 | `web/themes/*` (16) | ryandebraal.com | Palettes, per-theme CSS and animated effects; see `web/themes/README.md` |
 
