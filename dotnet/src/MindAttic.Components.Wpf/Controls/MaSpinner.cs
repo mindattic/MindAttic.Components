@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Windows;
 using System.Windows.Automation;
 using System.Windows.Automation.Peers;
@@ -7,23 +8,40 @@ using System.Windows.Threading;
 
 namespace MindAttic.Components.Wpf.Controls;
 
+/// <summary>Which of <see cref="MaSpinner"/>'s two looks it draws (M.COMP-T147).</summary>
+public enum MaSpinnerKind
+{
+    /// <summary>The original dashed ring.</summary>
+    Ring,
+
+    /// <summary>A small rotating glyph on its own, with no ring: meant to sit inside a caller-provided colored badge
+    /// (e.g. <c>ctl:MaBadge</c>) rather than draw its own background, the way a status badge's own busy mark does.</summary>
+    Glyph,
+}
+
 /// <summary>
-/// A busy spinner: a dashed ring that keeps turning while the UI thread is blocked (M.COMP-T33, lifted from the
-/// Orchestrator's loader spinner, M.ORCH-T200). WPF ticks an animation on the thread that owns it, so a storyboard
-/// spinner freezes exactly when it matters: while the window's thread applies a big result or lays out a heavy page
-/// behind a loader. This one draws into a <see cref="HostVisual"/> whose content lives on a private dispatcher thread,
-/// which the render thread composes however busy the window's thread is. That thread runs only while the spinner is
-/// loaded and visible, and shuts down when it's hidden or unloaded.
+/// A busy spinner: a dashed ring, or a small rotating glyph (<see cref="Kind"/>, M.COMP-T147), that keeps turning
+/// while the UI thread is blocked (M.COMP-T33, lifted from the Orchestrator's loader spinner, M.ORCH-T200). WPF ticks
+/// an animation on the thread that owns it, so a storyboard spinner freezes exactly when it matters: while the
+/// window's thread applies a big result or lays out a heavy page behind a loader. This one draws into a
+/// <see cref="HostVisual"/> whose content lives on a private dispatcher thread, which the render thread composes
+/// however busy the window's thread is. That thread runs only while the spinner is loaded and visible, and shuts down
+/// when it's hidden or unloaded.
 /// <code>
 /// &lt;ctl:MaSpinner Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibility}}" /&gt;
 /// &lt;ctl:MaSpinner Width="24" Height="24" StrokeThickness="3" /&gt;
+/// &lt;ctl:MaBadge Background="{DynamicResource MaGood}"&gt;
+///     &lt;ctl:MaSpinner Kind="Glyph" Width="12" Height="12" Stroke="{DynamicResource MaOnAccent}" /&gt;
+/// &lt;/ctl:MaBadge&gt;
 /// </code>
 /// <para>
 /// The implicit <c>MaSpinner</c> style in Theme.xaml draws the ring in <c>MaAccent</c>; set <see cref="Stroke"/> for
-/// another colour. It is 44x44 unless <c>Width</c>/<c>Height</c> say otherwise (the ring fits the smaller side). The
-/// ring's look is fixed when it starts turning; changing <see cref="Stroke"/>, <see cref="StrokeThickness"/>,
-/// <see cref="Period"/> or the size while it turns restarts it. It reads to UI Automation as a progress bar named
-/// "Loading" (or its <c>AutomationProperties.Name</c>), and is never a tab stop.
+/// another colour (it's the glyph's own colour under <see cref="MaSpinnerKind.Glyph"/>, not a ring colour). It is
+/// 44x44 unless <c>Width</c>/<c>Height</c> say otherwise (both kinds fit the smaller side). <see cref="StrokeThickness"/>
+/// only affects the ring; a glyph ignores it. The look is fixed when it starts turning; changing <see cref="Kind"/>,
+/// <see cref="Stroke"/>, <see cref="StrokeThickness"/>, <see cref="Period"/> or the size while it turns restarts it.
+/// It reads to UI Automation as a progress bar named "Loading" (or its <c>AutomationProperties.Name</c>), and is
+/// never a tab stop.
 /// </para>
 /// </summary>
 public sealed class MaSpinner : FrameworkElement
@@ -43,6 +61,10 @@ public sealed class MaSpinner : FrameworkElement
         nameof(Period), typeof(Duration), typeof(MaSpinner),
         new FrameworkPropertyMetadata(new Duration(TimeSpan.FromSeconds(1.2)), Restart));
 
+    public static readonly DependencyProperty KindProperty = DependencyProperty.Register(
+        nameof(Kind), typeof(MaSpinnerKind), typeof(MaSpinner),
+        new FrameworkPropertyMetadata(MaSpinnerKind.Ring, Restart));
+
     static MaSpinner()
     {
         WidthProperty.OverrideMetadata(typeof(MaSpinner), new FrameworkPropertyMetadata(double.NaN, Restart));
@@ -57,6 +79,9 @@ public sealed class MaSpinner : FrameworkElement
 
     /// <summary>One full turn; 1.2 seconds by default.</summary>
     public Duration Period { get => (Duration)GetValue(PeriodProperty); set => SetValue(PeriodProperty, value); }
+
+    /// <summary>The ring (default) or a small rotating glyph with no ring (M.COMP-T147).</summary>
+    public MaSpinnerKind Kind { get => (MaSpinnerKind)GetValue(KindProperty); set => SetValue(KindProperty, value); }
 
     private HostVisual? host;
     private Dispatcher? worker;
@@ -106,6 +131,8 @@ public sealed class MaSpinner : FrameworkElement
         var stroke = (Stroke ?? Brushes.Gray).CloneCurrentValue();
         stroke.Freeze(); // crosses to the worker thread
         var period = Period.HasTimeSpan && Period.TimeSpan > TimeSpan.Zero ? Period : new Duration(TimeSpan.FromSeconds(1.2));
+        var kind = Kind;
+        var pixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip; // read here: DependencyObjects are thread-affine
 
         host = new HostVisual();
         AddVisualChild(host);
@@ -116,7 +143,7 @@ public sealed class MaSpinner : FrameworkElement
         {
             started = Dispatcher.CurrentDispatcher;
             var source = new VisualTarget(target);
-            source.RootVisual = Ring(size, thickness, stroke, period, out turn);
+            source.RootVisual = kind == MaSpinnerKind.Glyph ? Glyph(size, stroke, period, pixelsPerDip, out turn) : Ring(size, thickness, stroke, period, out turn);
             ready.Set();
             Dispatcher.Run();
             source.Dispose();
@@ -147,6 +174,23 @@ public sealed class MaSpinner : FrameworkElement
             var r = Math.Max(0, (size - thickness) / 2);
             dc.DrawEllipse(null, pen, new Point(size / 2, size / 2), r, r);
         }
+        turn = new RotateTransform(0, size / 2, size / 2);
+        visual.Transform = turn;
+        turn.BeginAnimation(RotateTransform.AngleProperty, new DoubleAnimation(0, 360, period) { RepeatBehavior = RepeatBehavior.Forever });
+        return visual;
+    }
+
+    /// <summary>The glyph kind (M.COMP-T147): a rotating clockwise-arrow mark, no ring, meant to sit inside a
+    /// caller-provided colored badge. <see cref="FormattedText"/>/<see cref="DrawingContext.DrawText"/> are plain
+    /// retained-mode drawing, not dispatcher-bound, so this draws on the worker thread exactly as <see cref="Ring"/>
+    /// does.</summary>
+    private static DrawingVisual Glyph(double size, Brush stroke, Duration period, double pixelsPerDip, out RotateTransform turn)
+    {
+        var typeface = new Typeface(new FontFamily("Segoe UI Symbol"), FontStyles.Normal, FontWeights.Bold, FontStretches.Normal);
+        var text = new FormattedText("↻", CultureInfo.InvariantCulture, FlowDirection.LeftToRight, typeface, size * 0.8, stroke, pixelsPerDip);
+        var visual = new DrawingVisual();
+        using (var dc = visual.RenderOpen())
+            dc.DrawText(text, new Point((size - text.Width) / 2, (size - text.Height) / 2));
         turn = new RotateTransform(0, size / 2, size / 2);
         visual.Transform = turn;
         turn.BeginAnimation(RotateTransform.AngleProperty, new DoubleAnimation(0, 360, period) { RepeatBehavior = RepeatBehavior.Forever });

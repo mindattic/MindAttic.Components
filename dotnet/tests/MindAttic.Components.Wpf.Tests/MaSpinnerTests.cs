@@ -97,6 +97,31 @@ public sealed class MaSpinnerTests
     });
 
     [Fact]
+    public void The_glyph_kind_turns_on_its_own_thread_too_and_defaults_to_the_ring() => Sta(root =>
+    {
+        Assert.Equal(MaSpinnerKind.Ring, new MaSpinner().Kind);
+
+        var spinner = new MaSpinner { Kind = MaSpinnerKind.Glyph, Width = 16, Height = 16 };
+        root.Children.Add(spinner);
+        Pump();
+        Assert.True(spinner.IsSpinning);
+
+        var angles = new List<double>();
+        for (var i = 0; i < 4; i++)
+        {
+            angles.Add(spinner.Angle ?? double.NaN);
+            Thread.Sleep(150);
+        }
+        Assert.True(angles.Distinct().Count() > 1, $"angles while blocked: {string.Join(", ", angles)}");
+
+        var first = spinner.SpinnerThread!;
+        spinner.Kind = MaSpinnerKind.Ring;
+        Assert.True(spinner.IsSpinning, "switching kind while it turns restarts it rather than stopping it");
+        Assert.NotSame(first, spinner.SpinnerThread);
+        Assert.True(first.Join(TimeSpan.FromSeconds(5)));
+    });
+
+    [Fact]
     public void It_is_44_square_by_default_and_takes_its_width_and_height() => Sta(root =>
     {
         var plain = new MaSpinner { HorizontalAlignment = HorizontalAlignment.Left };
