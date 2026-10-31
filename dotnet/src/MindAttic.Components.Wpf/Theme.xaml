@@ -643,6 +643,41 @@
         <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
     </Style>
 
+    <!-- A PasswordBox that looks like MaTextBox (M.COMP-T155): MaSecretBox's masked field. -->
+    <Style x:Key="MaPasswordBox" TargetType="{x:Type PasswordBox}">
+        <Setter Property="Background" Value="{DynamicResource MaSurface}" />
+        <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource MaFieldBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CaretBrush" Value="{DynamicResource MaText}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource MaAccent}" />
+        <Setter Property="Padding" Value="6,4" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type PasswordBox}">
+                    <Border x:Name="Bd" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="4" SnapsToDevicePixels="True">
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="False" Margin="{TemplateBinding Padding}"
+                                      HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MaText}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MaFocus}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- A small icon-font toggle (pin/unpin) meant to sit inside a MaDropdownMenuItem's header. -->
     <Style x:Key="MaPinToggle" TargetType="{x:Type ToggleButton}">
         <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
