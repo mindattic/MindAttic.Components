@@ -27,7 +27,6 @@ The repo is organized by toolchain rather than by visual category: a JS bundle a
 - **Parity proof** (`web/tests/parity/`): shows a rebuilt page is indistinguishable from its original.
 - **Site assets** (`web/assets/`): each site's logos, icons and images, with a manifest of every served file.
 - **WPF package** (`dotnet/src/MindAttic.Components.Wpf`): a dark theme that meets WCAG 2.2 AA by itself (palette brushes, button, text box, progress bar and menu styles, tooltips, scroll bars) with persistent tooltips and a live high-contrast swap, building blocks (pill choice row, pill toggle, card, stat tiles, focus ring, text styles), MVVM helpers (`ObservableObject`, `RelayCommand`, `CollectionSync`, `ZoomLevel`), page building blocks (body scroll areas, row and tile lists, list cards, accent bars, dividers) and the `AddressBar`, `DropdownMenu`, `MaAccentTile`, `MaBadge`, `MaLineChart`, `MaMessageBox`, `MaModal`, `MaPicker`, `MaSpinner`, `MaToast` / `MaToastHost` and `MaWindow` controls.
-- **Settings-tab contract** (`dotnet/src/MindAttic.Components.Settings`): the interface an app's settings tab implements so MindAttic.Vault.Desktop (and, opted in, MindAttic.Vault.Web) can host it, plus the one "open my settings" helper every app's cog calls. See [MindAttic.Components.Settings](#mindatticcomponentssettings).
 - **Unity package** (`unity/com.mindattic.components.unity`): themed uGUI + TextMesh Pro menus and controls for Unity 6 (`MenuStack`/`MenuScreen`, modals, toasts, tooltips, buttons, toggles, text fields, selects, sliders, progress, toolbars, a join-code display, roster lists), the dark and light web palettes as `ThemeTokens`, keyboard/gamepad navigation, built from code or prefabs. See [MindAttic.Components.Unity](#mindatticcomponentsunity).
 
 ## Quick start
@@ -363,17 +362,6 @@ The full guide, with the API and recipes for the multiplayer front end and the H
 ## MindAttic.Components.Tokens
 
 The design tokens with no UI framework attached (`net10.0`, 1.0.0): `MaPalette.Dark` and `MaPalette.Light` hold every colour under the same `Ma*` names the WPF theme uses (`palette["MaAccent"]` or `palette.Accent`), as `MaColor` values with `ToHex()` (`#AARRGGBB`), `ToCssHex()` and the WCAG 2.2 `ContrastRatio`. They are the one source of the palette: `dotnet/tests/MindAttic.Components.Tokens.Tests` holds `Theme.xaml` and `Themes/Light.xaml` to them key for key and checks both palettes' AA contrast, so a colour changed in one place but not the other fails the build. The per-framework packages stay thin over it: `MindAttic.Components.Wpf` now, MAUI and Blazor when that work starts. It isn't published to `C:\LocalNuGet` yet (`publish-wpf.ps1` packs only the WPF package); a consumer references the project until one needs the package.
-
-## MindAttic.Components.Settings
-
-The settings-tab contract (`net10.0`, 1.0.0, no UI framework attached; M.COMP-T151, M.COMP-T153):
-
-- `ISettingsTab`: `AppId` (lower-case, e.g. `idiotproof`), `Title`, `Kind` (`Razor`: a portable component with no `@page`, render mode or auth lookup, hostable unmodified by Blazor Server or a `BlazorWebView`; `Wpf`: a `UserControl`, Desktop only), `ViewType`, `WebReachable` (off unless the app opts in), `ConfigureServices(services, host)` to register what the view injects, and `ParametersAsync(services, host)` for the Razor view's parameters, and `Stylesheets(host)` for the CSS files a host without the app's web root inlines.
-- `[assembly: SettingsTab(typeof(MyTab))]` marks the implementation; `SettingsTabDiscovery.FromAssembly` finds and validates it (by type name, so the contract needs neither Razor nor WPF).
-- `SettingsTabRegistry`: an app registers the assembly carrying its tab as `%APPDATA%\MindAttic\Vault\SettingsTabs\{appId}.json` (paths only, never settings), and the Desktop builds its tab list from that folder, so adding an app never changes the Desktop's source.
-- `SettingsLauncher.OpenAsync(appId)` is what every app's cog calls. It asks a running Desktop over the per-user named pipe `MindAttic.Vault.Desktop.Activate.{user}` (`open {appId}`, answered `ok` or `unknown`) to come to the front on that tab, or starts `MindAttic.Vault.Desktop.exe --tab {appId}`, found via `MINDATTIC_VAULT_DESKTOP_EXE`, the `%APPDATA%\MindAttic\Vault\desktop.json` the Desktop writes on start, or its usual install folders. It returns `Activated`, `Launched`, `UnknownTab` or `NotInstalled` and never throws for a missing Desktop. `SettingsActivationListener` is the Desktop's side of the same pipe, so the two cannot drift apart; creating it fails when another Desktop already owns the pipe.
-
-Consumers reference the project until it is published to `C:\LocalNuGet`.
 
 ## Building and consuming the .NET package
 
