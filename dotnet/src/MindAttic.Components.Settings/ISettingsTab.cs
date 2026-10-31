@@ -46,6 +46,11 @@ public interface ISettingsTab
     /// host's built container. Ignored for WPF views, which take what they need through DI.</summary>
     Task<IReadOnlyDictionary<string, object?>> ParametersAsync(IServiceProvider services, SettingsTabHostContext host) =>
         Task.FromResult<IReadOnlyDictionary<string, object?>>(new Dictionary<string, object?>());
+
+    /// <summary>Full paths of stylesheets a Razor view needs (its app's CSS, usually under
+    /// <see cref="SettingsTabHostContext.ContentRoot"/>). A host without the app's web root, such as
+    /// a BlazorWebView, inlines them into the page; missing files are skipped. Ignored for WPF views.</summary>
+    IReadOnlyList<string> Stylesheets(SettingsTabHostContext host) => [];
 }
 
 /// <summary>What a host tells a tab about where it is running.</summary>
