@@ -5,7 +5,8 @@
     <UseWPF>true</UseWPF>
     <PackageId>MindAttic.Components.Wpf</PackageId>
     <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
-    <Version>24.0.0</Version>
+    <!-- 25.0.0: AsyncRelayCommand, MaCheck, MaSecretBox + MaPasswordBox, and MaSettingsForm (manifest-driven settings editor) for LAMP (M.VALT-T35). -->
+    <Version>25.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the
@@ -41,13 +42,17 @@
       (a tile with a left bar in its own Accent) and MaPicker, a drop-down for choosing a person or login
       whose options show a name, a status light and a muted trailing text.
       MindAttic.Components.Wpf.Mvvm: ObservableObject, RelayCommand, CollectionSync (in-place
-      ReorderTo/SyncBy) and ZoomLevel (80-200% with Ctrl+Plus/Minus/0). MaToolTips.KeepOpen makes
+      ReorderTo/SyncBy), AsyncRelayCommand (disabled while running, failures surfaced) and ZoomLevel (80-200% with Ctrl+Plus/Minus/0). MaToolTips.KeepOpen makes
       tooltips stay up until dismissed, and MaHighContrast swaps the Windows high-contrast colours
       into every theme brush live. The palette meets WCAG 2.2 AA by itself: MaRec text is 4.5:1 and
       a text field's MaFieldBorder outline 3:1 on every surface. Light and dark themes: MaTheme.Set switches
       every control live between the dark default and a light palette at the same contrast standard (high
       contrast still wins), MaThemeToggle is the sun/moon switch, and MaWindow.ThemedTitleBar keeps the
-      title bar in step.</Description>
+      title bar in step.
+      MaCheck is a themed check box. MaSecretBox is a masked secret field (click to reveal, auto-masked after 30 s or
+      on focus or window change, no value in the automation tree, copies kept out of clipboard history and cleared after
+      30 s). MaSettingsForm renders a settings manifest (JSON) as one full-width row per setting with an editor per field
+      kind, nested objects and add/remove/edit collections, validation, ScrollTo deep links and pluggable editors.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
