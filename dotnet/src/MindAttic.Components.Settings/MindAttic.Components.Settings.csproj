@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PackageId>MindAttic.Components.Settings</PackageId>
+    <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
+    <Version>1.0.0</Version>
+    <Description>The settings-tab contract every MindAttic app's settings package implements, with no UI
+      framework attached. ISettingsTab names an app's tab (AppId, Title) and its view: a portable Razor
+      component (hostable unmodified by Blazor Server or a BlazorWebView) or a native WPF UserControl
+      (desktop only). [assembly: SettingsTab(typeof(...))] marks the implementation so a host finds it
+      by assembly scan, and SettingsTabRegistry lets an app register the assembly that carries its tab
+      (%APPDATA%\MindAttic\Vault\SettingsTabs\{appId}.json) without the host's source changing.
+      SettingsLauncher.OpenAsync(appId) is the one "open my settings" helper every app's cog calls: it
+      asks a running MindAttic.Vault.Desktop to switch to that tab over a named pipe, or launches it at
+      that tab; SettingsActivationListener is the Desktop's side of the same pipe.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+  </ItemGroup>
+
+</Project>
