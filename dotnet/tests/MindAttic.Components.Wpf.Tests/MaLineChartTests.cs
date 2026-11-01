@@ -153,6 +153,61 @@ public sealed class MaLineChartTests
         Assert.Equal(["00:00@05:00", "01:00@06:00", "01:00@07:00", "02:00@08:00", "03:00@09:00"],
             Marks(new DateTime(2026, 11, 1, 4, 30, 0, DateTimeKind.Utc), new DateTime(2026, 11, 1, 9, 30, 0, DateTimeKind.Utc), Central));
 
+    // ---- labelled ticks (M.COMP-T161): thinned to what fits, so a long span's labels never overlap ----
+
+    private static void AssertSpaced(IReadOnlyList<DateTime> ticks, DateTime startUtc, DateTime endUtc, double width, double labelWidth)
+    {
+        var pxPerHour = width / (endUtc - startUtc).TotalHours;
+        for (var i = 1; i < ticks.Count; i++)
+            Assert.True((ticks[i] - ticks[i - 1]).TotalHours * pxPerHour >= labelWidth + MaLineChart.LabelGap,
+                $"{ticks[i - 1]:u} and {ticks[i]:u} are closer than a label");
+        Assert.True(ticks.Count <= width / (labelWidth + MaLineChart.LabelGap));
+    }
+
+    [Theory]
+    [InlineData(24, 1344)]
+    [InlineData(24, 600)]
+    [InlineData(96, 1344)]
+    [InlineData(96, 400)]
+    [InlineData(24 * 21, 1344)]
+    public void A_long_span_labels_only_as_many_hours_as_fit(int hours, double width)
+    {
+        var start = new DateTime(2026, 10, 30, 5, 0, 0, DateTimeKind.Utc);
+        var end = start.AddHours(hours);
+        var ticks = MaLineChart.LabelTicks(start, end, Central, width, 52);
+        Assert.NotEmpty(ticks);
+        Assert.True(ticks.Count < MaLineChart.HourTicks(start, end, Central).Count());
+        AssertSpaced(ticks, start, end, width, 52);
+    }
+
+    [Fact]
+    public void A_day_is_labelled_on_whole_clock_steps_and_a_five_hour_span_still_on_every_hour()
+    {
+        var day = MaLineChart.LabelTicks(new DateTime(2026, 10, 30, 5, 0, 0, DateTimeKind.Utc), new DateTime(2026, 10, 31, 5, 0, 0, DateTimeKind.Utc), Central, 1344, 52);
+        var step = (day[1] - day[0]).TotalHours;
+        Assert.Contains(step, new double[] { 1, 2, 3, 4, 6, 12 });
+        Assert.All(day, t => Assert.Equal(0, TimeZoneInfo.ConvertTimeFromUtc(t, Central).Hour % (int)step));
+
+        var five = MaLineChart.LabelTicks(Start, End, Central, 1344, 52);
+        Assert.Equal(4, five.Count); // 10, 11, 12 and 13 o'clock; 14:00 is the end itself
+    }
+
+    [Fact]
+    public void Across_the_spring_forward_no_two_labels_crowd_together()
+    {
+        var start = new DateTime(2027, 3, 13, 12, 0, 0, DateTimeKind.Utc);
+        var end = start.AddHours(48);
+        AssertSpaced(MaLineChart.LabelTicks(start, end, Central, 700, 52), start, end, 700, 52);
+    }
+
+    [Fact]
+    public void On_a_span_over_a_day_midnight_reads_as_the_day()
+    {
+        var midnight = new DateTime(2026, 10, 30, 5, 0, 0, DateTimeKind.Utc); // Fri 00:00 Central
+        Assert.Equal(TimeZoneInfo.ConvertTimeFromUtc(midnight, Central).ToString("ddd"), MaLineChart.TickText(midnight, Central, multiDay: true));
+        Assert.Equal(TimeZoneInfo.ConvertTimeFromUtc(midnight, Central).ToString("t"), MaLineChart.TickText(midnight, Central, multiDay: false));
+    }
+
     // ---- end labels (M.ORCH-T194): the last point's label never runs into the projection's ----
 
     private static readonly Rect Plot = new(44, 10, 1344, 226);

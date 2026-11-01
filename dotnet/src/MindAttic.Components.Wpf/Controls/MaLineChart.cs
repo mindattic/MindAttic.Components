@@ -64,7 +64,8 @@ public sealed record MaLineChartData(DateTime StartUtc, DateTime EndUtc, IReadOn
 /// <summary>
 /// A percent-over-time line chart in the theme's brushes, lifted from MindAttic.Orchestrator's utilization chart. A
 /// percent axis with a gridline every 25% (0-100, with headroom above the highest point so its label clears the line);
-/// a time axis labelled at both ends, with a faint tick and local time on every whole hour between; reference lines
+/// a time axis labelled at both ends, with a faint tick and local time on the whole hours between, thinned to what fits
+/// the width (every few hours or days on a long span, see <see cref="LabelTicks"/>); reference lines
 /// behind the data; the line itself, each segment in its end point's brush; a dot on the last point with its label; and
 /// a dotted projection to where the line is headed, labelled at its end. With no points it draws just the axes, and
 /// without a projection just the line as it ended. Brushes come from the theme: <c>MaText</c>, <c>MaMuted</c>,
@@ -125,17 +126,23 @@ public sealed class MaLineChart : FrameworkElement
             Label($"{p}%", muted, new Point(Left - 6, P(d.StartUtc, p).Y), right: true);
         }
 
-        // The span's start and end at the ends, and a faint tick on every hour between them.
+        // The span's start and end at the ends, and between them a faint tick and a label on each whole hour that fits:
+        // every hour on a short span, every few hours (or days) on a long one, so no two labels overlap (M.COMP-T161).
         var labelY = ActualHeight - Bottom / 2;
-        Label(d.StartUtc.ToLocalTime().ToString("t"), muted, new Point(Left, labelY));
-        Label(d.EndUtc.ToLocalTime().ToString("t"), muted, new Point(ActualWidth - Right, labelY), right: true);
+        var multiDay = d.EndUtc - d.StartUtc > TimeSpan.FromDays(1);
+        var endFormat = multiDay ? "ddd h:mm tt" : "t";
+        var startText = Text(d.StartUtc.ToLocalTime().ToString(endFormat), muted);
+        var endText0 = Text(d.EndUtc.ToLocalTime().ToString(endFormat), muted);
+        dc.DrawText(startText, new Point(Left, labelY - startText.Height / 2));
+        dc.DrawText(endText0, new Point(ActualWidth - Right - endText0.Width, labelY - endText0.Height / 2));
+        var labelWidth = Math.Max(Text(new DateTime(2000, 1, 1, 12, 0, 0).ToString("t"), muted).Width, Text("Wed", muted).Width);
         var hourPen = new Pen(grid, 0.5) { DashStyle = DashStyles.Dot };
-        foreach (var at in HourTicks(d.StartUtc, d.EndUtc, TimeZoneInfo.Local))
+        foreach (var at in LabelTicks(d.StartUtc, d.EndUtc, TimeZoneInfo.Local, w, labelWidth,
+                     startText.Width + labelWidth / 2 + LabelGap, endText0.Width + labelWidth / 2 + LabelGap))
         {
             var x = P(at, 0).X;
-            if (x - Left < 48 || ActualWidth - Right - x < 48) continue; // leave the end labels room
             dc.DrawLine(hourPen, new Point(x, Top), new Point(x, Top + h));
-            var f = Text(TimeZoneInfo.ConvertTimeFromUtc(at, TimeZoneInfo.Local).ToString("t"), muted);
+            var f = Text(TickText(at, TimeZoneInfo.Local, multiDay), muted);
             dc.DrawText(f, new Point(x - f.Width / 2, labelY - f.Height / 2));
         }
 
@@ -195,6 +202,54 @@ public sealed class MaLineChart : FrameworkElement
         var (nowAt, endAt) = PlaceEndLabels(now, new Size(nowText.Width, nowText.Height), end, new Size(endText.Width, endText.Height), plot);
         if (d.EndLabel is { Length: > 0 }) dc.DrawText(nowText, nowAt.TopLeft);
         if (endAt is { } e && proj.Label is { Length: > 0 }) dc.DrawText(endText, e.TopLeft);
+    }
+
+    /// <summary>The least room, in pixels, between two time-axis labels.</summary>
+    public const double LabelGap = 12;
+
+    /// <summary>The hour steps the time axis may be labelled at, finest first: hours, then days, then a week.</summary>
+    public static IReadOnlyList<int> LabelStepsHours { get; } = [1, 2, 3, 4, 6, 12, 24, 48, 72, 168];
+
+    /// <summary>
+    /// The whole hours (as UTC instants) the time axis labels across <paramref name="plotWidth"/> pixels, each label
+    /// <paramref name="labelWidth"/> wide (M.COMP-T161). The step is the finest of <see cref="LabelStepsHours"/> whose
+    /// spacing holds a label and <see cref="LabelGap"/>, aligned to <paramref name="zone"/>'s clock (every 6 hours is
+    /// 12, 6, 12, 6; days fall on midnight); a tick within <paramref name="startRoom"/> or <paramref name="endRoom"/>
+    /// pixels of the plot's ends gives way to the end labels, and one a clock change pulls too close to the last is
+    /// skipped, so no two labels ever overlap. A 5-hour span on a normal width still labels every hour; a day or more
+    /// labels every few hours or days instead of drawing every hour on top of the next.
+    /// </summary>
+    public static IReadOnlyList<DateTime> LabelTicks(DateTime startUtc, DateTime endUtc, TimeZoneInfo zone, double plotWidth,
+        double labelWidth, double startRoom = 48, double endRoom = 48)
+    {
+        if (endUtc <= startUtc || plotWidth <= 0) return [];
+        var pxPerHour = plotWidth / (endUtc - startUtc).TotalHours;
+        var need = labelWidth + LabelGap;
+        var step = LabelStepsHours.FirstOrDefault(s => s * pxPerHour >= need);
+        if (step == 0) return [];
+        var ticks = new List<DateTime>();
+        var lastX = double.NegativeInfinity;
+        foreach (var t in HourTicks(startUtc, endUtc, zone))
+        {
+            var local = TimeZoneInfo.ConvertTimeFromUtc(t, zone);
+            var onStep = step < 24
+                ? local.Hour % step == 0
+                : local.Hour == 0 && local.Date.Ticks / TimeSpan.TicksPerDay % (step / 24) == 0;
+            if (!onStep) continue;
+            var x = (t - startUtc).TotalHours * pxPerHour;
+            if (x < startRoom || plotWidth - x < endRoom || x - lastX < need) continue;
+            ticks.Add(t);
+            lastX = x;
+        }
+        return ticks;
+    }
+
+    /// <summary>What a time-axis tick at <paramref name="atUtc"/> reads: the local time, or on a span over a day
+    /// (<paramref name="multiDay"/>) the day's name at midnight.</summary>
+    public static string TickText(DateTime atUtc, TimeZoneInfo zone, bool multiDay)
+    {
+        var local = TimeZoneInfo.ConvertTimeFromUtc(atUtc, zone);
+        return multiDay && local.Hour == 0 && local.Minute == 0 ? local.ToString("ddd") : local.ToString("t");
     }
 
     /// <summary>
