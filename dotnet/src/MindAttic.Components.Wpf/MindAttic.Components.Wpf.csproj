@@ -6,7 +6,8 @@
     <PackageId>MindAttic.Components.Wpf</PackageId>
     <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
     <!-- 25.0.0: AsyncRelayCommand, MaCheck, MaSecretBox + MaPasswordBox, and MaSettingsForm (manifest-driven settings editor) for LAMP (M.VALT-T35). -->
-    <Version>27.0.0</Version>
+    <!-- 28.0.0: MaCalloutToolTip / MaCallout, a callout tooltip with an arrow that places itself like Floating UI (M.COMP-T167). -->
+    <Version>28.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the
@@ -42,7 +43,7 @@
       (a tile with a left bar in its own Accent) and MaPicker, a drop-down for choosing a person or login
       whose options show a name, a status light and a muted trailing text.
       MindAttic.Components.Wpf.Mvvm: ObservableObject, RelayCommand, CollectionSync (in-place
-      ReorderTo/SyncBy), AsyncRelayCommand (disabled while running, failures surfaced) and ZoomLevel (80-200% with Ctrl+Plus/Minus/0). MaToolTips.KeepOpen makes
+      ReorderTo/SyncBy), AsyncRelayCommand (disabled while running, failures surfaced) and ZoomLevel (80-200% with Ctrl+Plus/Minus/0). MaCalloutToolTip (or the MaCallout.ToolTip attached property) is a tooltip with an arrow pointing at its target that flips and shifts to stay on its monitor. MaToolTips.KeepOpen makes
       tooltips stay up until dismissed, and MaHighContrast swaps the Windows high-contrast colours
       into every theme brush live. The palette meets WCAG 2.2 AA by itself: MaRec text is 4.5:1 and
       a text field's MaFieldBorder outline 3:1 on every surface. Light and dark themes: MaTheme.Set switches
