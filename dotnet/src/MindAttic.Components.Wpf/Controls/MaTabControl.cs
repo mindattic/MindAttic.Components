@@ -28,7 +28,9 @@ namespace MindAttic.Components.Wpf.Controls;
 /// Ctrl+Tab / Ctrl+Shift+Tab switch from anywhere inside, and a screen reader sees a tab list of
 /// selectable tab items. A tab's trailing text and status are its UI Automation item status, so
 /// they're read after its name. Set <see cref="ShowContent"/> to false for a bare strip whose
-/// selection drives content shown elsewhere (e.g. terminal panes). An <c>ItemContainerStyle</c>
+/// selection drives content shown elsewhere (e.g. terminal panes). <c>TabStripPlacement="Left"</c> turns
+/// it into a vertical sidebar: the tabs stack down their own column, Up/Down move the selection, and
+/// the content sits to the right. An <c>ItemContainerStyle</c>
 /// must be <c>BasedOn</c> the implicit <see cref="MaTabItem"/> style to keep the look.
 /// </para>
 /// </summary>

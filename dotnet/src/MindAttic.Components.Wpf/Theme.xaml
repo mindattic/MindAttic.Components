@@ -1002,7 +1002,8 @@
     <!-- Implicit: every Controls.MaTabControl, a tab strip over its content. The tabs sit in a
          TabPanel (PART_HeaderPanel: Tab enters once, Left/Right cycle) on a MaChromeBorder rule; the
          selected tab's content (PART_SelectedContentHost) fills the rest, collapsed when
-         ShowContent is false. M.COMP-T50. -->
+         ShowContent is false. TabStripPlacement="Left" stacks the tabs down their own column, the
+         rule on its right and the content beside it (Up/Down move the selection), M.COMP-T166. M.COMP-T50. -->
     <Style TargetType="{x:Type ctl:MaTabControl}">
         <Setter Property="Foreground" Value="{DynamicResource MaText}" />
         <Setter Property="Background" Value="Transparent" />
@@ -1018,11 +1019,15 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition x:Name="ContentRow" Height="*" />
                         </Grid.RowDefinitions>
-                        <Border Grid.Row="0" BorderBrush="{DynamicResource MaChromeBorder}" BorderThickness="0,0,0,1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="HeaderArea" Grid.Row="0" Grid.ColumnSpan="2" BorderBrush="{DynamicResource MaChromeBorder}" BorderThickness="0,0,0,1">
                             <TabPanel x:Name="PART_HeaderPanel" IsItemsHost="True" Background="Transparent"
                                       KeyboardNavigation.TabIndex="1" />
                         </Border>
-                        <Border x:Name="ContentArea" Grid.Row="1" Background="{TemplateBinding Background}"
+                        <Border x:Name="ContentArea" Grid.Row="1" Grid.ColumnSpan="2" Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
                                 KeyboardNavigation.TabNavigation="Local" KeyboardNavigation.DirectionalNavigation="Contained"
                                 KeyboardNavigation.TabIndex="2">
@@ -1031,6 +1036,15 @@
                         </Border>
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="TabStripPlacement" Value="Left">
+                            <Setter TargetName="HeaderArea" Property="Grid.RowSpan" Value="2" />
+                            <Setter TargetName="HeaderArea" Property="Grid.ColumnSpan" Value="1" />
+                            <Setter TargetName="HeaderArea" Property="BorderThickness" Value="0,0,1,0" />
+                            <Setter TargetName="ContentArea" Property="Grid.Row" Value="0" />
+                            <Setter TargetName="ContentArea" Property="Grid.RowSpan" Value="2" />
+                            <Setter TargetName="ContentArea" Property="Grid.Column" Value="1" />
+                            <Setter TargetName="ContentArea" Property="Grid.ColumnSpan" Value="1" />
+                        </Trigger>
                         <Trigger Property="ShowContent" Value="False">
                             <Setter TargetName="ContentArea" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="ContentRow" Property="Height" Value="0" />
@@ -1091,6 +1105,10 @@
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaHover}" />
                             <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+                        </Trigger>
+                        <Trigger Property="TabStripPlacement" Value="Left">
+                            <Setter Property="Margin" Value="0,0,0,2" />
+                            <Setter TargetName="Bd" Property="CornerRadius" Value="4" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaSurface}" />

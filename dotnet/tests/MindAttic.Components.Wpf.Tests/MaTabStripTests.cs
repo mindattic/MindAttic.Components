@@ -178,6 +178,28 @@ public sealed class MaTabStripTests
     });
 
     [Fact]
+    public void Left_placement_stacks_the_tabs_in_a_column_with_the_rule_on_its_right() => Sta(h =>
+    {
+        var (tabs, a, b) = TwoTabs(h);
+        tabs.TabStripPlacement = Dock.Left;
+        h.Pump();
+
+        var header = (Border)tabs.Template.FindName("HeaderArea", tabs);
+        var content = (FrameworkElement)tabs.Template.FindName("ContentArea", tabs);
+        Assert.Equal(new Thickness(0, 0, 1, 0), header.BorderThickness);
+        Assert.Equal(0, Grid.GetColumn(header));
+        Assert.Equal(1, Grid.GetColumn(content));
+        Assert.Equal(0, Grid.GetRow(content));
+        Assert.True(b.TranslatePoint(new Point(), a).Y >= a.ActualHeight, "the second tab sits below the first");
+        Assert.Equal(new Thickness(0, 0, 0, 2), a.Margin);
+
+        Assert.True(a.Focus());
+        Assert.True(a.MoveFocus(new TraversalRequest(FocusNavigationDirection.Down)));
+        h.Pump();
+        Assert.True(b.IsSelected);
+    });
+
+    [Fact]
     public void MaOther_is_a_theme_brush_high_contrast_swaps() =>
         Assert.Contains("MaOther", MaHighContrast.Foregrounds);
 
