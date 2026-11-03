@@ -6,7 +6,7 @@
     <PackageId>MindAttic.Components.Wpf</PackageId>
     <!-- HOUSE-LAW-1: whole-number versions only; bump the major. -->
     <!-- 25.0.0: AsyncRelayCommand, MaCheck, MaSecretBox + MaPasswordBox, and MaSettingsForm (manifest-driven settings editor) for LAMP (M.VALT-T35). -->
-    <Version>26.0.0</Version>
+    <Version>27.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the
