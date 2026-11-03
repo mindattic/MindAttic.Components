@@ -193,6 +193,17 @@ public sealed class MaTabStripTests
         Assert.True(b.TranslatePoint(new Point(), a).Y >= a.ActualHeight, "the second tab sits below the first");
         Assert.Equal(new Thickness(0, 0, 0, 2), a.Margin);
 
+        var bar = Part<Border>(a, MaTabItem.PartUnderline);
+        Assert.Equal(3d, bar.Width);
+        Assert.Equal(HorizontalAlignment.Left, bar.HorizontalAlignment);
+        Assert.True(bar.ActualHeight > bar.ActualWidth, "a leading-edge bar, not an underline");
+
+        Assert.Equal(Dock.Right, DockPanel.GetDock(Part<TextBlock>(a, MaTabItem.PartTrailing)));
+
+        tabs.ShowContent = false;
+        h.Pump();
+        Assert.Equal(new Thickness(0), header.BorderThickness);
+
         Assert.True(a.Focus());
         Assert.True(a.MoveFocus(new TraversalRequest(FocusNavigationDirection.Down)));
         h.Pump();

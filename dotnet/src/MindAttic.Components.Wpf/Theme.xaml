@@ -1049,6 +1049,14 @@
                             <Setter TargetName="ContentArea" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="ContentRow" Property="Height" Value="0" />
                         </Trigger>
+                        <!-- A bare vertical strip is a sidebar: its host draws the edge, so it draws none of its own. -->
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="TabStripPlacement" Value="Left" />
+                                <Condition Property="ShowContent" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="HeaderArea" Property="BorderThickness" Value="0" />
+                        </MultiTrigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Opacity" Value="0.5" />
                         </Trigger>
@@ -1060,7 +1068,8 @@
 
     <!-- Implicit: every Controls.MaTabItem. A flat MaMuted label on the chrome: an optional
          MaStatusLight (PART_StatusLight, collapsed while Status is null), the header, then the
-         Trailing text in TrailingForeground (PART_Trailing, 11px, collapsed while empty). Hover
+         Trailing text in TrailingForeground (PART_Trailing, 11px tabular figures, collapsed while
+         empty; right-aligned and the underline a leading-edge bar when TabStripPlacement is Left). Hover
          tints it MaHover; the selected tab lifts onto MaSurface in MaText with a 2px underline in
          its own Accent (PART_Underline); keyboard focus draws MaFocusRing. M.COMP-T50. -->
     <Style TargetType="{x:Type ctl:MaTabItem}">
@@ -1079,15 +1088,15 @@
                 <ControlTemplate TargetType="{x:Type ctl:MaTabItem}">
                     <Grid SnapsToDevicePixels="True">
                         <Border x:Name="Bd" Background="Transparent" CornerRadius="4,4,0,0" Padding="{TemplateBinding Padding}">
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
-                                <ctl:MaStatusLight x:Name="PART_StatusLight" Margin="0,0,7,0"
+                            <DockPanel LastChildFill="False" VerticalAlignment="{TemplateBinding VerticalContentAlignment}">
+                                <ctl:MaStatusLight x:Name="PART_StatusLight" Margin="0,0,7,0" VerticalAlignment="Center"
                                                    Status="{Binding Status, RelativeSource={RelativeSource TemplatedParent}, TargetNullValue={x:Static ctl:MaStatus.Other}}"
                                                    Label="{TemplateBinding StatusLabel}" />
                                 <ContentPresenter x:Name="HeaderHost" ContentSource="Header" RecognizesAccessKey="True"
                                                   VerticalAlignment="Center" />
                                 <TextBlock x:Name="PART_Trailing" Text="{TemplateBinding Trailing}" Foreground="{TemplateBinding TrailingForeground}"
-                                           FontSize="11" Margin="8,0,0,0" VerticalAlignment="Center" />
-                            </StackPanel>
+                                           FontSize="11" Margin="8,0,0,0" VerticalAlignment="Center" Typography.NumeralAlignment="Tabular" />
+                            </DockPanel>
                         </Border>
                         <Border x:Name="PART_Underline" Height="2" VerticalAlignment="Bottom" CornerRadius="1"
                                 Background="{TemplateBinding Accent}" Visibility="Hidden" />
@@ -1106,9 +1115,20 @@
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaHover}" />
                             <Setter Property="Foreground" Value="{DynamicResource MaText}" />
                         </Trigger>
+                        <!-- Vertical tabs mark the selected one with a bar on its leading edge, not an underline. -->
                         <Trigger Property="TabStripPlacement" Value="Left">
                             <Setter Property="Margin" Value="0,0,0,2" />
+                            <Setter Property="MinHeight" Value="34" />
+                            <Setter Property="Padding" Value="14,6,12,6" />
                             <Setter TargetName="Bd" Property="CornerRadius" Value="4" />
+                            <Setter TargetName="PART_Underline" Property="Height" Value="Auto" />
+                            <Setter TargetName="PART_Underline" Property="Width" Value="3" />
+                            <Setter TargetName="PART_Underline" Property="HorizontalAlignment" Value="Left" />
+                            <Setter TargetName="PART_Underline" Property="VerticalAlignment" Value="Stretch" />
+                            <Setter TargetName="PART_Underline" Property="Margin" Value="0,7" />
+                            <!-- The trailing text right-aligned, so a column of tabs reads as a column of figures. -->
+                            <Setter TargetName="PART_Trailing" Property="DockPanel.Dock" Value="Right" />
+                            <Setter TargetName="PART_Trailing" Property="Margin" Value="16,0,0,0" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaSurface}" />
