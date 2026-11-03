@@ -56,6 +56,9 @@
     if (!state) throw new Error('WebSnapshot.refresh: element not attached');
     const src = state.opts.src;
     if (!src) return;
+    // Only the latest refresh may write: an earlier fetch (an older data-src) finishing last
+    // would otherwise put the stale image back.
+    const gen = state.gen = (state.gen || 0) + 1;
 
     const bust = '_t=' + Date.now();
     const url = src + (src.includes('?') ? '&' : '?') + bust;
@@ -67,6 +70,7 @@
     if (!/^(data:image\/|https?:\/\/)/i.test(payload)) {
       throw new Error(`Fetch ${src} returned a non-image payload`);
     }
+    if (gen !== state.gen) return;
     state.img.src = payload;
   }
 

@@ -39,7 +39,12 @@ namespace MindAttic.Components.Unity.Core
             {
                 int open = text.IndexOf('{', i);
                 if (open < 0) break;
-                string selector = text.Substring(i, open - i).Trim();
+                string selector = text.Substring(i, open - i);
+                // A statement at-rule before the rule (@charset "UTF-8"; @import url(x);) ends at its ';' and is not
+                // part of the selector: without this, a sheet opening with one lost its first (:root) palette.
+                int statementEnd = selector.LastIndexOf(';');
+                if (statementEnd >= 0) selector = selector.Substring(statementEnd + 1);
+                selector = selector.Trim();
                 int close = MatchingBrace(text, open);
                 if (close < 0) break;
                 string body = text.Substring(open + 1, close - open - 1);

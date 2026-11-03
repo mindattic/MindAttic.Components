@@ -49,7 +49,7 @@ window.MindAtticHashPages = (function () {
         e.preventDefault();
         var name = a.getAttribute('data-page');
         if (name === home) {
-          history.replaceState(null, '', window.location.pathname);
+          history.replaceState(null, '', window.location.pathname + window.location.search);
         } else {
           history.replaceState(null, '', '#' + name);
         }

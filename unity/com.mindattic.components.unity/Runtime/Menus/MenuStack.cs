@@ -231,7 +231,21 @@ namespace MindAttic.Components.Unity
             if (previous != null && previous != current) previous.HideInternal();
             if (current != null && _model.IsOpen) current.ShowInternal(restoreFocus: popped, direction: popped ? -1 : 1);
             foreach (var s in _model.Screens) s.UpdateBackButton();
-            if (popped && _destroyOnPop.Remove(previous)) MaUi.Destroy(previous.gameObject);
+            // Every throwaway screen that left the stack, not just the top: PopToRoot and SetRoot drop the ones
+            // under it too, which were otherwise left behind, inactive, for good.
+            if (_destroyOnPop.Count > 0)
+            {
+                var gone = new List<MenuScreen>();
+                foreach (var s in _destroyOnPop)
+                {
+                    if (s == null || !Contains(s)) gone.Add(s);
+                }
+                foreach (var s in gone)
+                {
+                    _destroyOnPop.Remove(s);
+                    if (s != null) MaUi.Destroy(s.gameObject);
+                }
+            }
             ScreenChanged?.Invoke(current);
         }
 

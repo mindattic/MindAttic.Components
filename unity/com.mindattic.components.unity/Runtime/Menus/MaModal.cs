@@ -125,6 +125,8 @@ namespace MindAttic.Components.Unity
             var no = m.AddButton(cancel, () => Answer(false));
             var yes = m.AddButton(confirm, () => Answer(true), confirmVariant);
             m.OnCancel = () => Answer(false);
+            // Closed without an answer (CloseAll, a host's Close()): that's a no, so ConfirmAsync never hangs.
+            m.Closed += () => Answer(false);
             m.DefaultSelection = confirmVariant == ButtonVariant.Danger ? no.Button : yes.Button;
             m.Open();
             return m;
