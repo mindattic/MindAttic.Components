@@ -428,6 +428,10 @@ namespace MindAttic.Components.Unity
             s_open.Remove(this);
             var restore = s_trap.Exit(this);
             if (restore != null && restore.activeInHierarchy) MaEventSystem.Select(restore);
+            // Destroyed while open (scene unload, a parent destroyed): still a close, so a pending Confirm answers
+            // false and ConfirmAsync never hangs. Guarded: the listener may touch objects torn down in the same unload.
+            try { Closed?.Invoke(); }
+            catch (Exception e) { Debug.LogException(e); }
         }
 
         /// <summary>Closes every open modal (scene teardown, tests).</summary>

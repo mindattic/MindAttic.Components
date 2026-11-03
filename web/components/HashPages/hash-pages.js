@@ -48,16 +48,20 @@ window.MindAtticHashPages = (function () {
       a.addEventListener('click', function(e){
         e.preventDefault();
         var name = a.getAttribute('data-page');
-        if (name === home) {
-          history.replaceState(null, '', window.location.pathname + window.location.search);
-        } else {
-          history.replaceState(null, '', '#' + name);
-        }
+        // pushState (a history entry per page switch) so back/forward step through pages, as documented above.
+        // pushState fires no hashchange, so a popstate handler below re-reads the URL on back/forward.
+        var url = name === home ? window.location.pathname + window.location.search : '#' + name;
+        var current = window.location.pathname + window.location.search + window.location.hash;
+        var next = name === home ? url : window.location.pathname + window.location.search + url;
+        if (next !== current) history.pushState(null, '', url);
         show(name);
       });
     });
 
     window.addEventListener('hashchange', fromHash);
+    // Back/forward across pushState entries fires popstate (and hashchange only when the hash differs);
+    // fromHash is idempotent, so handling both is harmless.
+    window.addEventListener('popstate', fromHash);
     fromHash();
     return { show: show, pages: pages };
   }
