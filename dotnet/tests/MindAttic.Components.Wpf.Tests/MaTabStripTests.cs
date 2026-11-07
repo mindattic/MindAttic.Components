@@ -214,6 +214,142 @@ public sealed class MaTabStripTests
     public void MaOther_is_a_theme_brush_high_contrast_swaps() =>
         Assert.Contains("MaOther", MaHighContrast.Foregrounds);
 
+    // ---- drag-to-reorder (M.COMP-T168) ----
+
+    [Fact]
+    public void AllowReorder_and_IsLocked_default_to_false() => Sta(_ =>
+    {
+        var tabs = new MaTabControl();
+        var item = new MaTabItem();
+        Assert.False(tabs.AllowReorder);
+        Assert.False(item.IsLocked);
+    });
+
+    // These drive MaTabItem's internal HandleMouseDown/Move/Up directly with plain Points rather than
+    // raising synthetic mouse events: WPF's MouseEventArgs.GetPosition reads real OS cursor state, which a
+    // unit test can't drive, so the gesture's state machine takes explicit positions instead (see the XML
+    // doc on HandleMouseDown) and that's exactly the seam these tests exercise.
+
+    [Fact]
+    public void A_drag_with_AllowReorder_off_raises_nothing() => Sta(h =>
+    {
+        var (tabs, a, _) = TwoTabs(h);
+        TabReorderEventArgs? raised = null;
+        tabs.Reordered += (_, e) => raised = e;
+
+        a.HandleMouseDown(tabs, new Point(10, 0), new Point(0, 0));
+        a.HandleMouseMove(tabs, new Point(200, 0), new Point(190, 0));
+        a.HandleMouseUp(tabs, new Point(200, 0));
+
+        Assert.Null(raised);
+    });
+
+    [Fact]
+    public void A_locked_tab_never_starts_a_drag_even_with_AllowReorder_on() => Sta(h =>
+    {
+        var (tabs, a, _) = TwoTabs(h);
+        tabs.AllowReorder = true;
+        a.IsLocked = true;
+        TabReorderEventArgs? raised = null;
+        tabs.Reordered += (_, e) => raised = e;
+
+        a.HandleMouseDown(tabs, new Point(10, 0), new Point(0, 0));
+        a.HandleMouseMove(tabs, new Point(200, 0), new Point(190, 0));
+        a.HandleMouseUp(tabs, new Point(200, 0));
+
+        Assert.Null(raised);
+    });
+
+    [Fact]
+    public void Dragging_past_the_drop_distance_threshold_reorders_and_raises_once() => Sta(h =>
+    {
+        var (tabs, a, b) = TwoTabs(h);
+        tabs.AllowReorder = true;
+        var raised = new List<TabReorderEventArgs>();
+        tabs.Reordered += (_, e) => raised.Add(e);
+        var past = b.ActualWidth + a.ActualWidth / 2 + 5;
+
+        a.HandleMouseDown(tabs, new Point(10, 0), new Point(0, 0));
+        a.HandleMouseMove(tabs, new Point(past, 0), new Point(past - 10, 0));
+        a.HandleMouseUp(tabs, new Point(past, 0));
+
+        var e = Assert.Single(raised);
+        Assert.Same(a, e.MovedItem);
+        Assert.Equal(1, e.NewIndex);
+    });
+
+    [Fact]
+    public void A_drag_that_ends_back_where_it_started_raises_nothing() => Sta(h =>
+    {
+        var (tabs, a, _) = TwoTabs(h);
+        tabs.AllowReorder = true;
+        TabReorderEventArgs? raised = null;
+        tabs.Reordered += (_, e) => raised = e;
+
+        // Past the threshold, but not far enough to cross the next tab's midpoint, and back to the start.
+        a.HandleMouseDown(tabs, new Point(10, 0), new Point(0, 0));
+        a.HandleMouseMove(tabs, new Point(30, 0), new Point(20, 0));
+        a.HandleMouseUp(tabs, new Point(10, 0));
+
+        Assert.Null(raised);
+    });
+
+    [Fact]
+    public void A_mid_drag_capture_loss_cancels_without_raising_Reordered() => Sta(h =>
+    {
+        var (tabs, a, b) = TwoTabs(h);
+        tabs.AllowReorder = true;
+        TabReorderEventArgs? raised = null;
+        tabs.Reordered += (_, e) => raised = e;
+        var past = b.ActualWidth + a.ActualWidth / 2 + 5;
+
+        a.HandleMouseDown(tabs, new Point(10, 0), new Point(0, 0));
+        a.HandleMouseMove(tabs, new Point(past, 0), new Point(past - 10, 0));
+        a.RaiseEvent(new MouseEventArgs(Mouse.PrimaryDevice, 0) { RoutedEvent = UIElement.LostMouseCaptureEvent });
+
+        Assert.Null(raised);
+    });
+
+    [Fact]
+    public void Escape_mid_drag_cancels_without_raising_Reordered() => Sta(h =>
+    {
+        // Unlike position, a KeyEventArgs' Key is part of the constructed args, not live device state, so
+        // this one gesture step IS reliably simulated with a real RaiseEvent (see the comment above).
+        var (tabs, a, b) = TwoTabs(h);
+        tabs.AllowReorder = true;
+        TabReorderEventArgs? raised = null;
+        tabs.Reordered += (_, e) => raised = e;
+        var past = b.ActualWidth + a.ActualWidth / 2 + 5;
+        var source = PresentationSource.FromVisual(h.Window)!;
+
+        a.HandleMouseDown(tabs, new Point(10, 0), new Point(0, 0));
+        a.HandleMouseMove(tabs, new Point(past, 0), new Point(past - 10, 0));
+        a.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, source, 0, Key.Escape) { RoutedEvent = Keyboard.PreviewKeyDownEvent });
+        a.HandleMouseUp(tabs, new Point(past, 0));
+
+        Assert.Null(raised);
+    });
+
+    [Theory]
+    // 4 unlocked items (midpoints 50, 150, 250, 350): a pointer past item i's midpoint (and before item
+    // i+1's) drops just after i. Comparisons are strict ("<"), so the probe points sit just past each
+    // midpoint rather than exactly on it — landing exactly on a boundary is an unexercised tie, not a case
+    // these values are meant to pin down.
+    [InlineData(new[] { false, false, false, false }, 0, 25.0, 0)] // barely past start: stays put
+    [InlineData(new[] { false, false, false, false }, 0, 151.0, 1)]
+    [InlineData(new[] { false, false, false, false }, 0, 251.0, 2)]
+    [InlineData(new[] { false, false, false, false }, 3, 10.0, 0)] // dragging the last item to the front
+    // one locked item fixed at index 0: index 0 is never reachable as a drop target.
+    [InlineData(new[] { true, false, false }, 1, 5.0, 1)]
+    [InlineData(new[] { true, false, false }, 2, 5.0, 1)]
+    public void ComputeDropIndex_matches_ObservableCollection_Move_semantics(bool[] locked, int draggedIndex, double pointer, int expected)
+    {
+        // Midpoints of same-width-100 tabs laid out left to right: 50, 150, 250, ...
+        var midpoints = Enumerable.Range(0, locked.Length).Select(i => 50.0 + i * 100).ToList();
+
+        Assert.Equal(expected, MaTabItem.ComputeDropIndex(midpoints, locked, draggedIndex, pointer));
+    }
+
     // ---- harness ----
 
     public sealed record Person(string Name, string Left);
