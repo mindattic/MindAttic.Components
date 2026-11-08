@@ -75,6 +75,22 @@ public sealed class MaBadgeTests
     });
 
     [Fact]
+    public void A_badge_forced_bigger_than_its_content_centers_it_instead_of_hugging_the_left_edge() => Sta(h =>
+    {
+        // M.COMP-T170: the Orchestrator forces its 18x18 status badges (Content="zzz", "?", or a bare MaSpinner child)
+        // well past their content's natural size, to keep one consistent footprint across tabs regardless of which status
+        // is showing. The content must still center in that extra space rather than hug the border's left edge.
+        var badge = new MaBadge { Content = "?", Width = 60, Height = 40, Padding = new Thickness(0) };
+        h.Show(badge);
+        var border = (Border)badge.Template.FindName("PART_Border", badge);
+        var content = (FrameworkElement)VisualTreeHelper.GetChild(border, 0);
+
+        Assert.Equal(HorizontalAlignment.Center, content.HorizontalAlignment);
+        Assert.Equal(VerticalAlignment.Center, content.VerticalAlignment);
+        Assert.True(content.ActualWidth < badge.ActualWidth, "the content should size to itself, not stretch to fill the badge");
+    });
+
+    [Fact]
     public void MaTag_is_a_plain_square_neutral_label() => Sta(h =>
     {
         var tag = new MaBadge { Content = "general-purpose", Style = (Style)h.Window.FindResource("MaTag") };

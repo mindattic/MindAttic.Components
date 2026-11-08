@@ -925,7 +925,13 @@
                     <Border x:Name="PART_Border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
                             Padding="{TemplateBinding Padding}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}">
-                        <StackPanel Orientation="Horizontal">
+                        <!-- Centered both ways (M.COMP-T170): a StackPanel always lays its children out flush at its own
+                             origin, never centered within extra space it's stretched into, so a badge forced bigger than its
+                             content (a fixed-size square icon badge, e.g. MaTag sized 18x18 for a one-glyph status) had its
+                             glyph/content hugging the left edge instead of sitting in the middle of the box. Centering the
+                             StackPanel itself sizes it to its content and centers that within the Border, with no effect on
+                             the ordinary case (a pill sized to its own content, where there's no extra space to begin with). -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock x:Name="PART_Glyph" Text="{TemplateBinding Glyph}" FontFamily="{TemplateBinding GlyphFontFamily}"
                                        FontSize="{TemplateBinding GlyphFontSize}" FontWeight="Normal" Foreground="{TemplateBinding Foreground}"
                                        VerticalAlignment="Center" Margin="0,0,5,0" />

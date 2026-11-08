@@ -8,7 +8,8 @@
     <!-- 25.0.0: AsyncRelayCommand, MaCheck, MaSecretBox + MaPasswordBox, and MaSettingsForm (manifest-driven settings editor) for LAMP (M.VALT-T35). -->
     <!-- 28.0.0: MaCalloutToolTip / MaCallout, a callout tooltip with an arrow that places itself like Floating UI (M.COMP-T167). -->
     <!-- 29.0.0: MaTabControl.AllowReorder + MaTabItem.IsLocked/Reordered: opt-in drag-to-reorder tabs, any tab lockable to its own fixed slot (M.COMP-T168). -->
-    <Version>29.0.0</Version>
+    <!-- 30.0.0: MaBadge's own ControlTemplate centers its glyph/content when the badge is sized bigger than them, instead of hugging the StackPanel's left edge (M.COMP-T170). -->
+    <Version>30.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the
