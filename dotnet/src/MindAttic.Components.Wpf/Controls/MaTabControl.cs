@@ -115,6 +115,14 @@ public class MaTabItem : TabItem
         nameof(TrailingForeground), typeof(Brush), typeof(MaTabItem),
         new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
+    public static readonly DependencyProperty TrailingContentProperty = DependencyProperty.Register(
+        nameof(TrailingContent), typeof(object), typeof(MaTabItem),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnItemStatusPartChanged));
+
+    public static readonly DependencyProperty TrailingContentTemplateProperty = DependencyProperty.Register(
+        nameof(TrailingContentTemplate), typeof(DataTemplate), typeof(MaTabItem),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure));
+
     public static readonly DependencyProperty StatusProperty = DependencyProperty.Register(
         nameof(Status), typeof(MaStatus?), typeof(MaTabItem),
         new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnItemStatusPartChanged));
@@ -134,6 +142,9 @@ public class MaTabItem : TabItem
 
     /// <summary>The template part that draws <see cref="Trailing"/>.</summary>
     public const string PartTrailing = "PART_Trailing";
+
+    /// <summary>The template part that draws <see cref="TrailingContent"/>.</summary>
+    public const string PartTrailingContent = "PART_TrailingContent";
 
     /// <summary>The tab's own colour: its underline while selected. <c>MaAccent</c> by default
     /// (from the implicit style), so set it per tab, e.g. one colour per person.</summary>
@@ -157,6 +168,25 @@ public class MaTabItem : TabItem
     {
         get => (Brush?)GetValue(TrailingForegroundProperty);
         set => SetValue(TrailingForegroundProperty, value);
+    }
+
+    /// <summary>Arbitrary content after the header, in <see cref="TrailingContentTemplate"/>, in place of the plain
+    /// <see cref="Trailing"/> text (M.COMP-T172, e.g. a pair of small progress bars a string can't be); null (the
+    /// default) for none. Positioned exactly where <see cref="Trailing"/> is (after the header; docked to the
+    /// strip's trailing edge when <c>TabStripPlacement="Left"</c>), so a tab sets one or the other, not usually
+    /// both. Not part of the tab's UI Automation item status the way <see cref="Trailing"/> is, since it isn't
+    /// text; give the content its own accessible name if it needs one.</summary>
+    public object? TrailingContent
+    {
+        get => GetValue(TrailingContentProperty);
+        set => SetValue(TrailingContentProperty, value);
+    }
+
+    /// <summary>How <see cref="TrailingContent"/> is drawn.</summary>
+    public DataTemplate? TrailingContentTemplate
+    {
+        get => (DataTemplate?)GetValue(TrailingContentTemplateProperty);
+        set => SetValue(TrailingContentTemplateProperty, value);
     }
 
     /// <summary>A status light before the header; null (the default) for none.</summary>

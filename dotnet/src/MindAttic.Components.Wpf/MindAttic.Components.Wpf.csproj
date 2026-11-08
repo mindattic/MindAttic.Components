@@ -9,7 +9,9 @@
     <!-- 28.0.0: MaCalloutToolTip / MaCallout, a callout tooltip with an arrow that places itself like Floating UI (M.COMP-T167). -->
     <!-- 29.0.0: MaTabControl.AllowReorder + MaTabItem.IsLocked/Reordered: opt-in drag-to-reorder tabs, any tab lockable to its own fixed slot (M.COMP-T168). -->
     <!-- 30.0.0: MaBadge's own ControlTemplate centers its glyph/content when the badge is sized bigger than them, instead of hugging the StackPanel's left edge (M.COMP-T170). -->
-    <Version>30.0.0</Version>
+    <!-- 31.0.0: MaBadge's text content (e.g. "zzz") is visually centered, not just box-centered: its ContentPresenter tightens the line height to the badge's own FontSize instead of the font's full line box (M.COMP-T171). -->
+    <!-- 32.0.0: MaTabItem.TrailingContent/TrailingContentTemplate: arbitrary content (e.g. a pair of progress bars) docked exactly where Trailing sits, including right-aligned in TabStripPlacement=Left (M.COMP-T172). -->
+    <Version>32.0.0</Version>
     <Description>Shared WPF theme (dark chrome palette, tool/text button, pin toggle, themed
       dropdown menu styles), a DropdownMenu control (a themed, pinnable action menu that closes
       its own popup before invoking an action, so it's never on screen for a screenshot or the

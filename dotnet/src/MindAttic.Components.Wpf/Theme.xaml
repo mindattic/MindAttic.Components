@@ -935,7 +935,13 @@
                             <TextBlock x:Name="PART_Glyph" Text="{TemplateBinding Glyph}" FontFamily="{TemplateBinding GlyphFontFamily}"
                                        FontSize="{TemplateBinding GlyphFontSize}" FontWeight="Normal" Foreground="{TemplateBinding Foreground}"
                                        VerticalAlignment="Center" Margin="0,0,5,0" />
-                            <ContentPresenter VerticalAlignment="Center" RecognizesAccessKey="False" />
+                            <!-- Visually centered, not just box-centered (M.COMP-T171): a TextBlock's default line box
+                                 includes descender space below the glyphs, so VerticalAlignment=Center alone centers that
+                                 whole line box and the text (e.g. "zzz") reads a little low. Tightening the line height to
+                                 the badge's own FontSize centers the visible ink instead. -->
+                            <ContentPresenter VerticalAlignment="Center" RecognizesAccessKey="False"
+                                               TextBlock.LineStackingStrategy="BlockLineHeight"
+                                               TextBlock.LineHeight="{Binding FontSize, RelativeSource={RelativeSource TemplatedParent}}" />
                         </StackPanel>
                     </Border>
                     <ControlTemplate.Triggers>
@@ -1075,7 +1081,10 @@
     <!-- Implicit: every Controls.MaTabItem. A flat MaMuted label on the chrome: an optional
          MaStatusLight (PART_StatusLight, collapsed while Status is null), the header, then the
          Trailing text in TrailingForeground (PART_Trailing, 11px tabular figures, collapsed while
-         empty; right-aligned and the underline a leading-edge bar when TabStripPlacement is Left). Hover
+         empty; right-aligned and the underline a leading-edge bar when TabStripPlacement is Left), or
+         TrailingContent in its own template (PART_TrailingContent, M.COMP-T172, positioned and docked
+         exactly the same as Trailing - arbitrary content a plain string can't hold, e.g. a pair of
+         progress bars). Hover
          tints it MaHover; the selected tab lifts onto MaSurface in MaText with a 2px underline in
          its own Accent (PART_Underline); keyboard focus draws MaFocusRing. M.COMP-T50. -->
     <Style TargetType="{x:Type ctl:MaTabItem}">
@@ -1102,6 +1111,8 @@
                                                   VerticalAlignment="Center" />
                                 <TextBlock x:Name="PART_Trailing" Text="{TemplateBinding Trailing}" Foreground="{TemplateBinding TrailingForeground}"
                                            FontSize="11" Margin="8,0,0,0" VerticalAlignment="Center" Typography.NumeralAlignment="Tabular" />
+                                <ContentPresenter x:Name="PART_TrailingContent" Content="{TemplateBinding TrailingContent}"
+                                                  ContentTemplate="{TemplateBinding TrailingContentTemplate}" Margin="8,0,0,0" VerticalAlignment="Center" />
                             </DockPanel>
                         </Border>
                         <Border x:Name="PART_Underline" Height="2" VerticalAlignment="Bottom" CornerRadius="1"
@@ -1116,6 +1127,9 @@
                         </Trigger>
                         <Trigger Property="Trailing" Value="">
                             <Setter TargetName="PART_Trailing" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="TrailingContent" Value="{x:Null}">
+                            <Setter TargetName="PART_TrailingContent" Property="Visibility" Value="Collapsed" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaHover}" />
@@ -1135,6 +1149,8 @@
                             <!-- The trailing text right-aligned, so a column of tabs reads as a column of figures. -->
                             <Setter TargetName="PART_Trailing" Property="DockPanel.Dock" Value="Right" />
                             <Setter TargetName="PART_Trailing" Property="Margin" Value="16,0,0,0" />
+                            <Setter TargetName="PART_TrailingContent" Property="DockPanel.Dock" Value="Right" />
+                            <Setter TargetName="PART_TrailingContent" Property="Margin" Value="16,0,0,0" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaSurface}" />

@@ -135,6 +135,25 @@ public sealed class MaTabStripTests
     });
 
     [Fact]
+    public void TrailingContent_draws_arbitrary_content_in_its_own_template_and_collapses_when_null() => Sta(h =>
+    {
+        var (tabs, a, b) = TwoTabs(h);
+        a.TrailingContentTemplate = new DataTemplate(typeof(string)) { VisualTree = new FrameworkElementFactory(typeof(TextBlock)) };
+        a.TrailingContentTemplate.VisualTree!.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding());
+        a.TrailingContent = "15% / 29%";
+        h.Pump();
+
+        var content = Part<ContentPresenter>(a, MaTabItem.PartTrailingContent);
+        Assert.Equal(Visibility.Visible, content.Visibility);
+        Assert.Equal("15% / 29%", content.Content);
+        Assert.Equal(Visibility.Collapsed, Part<ContentPresenter>(b, MaTabItem.PartTrailingContent).Visibility);
+
+        a.TrailingContent = null;
+        h.Pump();
+        Assert.Equal(Visibility.Collapsed, content.Visibility);
+    });
+
+    [Fact]
     public void Bound_items_get_MaTabItem_containers_styled_through_a_based_on_container_style() => Sta(h =>
     {
         var style = new Style(typeof(MaTabItem), (Style)h.Window.FindResource(typeof(MaTabItem)));
@@ -199,6 +218,7 @@ public sealed class MaTabStripTests
         Assert.True(bar.ActualHeight > bar.ActualWidth, "a leading-edge bar, not an underline");
 
         Assert.Equal(Dock.Right, DockPanel.GetDock(Part<TextBlock>(a, MaTabItem.PartTrailing)));
+        Assert.Equal(Dock.Right, DockPanel.GetDock(Part<ContentPresenter>(a, MaTabItem.PartTrailingContent)));
 
         tabs.ShowContent = false;
         h.Pump();
