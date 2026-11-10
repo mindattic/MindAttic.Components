@@ -53,6 +53,20 @@ public sealed class MaShapeBorderClipTests
     });
 
     [Fact]
+    public void ChamferCorners_cuts_only_the_corners_asked_for() => StaHost.Run(h =>
+    {
+        var child = new Border();
+        var frame = new MaShapeBorder { Shape = MaShape.Chamfer, Chamfer = 20, ChamferCorners = MaCorners.TopLeft, ClipToShape = true, Width = 200, Height = 100, Child = child };
+        h.Show(frame);
+
+        Assert.False(child.Clip!.FillContains(new Point(2, 2)), "top-left is cut");
+        Assert.True(child.Clip.FillContains(new Point(198, 98)), "bottom-right stays square");
+        Assert.True(child.Clip.FillContains(new Point(198, 2)), "top-right stays square");
+        Assert.True(child.Clip.FillContains(new Point(2, 98)), "bottom-left stays square");
+        Assert.Equal(MaCorners.Diagonal, new MaShapeBorder().ChamferCorners);
+    });
+
+    [Fact]
     public void Off_by_default_and_turning_it_off_removes_only_its_own_clip() => StaHost.Run(h =>
     {
         var child = new Border();

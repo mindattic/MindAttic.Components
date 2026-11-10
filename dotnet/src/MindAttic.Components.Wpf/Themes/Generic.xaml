@@ -17,7 +17,7 @@
                 <ControlTemplate TargetType="{x:Type ctl:MaButton}">
                     <ctl:MaShapeBorder Shape="{TemplateBinding Shape}" Fill="{TemplateBinding EffectiveBackground}"
                                        Stroke="{TemplateBinding EffectiveBorderBrush}" StrokeThickness="{TemplateBinding StrokeThickness}"
-                                       Chamfer="{TemplateBinding Chamfer}" CornerRadius="{TemplateBinding CornerRadius}" Slant="{TemplateBinding Slant}"
+                                       Chamfer="{TemplateBinding Chamfer}" ChamferCorners="{TemplateBinding ChamferCorners}" CornerRadius="{TemplateBinding CornerRadius}" Slant="{TemplateBinding Slant}"
                                        AccentBrush="{TemplateBinding EffectiveAccent}" AccentEdge="{TemplateBinding AccentEdge}"
                                        AccentThickness="{TemplateBinding AccentThickness}" Padding="{TemplateBinding Padding}">
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"

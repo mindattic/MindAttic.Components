@@ -29,6 +29,26 @@ public enum MaShape
     Parallelogram,
 }
 
+/// <summary>Which corners a <see cref="MaShape.Chamfer"/> cuts.</summary>
+[Flags]
+public enum MaCorners
+{
+    /// <summary>No corner cut (a rectangle).</summary>
+    None = 0,
+    /// <summary>The top-left corner.</summary>
+    TopLeft = 1,
+    /// <summary>The top-right corner.</summary>
+    TopRight = 2,
+    /// <summary>The bottom-right corner.</summary>
+    BottomRight = 4,
+    /// <summary>The bottom-left corner.</summary>
+    BottomLeft = 8,
+    /// <summary>Top-left and bottom-right: the classic chamfered panel.</summary>
+    Diagonal = TopLeft | BottomRight,
+    /// <summary>All four corners.</summary>
+    All = TopLeft | TopRight | BottomRight | BottomLeft,
+}
+
 /// <summary>Where a <see cref="MaShapeBorder"/> draws its accent.</summary>
 public enum MaAccentEdge
 {
@@ -76,6 +96,12 @@ public sealed class MaShapeBorder : Decorator
     public static readonly DependencyProperty AccentThicknessProperty = Register(nameof(AccentThickness), typeof(double), 2.0, render: true);
     /// <summary>Identifies the <see cref="Padding"/> property.</summary>
     public static readonly DependencyProperty PaddingProperty = Register(nameof(Padding), typeof(Thickness), default(Thickness), render: false);
+    /// <summary>Identifies the <see cref="ChamferCorners"/> property.</summary>
+    public static readonly DependencyProperty ChamferCornersProperty = Register(nameof(ChamferCorners), typeof(MaCorners), MaCorners.Diagonal, render: true, outline: true);
+
+    /// <summary>Which corners a <see cref="MaShape.Chamfer"/> cuts (and gets <see cref="MaAccentEdge.ChamferTicks"/> on); top-left and bottom-right by default.</summary>
+    public MaCorners ChamferCorners { get => (MaCorners)GetValue(ChamferCornersProperty); set => SetValue(ChamferCornersProperty, value); }
+
     /// <summary>Identifies the <see cref="ClipToShape"/> property.</summary>
     public static readonly DependencyProperty ClipToShapeProperty = Register(nameof(ClipToShape), typeof(bool), false, render: false);
 
@@ -248,12 +274,22 @@ public sealed class MaShapeBorder : Decorator
             {
                 var c = Math.Min(Chamfer, Math.Min(w, h) / 3);
                 var half = t / 2;
-                g.BeginFigure(new Point(c + half, half), isFilled: true, isClosed: true);
-                g.LineTo(new Point(w - half, half), isStroked: true, isSmoothJoin: false);
-                g.LineTo(new Point(w - half, h - c - half), isStroked: true, isSmoothJoin: false);
-                g.LineTo(new Point(w - c - half, h - half), isStroked: true, isSmoothJoin: false);
-                g.LineTo(new Point(half, h - half), isStroked: true, isSmoothJoin: false);
-                g.LineTo(new Point(half, c + half), isStroked: true, isSmoothJoin: false);
+                var corners = ChamferCorners;
+                double Cut(MaCorners corner) => corners.HasFlag(corner) ? c : 0;
+                var (tl, tr, br, bl) = (Cut(MaCorners.TopLeft), Cut(MaCorners.TopRight), Cut(MaCorners.BottomRight), Cut(MaCorners.BottomLeft));
+                Point[] figure =
+                [
+                    new(tl + half, half), new(w - tr - half, half),
+                    new(w - half, tr + half), new(w - half, h - br - half),
+                    new(w - br - half, h - half), new(bl + half, h - half),
+                    new(half, h - bl - half), new(half, tl + half),
+                ];
+                g.BeginFigure(figure[0], isFilled: true, isClosed: true);
+                for (var i = 1; i < figure.Length; i++)
+                {
+                    // An uncut corner repeats its point: a zero-length segment, drawn the same as a square corner.
+                    g.LineTo(figure[i], isStroked: true, isSmoothJoin: false);
+                }
             }
             else
             {
@@ -292,8 +328,26 @@ public sealed class MaShapeBorder : Decorator
                 if (c > 0)
                 {
                     var tick = new Pen(AccentBrush, a) { StartLineCap = PenLineCap.Flat, EndLineCap = PenLineCap.Flat };
-                    dc.DrawLine(tick, new Point(1, c + 1), new Point(c + 1, 1));
-                    dc.DrawLine(tick, new Point(w - c - 1, h - 1), new Point(w - 1, h - c - 1));
+                    var cut = ChamferCorners;
+                    if (cut.HasFlag(MaCorners.TopLeft))
+                    {
+                        dc.DrawLine(tick, new Point(1, c + 1), new Point(c + 1, 1));
+                    }
+
+                    if (cut.HasFlag(MaCorners.TopRight))
+                    {
+                        dc.DrawLine(tick, new Point(w - c - 1, 1), new Point(w - 1, c + 1));
+                    }
+
+                    if (cut.HasFlag(MaCorners.BottomRight))
+                    {
+                        dc.DrawLine(tick, new Point(w - c - 1, h - 1), new Point(w - 1, h - c - 1));
+                    }
+
+                    if (cut.HasFlag(MaCorners.BottomLeft))
+                    {
+                        dc.DrawLine(tick, new Point(1, h - c - 1), new Point(c + 1, h - 1));
+                    }
                 }
 
                 break;

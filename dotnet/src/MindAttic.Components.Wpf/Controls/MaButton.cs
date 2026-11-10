@@ -136,6 +136,12 @@ public class MaButton : ToggleButton
     /// <summary>How deep the <see cref="MaShape.Chamfer"/> corners are cut.</summary>
     public double Chamfer { get => (double)GetValue(ChamferProperty); set => SetValue(ChamferProperty, value); }
 
+    /// <summary>Identifies the <see cref="ChamferCorners"/> property.</summary>
+    public static readonly DependencyProperty ChamferCornersProperty = Visual(nameof(ChamferCorners), typeof(MaCorners), MaCorners.Diagonal);
+
+    /// <summary>Which corners a <see cref="MaShape.Chamfer"/> cuts; top-left and bottom-right by default.</summary>
+    public MaCorners ChamferCorners { get => (MaCorners)GetValue(ChamferCornersProperty); set => SetValue(ChamferCornersProperty, value); }
+
     /// <summary>Corner radius for <see cref="MaShape.Rounded"/>.</summary>
     public double CornerRadius { get => (double)GetValue(CornerRadiusProperty); set => SetValue(CornerRadiusProperty, value); }
 
