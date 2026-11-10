@@ -68,8 +68,14 @@
                                     <Border x:Name="FooterArea" Grid.Row="2" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0,1,0,0" Padding="20,12">
                                         <ContentPresenter Content="{TemplateBinding Footer}" HorizontalAlignment="Right" />
                                     </Border>
+                                    <!-- Every look-affecting property is pinned so an app's implicit MaButton style (padding,
+                                         min size, state brushes) can't squeeze or recolour the glyph (M.COMP-T181). -->
                                     <ctl:MaButton x:Name="PART_CloseButton" Shape="Rectangle" StrokeThickness="0" Width="32" Height="32"
-                                                  Background="Transparent" HoverBackground="#22FFFFFF" Foreground="{TemplateBinding Foreground}"
+                                                  MinWidth="0" MinHeight="0" Padding="0"
+                                                  HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
+                                                  Background="Transparent" HoverBackground="#22FFFFFF" PressedBackground="#33FFFFFF"
+                                                  BorderBrush="Transparent" Foreground="{TemplateBinding Foreground}"
+                                                  HoverForeground="{TemplateBinding Foreground}" DisabledOpacity="0.4"
                                                   HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,8,8,0"
                                                   AutomationProperties.Name="Close" ToolTip="Close">
                                         <Path Data="M0,0 L10,10 M10,0 L0,10" Width="10" Height="10" StrokeThickness="1.6"

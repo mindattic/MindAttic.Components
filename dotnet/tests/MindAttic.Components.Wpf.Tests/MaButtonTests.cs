@@ -317,6 +317,39 @@ public sealed class MaButtonTests
         }
     });
 
+    [Fact]
+    public void MaModal_close_glyph_survives_an_apps_implicit_MaButton_style() => StaHost.Run(h =>
+    {
+        // M.COMP-T181: an app-wide MaButton style's padding used to squeeze the 32px close button's glyph to nothing.
+        var root = new Grid();
+        var window = OffScreenWindow.Create(500, 400, root);
+        window.Resources.MergedDictionaries.Clear();
+        var appStyle = new Style(typeof(MaButton));
+        appStyle.Setters.Add(new Setter(Control.PaddingProperty, new Thickness(16, 0, 16, 0)));
+        appStyle.Setters.Add(new Setter(FrameworkElement.MinWidthProperty, 120.0));
+        appStyle.Setters.Add(new Setter(MaButton.BorderBrushProperty, Accent));
+        window.Resources.Add(typeof(MaButton), appStyle);
+        var modal = new MaModal { Title = "Mech", Foreground = Fg, Content = new TextBlock { Text = "picture" } };
+        root.Children.Add(modal);
+        OffScreenWindow.Show(window);
+        try
+        {
+            modal.IsOpen = true;
+            h.Pump();
+            modal.ApplyTemplate();
+            var close = (MaButton)modal.Template.FindName(MaModal.PartCloseButton, modal);
+            var glyph = StaHost.Descendants<System.Windows.Shapes.Path>(close).Single();
+            Assert.Equal(32, close.ActualWidth);
+            Assert.InRange(glyph.ActualWidth, 9.5, 12.0);
+            Assert.InRange(glyph.ActualHeight, 9.5, 12.0);
+            Assert.Equal(Fg, glyph.Stroke);
+        }
+        finally
+        {
+            window.Close();
+        }
+    });
+
     private static MaButton Make(bool toggle = false, string? group = null) => new()
     {
         Background = Bg, Foreground = Fg, CheckedBackground = CheckedBg, CheckedForeground = CheckedFg,
