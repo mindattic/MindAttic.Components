@@ -139,13 +139,18 @@ public sealed class MaShapeBorder : Decorator
         ArgumentNullException.ThrowIfNull(drawingContext);
         var w = ActualWidth;
         var h = ActualHeight;
-        if (w <= 0 || h <= 0 || Shape == MaShape.None)
+        if (w <= 0 || h <= 0)
         {
             return;
         }
 
-        // The whole frame is clickable, even where it's transparent (a fill-less tab, nav item or chrome button).
+        // The whole frame is clickable, even where it's transparent (a fill-less tab, nav item or chrome button, and a
+        // shapeless link, which would otherwise only take clicks on the strokes of its letters).
         drawingContext.DrawRectangle(Brushes.Transparent, null, new Rect(0, 0, w, h));
+        if (Shape == MaShape.None)
+        {
+            return;
+        }
 
         var t = StrokeThickness;
         var pen = Stroke is null || t <= 0 ? null : new Pen(Stroke, t);

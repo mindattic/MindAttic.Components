@@ -1,4 +1,7 @@
 using System.Windows;
+using System.Windows.Automation;
+using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
 using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -105,7 +108,12 @@ public class MaButton : ToggleButton
     private const string EnterKey = "\r";
     private const string EscapeKey = "\u001b";
 
-    private static readonly Dictionary<string, List<WeakReference<MaButton>>> Groups = new(StringComparer.Ordinal);
+    // One registry per UI thread: a button only ever groups with buttons on its own Dispatcher, and touching
+    // another thread's button would throw.
+    [ThreadStatic]
+    private static Dictionary<string, List<WeakReference<MaButton>>>? t_groups;
+
+    private static Dictionary<string, List<WeakReference<MaButton>>> Groups => t_groups ??= new(StringComparer.Ordinal);
 
     static MaButton()
     {
@@ -217,6 +225,18 @@ public class MaButton : ToggleButton
         }
     }
 
+    /// <summary>
+    /// Plain MaButtons are buttons to UI Automation and screen readers (Invoke); only toggles and grouped buttons
+    /// (chips, tabs, nav items) also expose the Toggle pattern.
+    /// </summary>
+    protected override AutomationPeer OnCreateAutomationPeer() => new MaButtonAutomationPeer(this);
+
+    /// <summary>True when a click changes <see cref="ToggleButton.IsChecked"/> (a toggle or a group member).</summary>
+    internal bool Toggles => IsToggle || !string.IsNullOrEmpty(GroupName);
+
+    /// <summary>Clicks the button for UI Automation, as a mouse click would.</summary>
+    internal void AutomationClick() => OnClick();
+
     /// <inheritdoc/>
     protected override void OnToggle()
     {
@@ -245,15 +265,38 @@ public class MaButton : ToggleButton
             return;
         }
 
-        var root = PresentationSource.FromVisual(this)?.RootVisual;
+        // Like RadioButton: a group is scoped to one window (or, before it's shown, one element tree).
+        var scope = ScopeOf(this);
         members.RemoveAll(r => !r.TryGetTarget(out _));
-        foreach (var weak in members)
+        foreach (var weak in members.ToList())
         {
             if (weak.TryGetTarget(out var other) && !ReferenceEquals(other, this) && other.IsChecked == true
-                && (root is null || ReferenceEquals(PresentationSource.FromVisual(other)?.RootVisual, root)))
+                && ReferenceEquals(ScopeOf(other), scope))
             {
                 other.SetCurrentValue(IsCheckedProperty, false);
             }
+        }
+    }
+
+    /// <summary>The window's root visual once shown; otherwise the top of the element's own tree.</summary>
+    private static DependencyObject ScopeOf(MaButton button)
+    {
+        if (PresentationSource.FromVisual(button)?.RootVisual is { } root)
+        {
+            return root;
+        }
+
+        DependencyObject node = button;
+        while (true)
+        {
+            var parent = (node is System.Windows.Media.Visual or System.Windows.Media.Media3D.Visual3D ? VisualTreeHelper.GetParent(node) : null)
+                ?? LogicalTreeHelper.GetParent(node);
+            if (parent is null)
+            {
+                return node;
+            }
+
+            node = parent;
         }
     }
 
@@ -342,4 +385,33 @@ public class MaButton : ToggleButton
 
     private static DependencyPropertyKey Effective(string name) =>
         DependencyProperty.RegisterReadOnly(name, typeof(Brush), typeof(MaButton), new FrameworkPropertyMetadata(null));
+}
+
+/// <summary>UI Automation peer for <see cref="MaButton"/>: Invoke always, Toggle only for toggles and groups.</summary>
+public sealed class MaButtonAutomationPeer(MaButton owner) : ToggleButtonAutomationPeer(owner), IInvokeProvider
+{
+    private MaButton Button => (MaButton)Owner;
+
+    /// <inheritdoc/>
+    public override object? GetPattern(PatternInterface patternInterface) => patternInterface switch
+    {
+        PatternInterface.Invoke => this,
+        PatternInterface.Toggle => Button.Toggles ? base.GetPattern(patternInterface) : null,
+        _ => base.GetPattern(patternInterface),
+    };
+
+    /// <inheritdoc/>
+    protected override string GetClassNameCore() => nameof(MaButton);
+
+    /// <inheritdoc/>
+    public void Invoke()
+    {
+        if (!IsEnabled())
+        {
+            throw new ElementNotEnabledException();
+        }
+
+        // Like ButtonAutomationPeer: click asynchronously so the automation client isn't blocked by handlers.
+        Button.Dispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.Input, new Action(Button.AutomationClick));
+    }
 }
