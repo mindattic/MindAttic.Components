@@ -13,7 +13,8 @@
     <!-- 32.0.0: MaTabItem.TrailingContent/TrailingContentTemplate: arbitrary content (e.g. a pair of progress bars) docked exactly where Trailing sits, including right-aligned in TabStripPlacement=Left (M.COMP-T172). -->
     <!-- 33.0.0: nuget.org metadata (authors, repository and project links, tags); published publicly on nuget.org from here on (M.COMP-T173). -->
     <!-- 34.0.0: MaButton, the one configurable button (shape, per-state colours, accent, toggle and group), drawn by MaShapeBorder; default template in Themes/Generic.xaml via ThemeInfo (M.COMP-T174). -->
-    <Version>34.0.0</Version>
+    <!-- 35.0.0: MaButton.IsDefault / IsCancel (Enter / Esc press it, as with Button) (M.COMP-T174). -->
+    <Version>35.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>

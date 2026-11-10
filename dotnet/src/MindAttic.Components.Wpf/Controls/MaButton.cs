@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
 
@@ -78,6 +79,14 @@ public class MaButton : ToggleButton
     /// <summary>Identifies the <see cref="GroupName"/> property.</summary>
     public static readonly DependencyProperty GroupNameProperty = DependencyProperty.Register(
         nameof(GroupName), typeof(string), typeof(MaButton), new PropertyMetadata(null, OnGroupNameChanged));
+
+    /// <summary>Identifies the <see cref="IsDefault"/> property.</summary>
+    public static readonly DependencyProperty IsDefaultProperty = DependencyProperty.Register(
+        nameof(IsDefault), typeof(bool), typeof(MaButton), new PropertyMetadata(false, (d, e) => ((MaButton)d).SetAccessKey("", (bool)e.NewValue)));
+
+    /// <summary>Identifies the <see cref="IsCancel"/> property.</summary>
+    public static readonly DependencyProperty IsCancelProperty = DependencyProperty.Register(
+        nameof(IsCancel), typeof(bool), typeof(MaButton), new PropertyMetadata(false, (d, e) => ((MaButton)d).SetAccessKey("", (bool)e.NewValue)));
 
     private static readonly DependencyPropertyKey EffectiveBackgroundKey = Effective(nameof(EffectiveBackground));
     private static readonly DependencyPropertyKey EffectiveBorderBrushKey = Effective(nameof(EffectiveBorderBrush));
@@ -166,6 +175,12 @@ public class MaButton : ToggleButton
     /// <summary>Buttons sharing a group name act as one choice: clicking one checks it and unchecks the rest.</summary>
     public string? GroupName { get => (string?)GetValue(GroupNameProperty); set => SetValue(GroupNameProperty, value); }
 
+    /// <summary>Enter presses this button (a dialog's default action), as with <c>Button.IsDefault</c>.</summary>
+    public bool IsDefault { get => (bool)GetValue(IsDefaultProperty); set => SetValue(IsDefaultProperty, value); }
+
+    /// <summary>Esc presses this button (a dialog's cancel action), as with <c>Button.IsCancel</c>.</summary>
+    public bool IsCancel { get => (bool)GetValue(IsCancelProperty); set => SetValue(IsCancelProperty, value); }
+
     /// <summary>The background for the current state (what the template draws).</summary>
     public Brush? EffectiveBackground => (Brush?)GetValue(EffectiveBackgroundProperty);
 
@@ -246,6 +261,18 @@ public class MaButton : ToggleButton
             }
 
             members.Add(new WeakReference<MaButton>(button));
+        }
+    }
+
+    private void SetAccessKey(string key, bool on)
+    {
+        if (on)
+        {
+            AccessKeyManager.Register(key, this);
+        }
+        else
+        {
+            AccessKeyManager.Unregister(key, this);
         }
     }
 
