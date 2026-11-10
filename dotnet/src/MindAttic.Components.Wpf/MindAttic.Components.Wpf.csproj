@@ -16,7 +16,8 @@
     <!-- 35.0.0: MaButton.IsDefault / IsCancel (Enter / Esc press it, as with Button) (M.COMP-T174). -->
     <!-- 36.0.0: MaButton.Foreground resolves to the current state's colour (coerced; the set value stays the resting colour), so icons and other content that inherit their colour follow hover/checked like the text (M.COMP-T174). -->
     <!-- 39.0.0: MaShapeBorder.ClipToShape clips the child to the frame's outline, so a header band can't paint square corners over a chamfer (M.COMP-T185). -->
-    <Version>39.0.0</Version>
+    <!-- 40.0.0: ClipToShape follows outline changes and leaves no clip on a swapped-out child (M.COMP-T187). -->
+    <Version>40.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>
