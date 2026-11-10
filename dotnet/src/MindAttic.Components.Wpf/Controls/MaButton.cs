@@ -110,6 +110,10 @@ public class MaButton : ToggleButton
     static MaButton()
     {
         DefaultStyleKeyProperty.OverrideMetadata(typeof(MaButton), new FrameworkPropertyMetadata(typeof(MaButton)));
+
+        // Foreground resolves to the current state's colour (coercion keeps the set value as the resting
+        // colour underneath), so content that inherits its text colour, such as an icon, follows it too.
+        ForegroundProperty.OverrideMetadata(typeof(MaButton), new FrameworkPropertyMetadata(null, CoerceForeground));
     }
 
     /// <summary>Creates a button with its state brushes resolved.</summary>
@@ -200,6 +204,11 @@ public class MaButton : ToggleButton
     protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);
+        if (_updating)
+        {
+            return;
+        }
+
         if (e.Property == BackgroundProperty || e.Property == BorderBrushProperty || e.Property == ForegroundProperty
             || e.Property == IsMouseOverProperty || e.Property == IsPressedProperty || e.Property == IsCheckedProperty
             || e.Property == IsKeyboardFocusedProperty || e.Property == IsEnabledProperty)
@@ -279,13 +288,34 @@ public class MaButton : ToggleButton
         }
     }
 
+    private bool _updating;
+
     private void UpdateState()
+    {
+        if (_updating)
+        {
+            return;
+        }
+
+        _updating = true;
+        try
+        {
+            UpdateStateCore();
+        }
+        finally
+        {
+            _updating = false;
+        }
+    }
+
+    private void UpdateStateCore()
     {
         var on = IsChecked == true;
         var hover = IsMouseOver;
         SetValue(EffectiveBackgroundKey, Pick(IsPressed ? PressedBackground : null, on ? CheckedBackground : null, hover ? HoverBackground : null, Background));
         SetValue(EffectiveBorderBrushKey, Pick(on ? CheckedBorderBrush : null, IsKeyboardFocused ? FocusedBorderBrush : null, hover ? HoverBorderBrush : null, BorderBrush));
-        SetValue(EffectiveForegroundKey, Pick(on ? CheckedForeground : null, hover ? HoverForeground : null, Foreground));
+        CoerceValue(ForegroundProperty);
+        SetValue(EffectiveForegroundKey, Foreground);
         SetValue(EffectiveAccentKey, AccentWhen switch
         {
             MaAccentWhen.Always => AccentBrush,
@@ -293,6 +323,13 @@ public class MaButton : ToggleButton
             _ => null,
         });
         SetCurrentValue(OpacityProperty, IsEnabled ? 1.0 : DisabledOpacity);
+    }
+
+    private static object CoerceForeground(DependencyObject d, object baseValue)
+    {
+        var b = (MaButton)d;
+        var on = b.IsChecked == true;
+        return Pick(on ? b.CheckedForeground : null, b.IsMouseOver ? b.HoverForeground : null, baseValue as Brush) ?? baseValue;
     }
 
     private static Brush? Pick(params Brush?[] choices) => choices.FirstOrDefault(c => c is not null);
