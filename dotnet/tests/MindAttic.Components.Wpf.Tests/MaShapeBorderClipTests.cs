@@ -36,6 +36,23 @@ public sealed class MaShapeBorderClipTests
     });
 
     [Fact]
+    public void The_clip_follows_a_new_chamfer_and_leaves_a_swapped_out_child() => StaHost.Run(h =>
+    {
+        var child = new Border();
+        var frame = new MaShapeBorder { Shape = MaShape.Chamfer, Chamfer = 10, ClipToShape = true, Width = 200, Height = 100, Child = child };
+        h.Show(frame);
+        Assert.True(child.Clip!.FillContains(new Point(12, 2)), "inside a 10 px cut's reach");
+
+        frame.Chamfer = 30;
+        frame.UpdateLayout();
+        Assert.False(child.Clip!.FillContains(new Point(12, 2)), "now inside the deeper 30 px cut");
+
+        frame.Child = new Border();
+        frame.UpdateLayout();
+        Assert.Null(child.Clip);
+    });
+
+    [Fact]
     public void Off_by_default_and_turning_it_off_removes_only_its_own_clip() => StaHost.Run(h =>
     {
         var child = new Border();

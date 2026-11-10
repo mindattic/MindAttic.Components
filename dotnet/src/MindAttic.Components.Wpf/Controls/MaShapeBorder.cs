@@ -55,19 +55,19 @@ public enum MaAccentEdge
 public sealed class MaShapeBorder : Decorator
 {
     /// <summary>Identifies the <see cref="Shape"/> property.</summary>
-    public static readonly DependencyProperty ShapeProperty = Register(nameof(Shape), typeof(MaShape), MaShape.Rectangle, render: true);
+    public static readonly DependencyProperty ShapeProperty = Register(nameof(Shape), typeof(MaShape), MaShape.Rectangle, render: true, outline: true);
     /// <summary>Identifies the <see cref="Fill"/> property.</summary>
     public static readonly DependencyProperty FillProperty = Register(nameof(Fill), typeof(Brush), null, render: true);
     /// <summary>Identifies the <see cref="Stroke"/> property.</summary>
     public static readonly DependencyProperty StrokeProperty = Register(nameof(Stroke), typeof(Brush), null, render: true);
     /// <summary>Identifies the <see cref="StrokeThickness"/> property.</summary>
-    public static readonly DependencyProperty StrokeThicknessProperty = Register(nameof(StrokeThickness), typeof(double), 1.0, render: true);
+    public static readonly DependencyProperty StrokeThicknessProperty = Register(nameof(StrokeThickness), typeof(double), 1.0, render: true, outline: true);
     /// <summary>Identifies the <see cref="CornerRadius"/> property.</summary>
-    public static readonly DependencyProperty CornerRadiusProperty = Register(nameof(CornerRadius), typeof(double), 4.0, render: true);
+    public static readonly DependencyProperty CornerRadiusProperty = Register(nameof(CornerRadius), typeof(double), 4.0, render: true, outline: true);
     /// <summary>Identifies the <see cref="Chamfer"/> property.</summary>
-    public static readonly DependencyProperty ChamferProperty = Register(nameof(Chamfer), typeof(double), 8.0, render: true);
+    public static readonly DependencyProperty ChamferProperty = Register(nameof(Chamfer), typeof(double), 8.0, render: true, outline: true);
     /// <summary>Identifies the <see cref="Slant"/> property.</summary>
-    public static readonly DependencyProperty SlantProperty = Register(nameof(Slant), typeof(double), 12.0, render: true);
+    public static readonly DependencyProperty SlantProperty = Register(nameof(Slant), typeof(double), 12.0, render: true, outline: true);
     /// <summary>Identifies the <see cref="AccentBrush"/> property.</summary>
     public static readonly DependencyProperty AccentBrushProperty = Register(nameof(AccentBrush), typeof(Brush), null, render: true);
     /// <summary>Identifies the <see cref="AccentEdge"/> property.</summary>
@@ -82,6 +82,8 @@ public sealed class MaShapeBorder : Decorator
     /// <summary>
     /// Clips the child to the frame's outline (a chamfer's cut corners, rounded corners, slanted sides), so a child
     /// with its own background, such as a header band, can't paint square corners over the shape. Off by default.
+    /// While on, the frame owns the child's <c>Clip</c> (a clip the child sets itself is replaced); it follows changes
+    /// to the shape, chamfer, radius, slant and stroke, and is removed when turned off or the child is swapped.
     /// </summary>
     public bool ClipToShape { get => (bool)GetValue(ClipToShapeProperty); set => SetValue(ClipToShapeProperty, value); }
 
@@ -143,6 +145,18 @@ public sealed class MaShapeBorder : Decorator
     }
 
     private Geometry? _childClip;
+
+    /// <summary>A child that's swapped out takes no clip of ours with it.</summary>
+    protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
+    {
+        if (visualRemoved is UIElement old && _childClip is not null && ReferenceEquals(old.Clip, _childClip))
+        {
+            old.Clip = null;
+            _childClip = null;
+        }
+
+        base.OnVisualChildrenChanged(visualAdded, visualRemoved);
+    }
 
     /// <summary>Sets (or clears) the child's clip to the outline, in the child's coordinates; leaves a clip it didn't set alone.</summary>
     private void ClipChild(Size size, Thickness pad)
@@ -304,8 +318,10 @@ public sealed class MaShapeBorder : Decorator
         }
     }
 
-    private static DependencyProperty Register(string name, Type type, object? fallback, bool render) =>
+    /// <summary><paramref name="outline"/>: the property changes the outline, so a ClipToShape clip is rebuilt (re-arranged) too.</summary>
+    private static DependencyProperty Register(string name, Type type, object? fallback, bool render, bool outline = false) =>
         DependencyProperty.Register(name, type, typeof(MaShapeBorder), new FrameworkPropertyMetadata(
             fallback,
-            render ? FrameworkPropertyMetadataOptions.AffectsRender : FrameworkPropertyMetadataOptions.AffectsMeasure));
+            (render ? FrameworkPropertyMetadataOptions.AffectsRender : FrameworkPropertyMetadataOptions.AffectsMeasure)
+            | (outline ? FrameworkPropertyMetadataOptions.AffectsArrange : FrameworkPropertyMetadataOptions.None)));
 }
