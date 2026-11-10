@@ -76,6 +76,14 @@ public sealed class MaShapeBorder : Decorator
     public static readonly DependencyProperty AccentThicknessProperty = Register(nameof(AccentThickness), typeof(double), 2.0, render: true);
     /// <summary>Identifies the <see cref="Padding"/> property.</summary>
     public static readonly DependencyProperty PaddingProperty = Register(nameof(Padding), typeof(Thickness), default(Thickness), render: false);
+    /// <summary>Identifies the <see cref="ClipToShape"/> property.</summary>
+    public static readonly DependencyProperty ClipToShapeProperty = Register(nameof(ClipToShape), typeof(bool), false, render: false);
+
+    /// <summary>
+    /// Clips the child to the frame's outline (a chamfer's cut corners, rounded corners, slanted sides), so a child
+    /// with its own background, such as a header band, can't paint square corners over the shape. Off by default.
+    /// </summary>
+    public bool ClipToShape { get => (bool)GetValue(ClipToShapeProperty); set => SetValue(ClipToShapeProperty, value); }
 
     /// <summary>The frame's outline.</summary>
     public MaShape Shape { get => (MaShape)GetValue(ShapeProperty); set => SetValue(ShapeProperty, value); }
@@ -130,7 +138,43 @@ public sealed class MaShapeBorder : Decorator
             pad.Top,
             Math.Max(0, arrangeSize.Width - pad.Left - pad.Right),
             Math.Max(0, arrangeSize.Height - pad.Top - pad.Bottom)));
+        ClipChild(arrangeSize, pad);
         return arrangeSize;
+    }
+
+    private Geometry? _childClip;
+
+    /// <summary>Sets (or clears) the child's clip to the outline, in the child's coordinates; leaves a clip it didn't set alone.</summary>
+    private void ClipChild(Size size, Thickness pad)
+    {
+        if (Child is not { } child)
+        {
+            return;
+        }
+
+        if (!ClipToShape || Shape == MaShape.None || size.Width <= 0 || size.Height <= 0)
+        {
+            if (_childClip is not null && ReferenceEquals(child.Clip, _childClip))
+            {
+                child.Clip = null;
+            }
+
+            _childClip = null;
+            return;
+        }
+
+        var (w, h) = (size.Width, size.Height);
+        Geometry outline = Shape switch
+        {
+            MaShape.Rectangle => new RectangleGeometry(new Rect(0, 0, w, h)),
+            MaShape.Rounded => new RectangleGeometry(new Rect(0, 0, w, h), CornerRadius, CornerRadius),
+            MaShape.Pill => new RectangleGeometry(new Rect(0, 0, w, h), h / 2, h / 2),
+            _ => Outline(w, h, StrokeThickness),
+        };
+        var clip = outline.CloneCurrentValue();
+        clip.Transform = new TranslateTransform(-pad.Left, -pad.Top);
+        clip.Freeze();
+        child.Clip = _childClip = clip;
     }
 
     /// <inheritdoc/>
