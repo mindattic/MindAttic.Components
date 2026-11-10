@@ -15,7 +15,7 @@
     <!-- 34.0.0: MaButton, the one configurable button (shape, per-state colours, accent, toggle and group), drawn by MaShapeBorder; default template in Themes/Generic.xaml via ThemeInfo (M.COMP-T174). -->
     <!-- 35.0.0: MaButton.IsDefault / IsCancel (Enter / Esc press it, as with Button) (M.COMP-T174). -->
     <!-- 36.0.0: MaButton.Foreground resolves to the current state's colour (coerced; the set value stays the resting colour), so icons and other content that inherit their colour follow hover/checked like the text (M.COMP-T174). -->
-    <Version>36.0.0</Version>
+    <Version>37.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>

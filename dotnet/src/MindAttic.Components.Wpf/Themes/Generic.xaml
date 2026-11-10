@@ -29,4 +29,66 @@
             </Setter.Value>
         </Setter>
     </Style>
+    <!--
+        MaModal's default look for apps that don't merge Theme.xaml (Theme.xaml's own MaModal style
+        still wins where it is merged). Colours, backdrop and corner radius are properties; the close
+        button is an MaButton, so a skin is property values, not a new template.
+    -->
+    <Style TargetType="{x:Type ctl:MaModal}">
+        <Setter Property="Foreground" Value="#FFE6E9ED" />
+        <Setter Property="Background" Value="#FF1E2329" />
+        <Setter Property="BorderBrush" Value="#FF3A4250" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="20,4,20,20" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Panel.ZIndex" Value="1000" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaModal}">
+                    <Grid>
+                        <Border x:Name="PART_Backdrop" Background="{TemplateBinding BackdropBrush}" />
+                        <Grid MaxWidth="{TemplateBinding DialogWidth}" Margin="24" HorizontalAlignment="Stretch" VerticalAlignment="Center">
+                            <Border x:Name="PART_Card" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}"
+                                    SnapsToDevicePixels="True" KeyboardNavigation.TabNavigation="Cycle"
+                                    KeyboardNavigation.ControlTabNavigation="Cycle" KeyboardNavigation.DirectionalNavigation="Contained">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock x:Name="TitleText" Text="{TemplateBinding Title}" FontSize="18" FontWeight="SemiBold"
+                                               Foreground="{TemplateBinding Foreground}" TextTrimming="CharacterEllipsis"
+                                               VerticalAlignment="Center" Margin="20,14,52,10" AutomationProperties.HeadingLevel="Level2" />
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                                        <ContentPresenter Margin="{TemplateBinding Padding}" />
+                                    </ScrollViewer>
+                                    <Border x:Name="FooterArea" Grid.Row="2" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0,1,0,0" Padding="20,12">
+                                        <ContentPresenter Content="{TemplateBinding Footer}" HorizontalAlignment="Right" />
+                                    </Border>
+                                    <ctl:MaButton x:Name="PART_CloseButton" Shape="Rectangle" StrokeThickness="0" Width="32" Height="32"
+                                                  Background="Transparent" HoverBackground="#22FFFFFF" Foreground="{TemplateBinding Foreground}"
+                                                  HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,8,8,0"
+                                                  AutomationProperties.Name="Close" ToolTip="Close">
+                                        <Path Data="M0,0 L10,10 M10,0 L0,10" Width="10" Height="10" StrokeThickness="1.6"
+                                              Stroke="{Binding (TextElement.Foreground), RelativeSource={RelativeSource Self}}" />
+                                    </ctl:MaButton>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Footer" Value="{x:Null}">
+                            <Setter TargetName="FooterArea" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Title" Value="">
+                            <Setter TargetName="TitleText" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
 </ResourceDictionary>

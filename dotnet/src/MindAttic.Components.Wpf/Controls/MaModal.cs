@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -50,6 +51,15 @@ public class MaModal : ContentControl
 
     public static readonly DependencyProperty CloseCommandProperty = DependencyProperty.Register(
         nameof(CloseCommand), typeof(ICommand), typeof(MaModal), new FrameworkPropertyMetadata(null));
+
+    /// <summary>Identifies the <see cref="BackdropBrush"/> property.</summary>
+    public static readonly DependencyProperty BackdropBrushProperty = DependencyProperty.Register(
+        nameof(BackdropBrush), typeof(Brush), typeof(MaModal),
+        new FrameworkPropertyMetadata(new SolidColorBrush(Color.FromArgb(0x99, 0, 0, 0))));
+
+    /// <summary>Identifies the <see cref="CornerRadius"/> property.</summary>
+    public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(
+        nameof(CornerRadius), typeof(CornerRadius), typeof(MaModal), new FrameworkPropertyMetadata(new CornerRadius(8)));
 
     public static readonly RoutedEvent OpenedEvent = EventManager.RegisterRoutedEvent(
         nameof(Opened), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MaModal));
@@ -116,6 +126,20 @@ public class MaModal : ContentControl
     {
         get => (ICommand?)GetValue(CloseCommandProperty);
         set => SetValue(CloseCommandProperty, value);
+    }
+
+    /// <summary>What dims the app behind the card (the default template; Theme.xaml uses MaBackdrop).</summary>
+    public Brush? BackdropBrush
+    {
+        get => (Brush?)GetValue(BackdropBrushProperty);
+        set => SetValue(BackdropBrushProperty, value);
+    }
+
+    /// <summary>The card's corner radius (the default template; Theme.xaml keeps 8). 0 for square HUD cards.</summary>
+    public CornerRadius CornerRadius
+    {
+        get => (CornerRadius)GetValue(CornerRadiusProperty);
+        set => SetValue(CornerRadiusProperty, value);
     }
 
     /// <summary>Raised once the dialog has opened.</summary>
