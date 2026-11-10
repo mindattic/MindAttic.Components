@@ -147,8 +147,21 @@ public sealed class MaMessageBoxTests
     });
 
     [Fact]
-    public void The_package_is_version_26() =>
-        Assert.Equal(28, typeof(MaMessageBox).Assembly.GetName().Version!.Major);
+    public void The_assembly_carries_the_package_version()
+    {
+        // Was a hard-coded major version that went stale on every release; compare with the csproj instead.
+        var dir = new System.IO.DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !System.IO.File.Exists(System.IO.Path.Combine(dir.FullName, "src", "MindAttic.Components.Wpf", "MindAttic.Components.Wpf.csproj")))
+        {
+            dir = dir.Parent;
+        }
+
+        Assert.NotNull(dir);
+        var csproj = System.IO.File.ReadAllText(System.IO.Path.Combine(dir!.FullName, "src", "MindAttic.Components.Wpf", "MindAttic.Components.Wpf.csproj"));
+        var declared = System.Text.RegularExpressions.Regex.Match(csproj, "<Version>([^<]+)</Version>").Groups[1].Value;
+        var built = typeof(MaMessageBox).Assembly.GetName().Version!;
+        Assert.Equal(declared, $"{built.Major}.{built.Minor}.{built.Build}");
+    }
 
     // ---- harness ----
 
