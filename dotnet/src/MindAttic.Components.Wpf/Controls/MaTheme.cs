@@ -13,7 +13,7 @@ public enum MaThemeMode
     Light,
 }
 
-/// <summary>Raised by <see cref="MaTheme.Changed"/> and <see cref="MaThemeToggle.ThemeChanged"/> once a theme switch
+/// <summary>Raised by <see cref="MaTheme.Changed"/> and <see cref="MaToggleIcon.ThemeChanged"/> once a theme switch
 /// has been applied: the new <see cref="Theme"/> and the dictionary it was applied to.</summary>
 public sealed class MaThemeChangedEventArgs(ResourceDictionary resources, MaThemeMode theme) : RoutedEventArgs
 {

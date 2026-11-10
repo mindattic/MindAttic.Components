@@ -148,7 +148,7 @@ Merge the theme once, in `App.xaml`:
 | `Controls.MaWindow.DarkTitleBar` | Attached property: asks Windows to draw the window's title bar dark |
 | `Controls.MaWindow.ThemedTitleBar` | Attached property: the title bar follows the theme in force (dark or light), live |
 | `Controls.MaTheme` (+ `Themes/Light.xaml`, `MaThemeMode`) | Light and dark themes switched live: `MaTheme.Set(MaThemeMode.Light)` / `Set(MaThemeMode.Dark)` (or `Set(resources, mode)` for a window's dictionary), `MaTheme.Current` to save, `MaTheme.Parse(saved)` to load (Dark when unknown), `MaTheme.Changed`; the `MaThemeMode` resource is the theme in force |
-| `Controls.MaThemeToggle` | The sun/moon switch: an `MaToolButton` showing a moon in light mode and a sun in dark mode that switches to the other theme; named "Switch to light theme" / "Switch to dark theme" for screen readers and its tooltip; `Theme`, `TargetTheme`, `Glyph`, `SwitchText`, and a bubbling `ThemeChanged` event to save the choice |
+| `Controls.MaToggleIcon` | A two-state icon button (was `MaThemeToggle`): an `MaToolButton` showing `OffGlyph` or `OnGlyph` by `IsChecked` (two-way), named and tooltipped by `OffText` / `OnText` (what a click does), raising a bubbling `Toggled`. `IsThemeToggle="True"` makes it the sun/moon switch: a moon in light mode and a sun in dark mode, "Switch to light theme" / "Switch to dark theme", switching the theme and raising `ThemeChanged` to save the choice; `Theme`, `TargetTheme` |
 | `MaHoverStrong`, `MaDisabledText`, `MaAccentBorder`, `MaAccentDisabled`, `MaOnAccentDisabled` | The last hand-set colours in the styles, now palette keys so they follow the theme |
 | `MaBodyScroll`, `MaPaneScroll` (+ `Controls.MaScrollArea.Gutter`) | A page body's / side pane's `ScrollViewer`: vertical only, not a tab stop, content padded by the gutter (24,0,24,16 / 20,16,20,20); while the bar shows it sits inside the right gutter instead of pushing the content in |
 | `MaList`, `MaRowList`, `MaTileList` (+ `Controls.MaList.*`) | `ItemsControl` lists, not tab stops: plain vertical, vertical rows 8px apart, and a wrap of tiles 10px apart (equal columns with `MaList.MinItemWidth`, else a flow); `MaList.Spacing` / `RowSpacing` / `UniformRows` / `Balanced` tune them |
@@ -168,11 +168,13 @@ Dark is the default: Theme.xaml on its own. `MaTheme.Set(MaThemeMode.Light)` mer
 
 ```csharp
 MaTheme.Set(MaTheme.Parse(settings.Theme));   // at startup
-settings.Theme = MaTheme.Current.ToString();  // to save, e.g. from MaThemeToggle.ThemeChanged
+settings.Theme = MaTheme.Current.ToString();  // to save, e.g. from MaToggleIcon.ThemeChanged
 ```
 
 ```xml
-<ctl:MaThemeToggle ThemeChanged="OnThemeChanged" />
+<ctl:MaToggleIcon IsThemeToggle="True" ThemeChanged="OnThemeChanged" />
+<ctl:MaToggleIcon IsChecked="{Binding PhoneLayout}" OffGlyph="&#xE7F8;" OnGlyph="&#xE8EA;"
+                  OffText="Switch to phone layout" OnText="Switch to desktop layout" />
 ```
 
 A theme toggle switches the nearest dictionary that carries the theme (`MaTheme.ScopeOf`): usually the Application's. Set `ctl:MaWindow.ThemedTitleBar="True"` instead of `DarkTitleBar` so the caption follows too.

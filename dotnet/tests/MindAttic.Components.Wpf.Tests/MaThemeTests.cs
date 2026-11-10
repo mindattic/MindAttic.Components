@@ -15,7 +15,7 @@ using Xunit;
 namespace MindAttic.Components.Wpf.Tests;
 
 /// <summary>M.COMP-T53: the light palette, the live switch between it and the dark default, high contrast still
-/// winning, and the MaThemeToggle sun/moon button.</summary>
+/// winning, and the MaToggleIcon sun/moon switch (IsThemeToggle).</summary>
 public sealed class MaThemeTests
 {
     // ---- the palettes ----
@@ -195,32 +195,32 @@ public sealed class MaThemeTests
         finally { window.Close(); }
     });
 
-    // ---- MaThemeToggle ----
+    // ---- MaToggleIcon ----
 
     [Fact]
     public void The_toggle_shows_a_sun_in_dark_mode_and_a_moon_in_light_mode_and_is_named_for_the_theme_it_switches_to() => Sta(() =>
     {
-        var toggle = new MaThemeToggle();
+        var toggle = new MaToggleIcon { IsThemeToggle = true };
         var window = OffScreenWindow.Show(content: toggle);
         try
         {
             Pump();
             Assert.Equal(MaThemeMode.Dark, toggle.Theme);
             Assert.Equal(MaThemeMode.Light, toggle.TargetTheme);
-            Assert.Equal(MaThemeToggle.SunGlyph, toggle.Glyph);
-            Assert.Equal(MaThemeToggle.SunGlyph, toggle.Content);
+            Assert.Equal(MaToggleIcon.SunGlyph, toggle.Glyph);
+            Assert.Equal(MaToggleIcon.SunGlyph, toggle.Content);
             Assert.Equal("Switch to light theme", toggle.ToolTip);
             Assert.True(toggle.Focusable);
             Assert.True(toggle.IsTabStop);
             var peer = UIElementAutomationPeer.CreatePeerForElement(toggle);
             Assert.Equal("Switch to light theme", peer.GetName());
             Assert.Equal(AutomationControlType.Button, peer.GetAutomationControlType());
-            Assert.Equal(nameof(MaThemeToggle), peer.GetClassName());
+            Assert.Equal(nameof(MaToggleIcon), peer.GetClassName());
 
             MaTheme.Set(window.Resources, MaThemeMode.Light);
             Pump();
             Assert.Equal(MaThemeMode.Light, toggle.Theme);
-            Assert.Equal(MaThemeToggle.MoonGlyph, toggle.Glyph);
+            Assert.Equal(MaToggleIcon.MoonGlyph, toggle.Glyph);
             Assert.Equal("Switch to dark theme", peer.GetName());
             Assert.Equal("Switch to dark theme", toggle.ToolTip);
 
@@ -233,7 +233,7 @@ public sealed class MaThemeTests
     [Fact]
     public void Invoking_the_toggle_switches_the_theme_raises_ThemeChanged_and_runs_its_command() => Sta(() =>
     {
-        var toggle = new MaThemeToggle();
+        var toggle = new MaToggleIcon { IsThemeToggle = true };
         var label = new TextBlock();
         var host = new StackPanel { Children = { toggle, label } };
         var window = OffScreenWindow.Show(content: host);
@@ -241,7 +241,7 @@ public sealed class MaThemeTests
         {
             label.SetResourceReference(TextBlock.ForegroundProperty, "MaText");
             var seen = new List<MaThemeMode>();
-            host.AddHandler(MaThemeToggle.ThemeChangedEvent, new EventHandler<MaThemeChangedEventArgs>((_, e) => seen.Add(e.Theme)));
+            host.AddHandler(MaToggleIcon.ThemeChangedEvent, new EventHandler<MaThemeChangedEventArgs>((_, e) => seen.Add(e.Theme)));
             var ran = 0;
             toggle.Command = new Mvvm.RelayCommand(() => ran++);
             Pump();
@@ -258,7 +258,7 @@ public sealed class MaThemeTests
             invoke.Invoke();
             Pump();
             Assert.Equal(MaThemeMode.Dark, MaTheme.Get(window.Resources));
-            Assert.Equal(MaThemeToggle.SunGlyph, toggle.Glyph);
+            Assert.Equal(MaToggleIcon.SunGlyph, toggle.Glyph);
             Assert.Equal([MaThemeMode.Light, MaThemeMode.Dark], seen);
         }
         finally { window.Close(); }
@@ -267,7 +267,7 @@ public sealed class MaThemeTests
     [Fact]
     public void The_toggle_answers_the_keyboard() => Sta(() =>
     {
-        var toggle = new MaThemeToggle();
+        var toggle = new MaToggleIcon { IsThemeToggle = true };
         var window = OffScreenWindow.Show(content: toggle);
         try
         {
@@ -279,6 +279,37 @@ public sealed class MaThemeTests
             Pump();
             Assert.Equal(MaThemeMode.Light, toggle.Theme);
             Assert.Equal(MaThemeMode.Light, MaTheme.Get(window.Resources));
+        }
+        finally { window.Close(); }
+    });
+
+    [Fact]
+    public void A_plain_toggle_icon_flips_its_glyph_and_name_and_raises_Toggled_without_touching_the_theme() => Sta(() =>
+    {
+        var toggle = new MaToggleIcon { OffGlyph = "", OnGlyph = "", OffText = "Switch to phone layout", OnText = "Switch to desktop layout" };
+        var window = OffScreenWindow.Show(content: toggle);
+        try
+        {
+            var toggled = 0;
+            toggle.Toggled += (_, _) => toggled++;
+            Pump();
+            Assert.False(toggle.IsChecked);
+            Assert.Equal("", toggle.Content);
+            Assert.Equal("Switch to phone layout", toggle.ToolTip);
+            var peer = UIElementAutomationPeer.CreatePeerForElement(toggle);
+            Assert.Equal("Switch to phone layout", peer.GetName());
+
+            ((IInvokeProvider)peer.GetPattern(PatternInterface.Invoke)).Invoke();
+            Pump();
+            Assert.True(toggle.IsChecked);
+            Assert.Equal("", toggle.Glyph);
+            Assert.Equal("Switch to desktop layout", peer.GetName());
+            Assert.Equal(1, toggled);
+            Assert.Equal(MaThemeMode.Dark, MaTheme.Get(window.Resources));
+
+            toggle.IsChecked = false; // set from outside (a binding): the look follows, no Toggled
+            Assert.Equal("", toggle.Glyph);
+            Assert.Equal(1, toggled);
         }
         finally { window.Close(); }
     });

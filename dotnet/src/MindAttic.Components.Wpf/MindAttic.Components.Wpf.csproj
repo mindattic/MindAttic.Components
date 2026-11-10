@@ -15,7 +15,7 @@
     <!-- 34.0.0: MaButton, the one configurable button (shape, per-state colours, accent, toggle and group), drawn by MaShapeBorder; default template in Themes/Generic.xaml via ThemeInfo (M.COMP-T174). -->
     <!-- 35.0.0: MaButton.IsDefault / IsCancel (Enter / Esc press it, as with Button) (M.COMP-T174). -->
     <!-- 36.0.0: MaButton.Foreground resolves to the current state's colour (coerced; the set value stays the resting colour), so icons and other content that inherit their colour follow hover/checked like the text (M.COMP-T174). -->
-    <Version>37.0.3</Version>
+    <Version>38.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>
@@ -63,7 +63,7 @@
       into every theme brush live. The palette meets WCAG 2.2 AA by itself: MaRec text is 4.5:1 and
       a text field's MaFieldBorder outline 3:1 on every surface. Light and dark themes: MaTheme.Set switches
       every control live between the dark default and a light palette at the same contrast standard (high
-      contrast still wins), MaThemeToggle is the sun/moon switch, and MaWindow.ThemedTitleBar keeps the
+      contrast still wins), MaToggleIcon is the two-state icon button (IsThemeToggle: the sun/moon switch), and MaWindow.ThemedTitleBar keeps the
       title bar in step.
       MaCheck is a themed check box. MaSecretBox is a masked secret field (click to reveal, auto-masked after 30 s or
       on focus or window change, no value in the automation tree, copies kept out of clipboard history and cleared after
