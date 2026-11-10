@@ -82,11 +82,11 @@ public class MaButton : ToggleButton
 
     /// <summary>Identifies the <see cref="IsDefault"/> property.</summary>
     public static readonly DependencyProperty IsDefaultProperty = DependencyProperty.Register(
-        nameof(IsDefault), typeof(bool), typeof(MaButton), new PropertyMetadata(false, (d, e) => ((MaButton)d).SetAccessKey("", (bool)e.NewValue)));
+        nameof(IsDefault), typeof(bool), typeof(MaButton), new PropertyMetadata(false, (d, e) => ((MaButton)d).SetAccessKey(EnterKey, (bool)e.NewValue)));
 
     /// <summary>Identifies the <see cref="IsCancel"/> property.</summary>
     public static readonly DependencyProperty IsCancelProperty = DependencyProperty.Register(
-        nameof(IsCancel), typeof(bool), typeof(MaButton), new PropertyMetadata(false, (d, e) => ((MaButton)d).SetAccessKey("", (bool)e.NewValue)));
+        nameof(IsCancel), typeof(bool), typeof(MaButton), new PropertyMetadata(false, (d, e) => ((MaButton)d).SetAccessKey(EscapeKey, (bool)e.NewValue)));
 
     private static readonly DependencyPropertyKey EffectiveBackgroundKey = Effective(nameof(EffectiveBackground));
     private static readonly DependencyPropertyKey EffectiveBorderBrushKey = Effective(nameof(EffectiveBorderBrush));
@@ -101,6 +101,9 @@ public class MaButton : ToggleButton
     public static readonly DependencyProperty EffectiveForegroundProperty = EffectiveForegroundKey.DependencyProperty;
     /// <summary>Identifies the <see cref="EffectiveAccent"/> property.</summary>
     public static readonly DependencyProperty EffectiveAccentProperty = EffectiveAccentKey.DependencyProperty;
+
+    private const string EnterKey = "\r";
+    private const string EscapeKey = "\u001b";
 
     private static readonly Dictionary<string, List<WeakReference<MaButton>>> Groups = new(StringComparer.Ordinal);
 
