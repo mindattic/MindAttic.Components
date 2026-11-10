@@ -82,11 +82,13 @@ public sealed class MaSecretBoxTests
     {
         var (box, _) = Make(h);
         Assert.Equal(TimeSpan.FromSeconds(30), box.RevealTimeout);
-        box.RevealTimeout = TimeSpan.FromMilliseconds(80);
+        // Long enough that the click's own dispatcher pump can't outlast it on a loaded machine (an 80 ms timeout
+        // sometimes hid the reveal before the first assert ran: M.COMP-T180), short enough to keep the test quick.
+        box.RevealTimeout = TimeSpan.FromSeconds(1);
 
         h.Click(Part<Button>(box, MaSecretBox.PartReveal));
         Assert.True(box.IsRevealed);
-        Assert.True(h.PumpUntil(() => !box.IsRevealed));
+        Assert.True(h.PumpUntil(() => !box.IsRevealed, TimeSpan.FromSeconds(10)));
         Assert.Equal("", Part<TextBox>(box, MaSecretBox.PartRevealed).Text);
         Assert.Equal(Canary, box.GetSecret());
     });
