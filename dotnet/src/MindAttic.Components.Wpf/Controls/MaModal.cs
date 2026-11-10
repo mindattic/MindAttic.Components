@@ -225,8 +225,10 @@ public class MaModal : ContentControl
 
     private void OnBackdropMouseDown(object sender, MouseButtonEventArgs e)
     {
-        RequestClose();
         e.Handled = true;
+        // The second press of a double-click that opened the dialog lands here; only a fresh press dismisses.
+        if (e.ClickCount > 1) return;
+        RequestClose();
     }
 
     private void OnCloseButtonClick(object sender, RoutedEventArgs e) => RequestClose();
