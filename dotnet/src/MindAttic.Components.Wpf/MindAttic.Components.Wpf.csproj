@@ -18,7 +18,7 @@
     <!-- 39.0.0: MaShapeBorder.ClipToShape clips the child to the frame's outline, so a header band can't paint square corners over a chamfer (M.COMP-T185). -->
     <!-- 40.0.0: ClipToShape follows outline changes and leaves no clip on a swapped-out child (M.COMP-T187). -->
     <!-- 41.0.0: ChamferCorners picks which corners a Chamfer cuts (default top-left + bottom-right) (M.COMP-T188). -->
-    <Version>41.0.0</Version>
+    <Version>42.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>

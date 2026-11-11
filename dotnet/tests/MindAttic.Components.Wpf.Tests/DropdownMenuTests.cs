@@ -56,6 +56,44 @@ public sealed class DropdownMenuTests
         }
     });
 
+    [Fact]
+    public void A_dropdown_row_with_items_is_a_branch_whose_items_open_beside_it() => Sta(() =>
+    {
+        // M.COMP-T189: nested MaDropdownMenuItems make a tree menu; a leaf keeps no chevron and no popup.
+        var target = new Button { Content = "Projects" };
+        var window = OffScreenWindow.Create(400, 300, new Grid { Children = { target } });
+        try
+        {
+            OffScreenWindow.Show(window);
+            Pump();
+            var menu = new ContextMenu { PlacementTarget = target, Style = (Style)window.FindResource("MaDropdownMenu") };
+            var leafStyle = (Style)window.FindResource("MaDropdownMenuItem");
+            var branch = new MenuItem { Header = "Unity", Style = leafStyle };
+            var child = new MenuItem { Header = "GridGame", Style = leafStyle };
+            branch.Items.Add(child);
+            var leaf = new MenuItem { Header = "Prose", Style = leafStyle };
+            menu.Items.Add(branch);
+            menu.Items.Add(leaf);
+            menu.IsOpen = true;
+            Pump();
+
+            Assert.Equal(MenuItemRole.SubmenuHeader, branch.Role);
+            Assert.Equal(Visibility.Visible, ((FrameworkElement)branch.Template.FindName("Chevron", branch)).Visibility);
+            Assert.Equal(Visibility.Collapsed, ((FrameworkElement)leaf.Template.FindName("Chevron", leaf)).Visibility);
+
+            var popup = (Popup)branch.Template.FindName("PART_Popup", branch);
+            branch.IsSubmenuOpen = true;
+            Pump();
+            Assert.True(popup.IsOpen);
+            Assert.True(child.IsVisible, "the branch's own item shows in its popup");
+            menu.IsOpen = false;
+        }
+        finally
+        {
+            window.Close();
+        }
+    });
+
     private static ContextMenu? Menu(DropdownMenu dropdown) =>
         (ContextMenu?)typeof(DropdownMenu).GetField("_menu", BindingFlags.NonPublic | BindingFlags.Instance)!.GetValue(dropdown);
 

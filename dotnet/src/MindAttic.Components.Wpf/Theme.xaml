@@ -724,7 +724,9 @@
     </Style>
 
     <!-- A dropdown row: a stretched header (so a trailing pin glyph lands flush right regardless of
-         label length) plus a muted InputGestureText column, dimmed when disabled. -->
+         label length) plus a muted InputGestureText column, dimmed when disabled. A row with items of
+         its own is a branch: a chevron marks it and hovering it opens them beside it in the same dark
+         shell, so nested rows make a tree menu of branches and leaves. -->
     <Style x:Key="MaDropdownMenuItem" TargetType="{x:Type MenuItem}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource MaText}" />
@@ -738,15 +740,35 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <ContentPresenter Grid.Column="0" ContentSource="Header" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
                             <TextBlock Grid.Column="1" Text="{TemplateBinding InputGestureText}" Foreground="{DynamicResource MaMuted}"
                                        Margin="16,0,0,0" VerticalAlignment="Center" />
+                            <TextBlock x:Name="Chevron" Grid.Column="2" Text="&#xE76C;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"
+                                       Foreground="{DynamicResource MaMuted}" Margin="12,0,0,0" VerticalAlignment="Center" Visibility="Collapsed" />
+                            <Popup x:Name="PART_Popup" PlacementTarget="{Binding ElementName=Bg}" Placement="Right" HorizontalOffset="6" VerticalOffset="-5"
+                                   IsOpen="{Binding IsSubmenuOpen, RelativeSource={RelativeSource TemplatedParent}}"
+                                   AllowsTransparency="True" Focusable="False" PopupAnimation="None">
+                                <Border Background="{DynamicResource MaChrome}" BorderBrush="{DynamicResource MaChromeBorder}" BorderThickness="1"
+                                        CornerRadius="6" Padding="4" SnapsToDevicePixels="True">
+                                    <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                </Border>
+                            </Popup>
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
                             <Setter TargetName="Bg" Property="Background" Value="{DynamicResource MaHover}" />
+                        </Trigger>
+                        <Trigger Property="IsSubmenuOpen" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource MaHover}" />
+                        </Trigger>
+                        <Trigger Property="Role" Value="SubmenuHeader">
+                            <Setter TargetName="Chevron" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <Trigger Property="Role" Value="TopLevelHeader">
+                            <Setter TargetName="Chevron" Property="Visibility" Value="Visible" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
