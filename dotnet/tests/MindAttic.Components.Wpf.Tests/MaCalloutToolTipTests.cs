@@ -323,6 +323,33 @@ public sealed class MaCalloutToolTipTests
     });
 
     [Fact]
+    public void Attached_tooltip_template_draws_rich_content_in_either_order_and_goes_back_to_text() => StaHost.Run(h =>
+    {
+        // M.COMP-T193: a callout can draw its value with a DataTemplate (a chart, say), not only as a text line.
+        var template = new DataTemplate { VisualTree = new FrameworkElementFactory(typeof(System.Windows.Shapes.Rectangle)) };
+        var first = h.Show(new Button { Content = "x" });
+        MaCallout.SetToolTip(first, new object());
+        var callout = Assert.IsType<MaCalloutToolTip>(first.ToolTip);
+        Assert.Equal(DependencyProperty.UnsetValue, callout.ReadLocalValue(ContentControl.ContentTemplateProperty)); // the style's text line
+        MaCallout.SetToolTipTemplate(first, template);
+        Assert.Same(template, callout.ContentTemplate);
+        MaCallout.SetToolTipTemplate(first, null);
+        Assert.Equal(DependencyProperty.UnsetValue, callout.ReadLocalValue(ContentControl.ContentTemplateProperty));
+
+        var second = h.Show(new Button { Content = "y" });
+        MaCallout.SetToolTipTemplate(second, template); // template before the value
+        MaCallout.SetToolTip(second, new object());
+        Assert.Same(template, Assert.IsType<MaCalloutToolTip>(second.ToolTip).ContentTemplate);
+
+        var third = h.Show(new Button { Content = "z" });
+        var element = new Border();
+        MaCallout.SetToolTip(third, element); // an element is shown as itself, not as its type name
+        var own = Assert.IsType<MaCalloutToolTip>(third.ToolTip);
+        Assert.Same(element, own.Content);
+        Assert.Null(own.ContentTemplate);
+    });
+
+    [Fact]
     public void Placement_callback_without_a_target_falls_back_beside_it() => StaHost.Run(_ =>
     {
         // WPF never calls it without a target on screen, but it mustn't throw if it did.

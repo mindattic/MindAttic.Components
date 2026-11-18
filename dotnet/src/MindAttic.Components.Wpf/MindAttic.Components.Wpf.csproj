@@ -19,7 +19,8 @@
     <!-- 40.0.0: ClipToShape follows outline changes and leaves no clip on a swapped-out child (M.COMP-T187). -->
     <!-- 41.0.0: ChamferCorners picks which corners a Chamfer cuts (default top-left + bottom-right) (M.COMP-T188). -->
     <!-- 43.0.0: MaSeparator spans the full row width in light gray (MaMuted) (M.COMP-T190). -->
-    <Version>43.0.0</Version>
+    <!-- 44.0.0: MaCallout.ToolTipTemplate: a callout tooltip can draw rich content (a chart, any element) from a DataTemplate, not only text (M.COMP-T193). -->
+    <Version>44.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>

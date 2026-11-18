@@ -194,6 +194,16 @@ public class MaCalloutToolTip : ToolTip
 /// &lt;/Style&gt;
 /// </code>
 /// Each element gets its own callout, kept in step as the bound value changes (live, even while it's open).
+/// <para>
+/// Rich content (M.COMP-T193): a callout isn't limited to text. Set <c>ctl:MaCallout.ToolTipTemplate</c> to a
+/// DataTemplate and <c>ctl:MaCallout.ToolTip</c> to the data it draws (a view model, say), and the bubble shows that
+/// template (a chart, an icon and text, anything) in place of the wrapped text line:
+/// </para>
+/// <code>
+/// &lt;Grid ctl:MaCallout.ToolTip="{Binding}" ctl:MaCallout.ToolTipTemplate="{StaticResource UsageTipTemplate}" /&gt;
+/// </code>
+/// A ToolTip value that is itself an element is shown as that element. The tooltip is not in its owner's visual tree,
+/// so the template's bindings read the ToolTip value (its DataContext), not the owner's ancestors.
 /// </summary>
 public static class MaCallout
 {
@@ -203,6 +213,9 @@ public static class MaCallout
     public static readonly DependencyProperty PlacementProperty = DependencyProperty.RegisterAttached(
         "Placement", typeof(MaCalloutSide), typeof(MaCallout), new PropertyMetadata(MaCalloutSide.Right, OnPlacementChanged));
 
+    public static readonly DependencyProperty ToolTipTemplateProperty = DependencyProperty.RegisterAttached(
+        "ToolTipTemplate", typeof(DataTemplate), typeof(MaCallout), new PropertyMetadata(null, OnToolTipTemplateChanged));
+
     private static readonly DependencyProperty CalloutProperty = DependencyProperty.RegisterAttached(
         "Callout", typeof(MaCalloutToolTip), typeof(MaCallout), new PropertyMetadata(null));
 
@@ -211,6 +224,12 @@ public static class MaCallout
 
     /// <summary>Sets the callout's content; null or an empty string removes the tooltip.</summary>
     public static void SetToolTip(DependencyObject element, object? value) => element.SetValue(ToolTipProperty, value);
+
+    /// <summary>The template the callout draws its ToolTip value with, or null for the wrapped text line.</summary>
+    public static DataTemplate? GetToolTipTemplate(DependencyObject element) => (DataTemplate?)element.GetValue(ToolTipTemplateProperty);
+
+    /// <summary>Sets the template the callout draws its ToolTip value with; null goes back to the wrapped text line.</summary>
+    public static void SetToolTipTemplate(DependencyObject element, DataTemplate? value) => element.SetValue(ToolTipTemplateProperty, value);
 
     /// <summary>The preferred side (Right by default).</summary>
     public static MaCalloutSide GetPlacement(DependencyObject element) => (MaCalloutSide)element.GetValue(PlacementProperty);
@@ -238,8 +257,24 @@ public static class MaCallout
             element.SetValue(CalloutProperty, callout);
         }
         callout.Content = e.NewValue;
+        ApplyTemplate(callout, GetToolTipTemplate(element), e.NewValue);
         if (!ReferenceEquals(element.ReadLocalValue(FrameworkElement.ToolTipProperty), callout))
             element.ToolTip = callout;
+    }
+
+    private static void OnToolTipTemplateChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (GetCallout(d) is { } callout) ApplyTemplate(callout, (DataTemplate?)e.NewValue, callout.Content);
+    }
+
+    /// <summary>How the callout draws <paramref name="content"/>: with <paramref name="template"/> when one is set; as
+    /// itself when it is an element (a local null template, so the style's text template doesn't print its type name);
+    /// otherwise the style's wrapped text line.</summary>
+    private static void ApplyTemplate(MaCalloutToolTip callout, DataTemplate? template, object? content)
+    {
+        if (template is not null) callout.ContentTemplate = template;
+        else if (content is UIElement) callout.ContentTemplate = null;
+        else callout.ClearValue(ContentControl.ContentTemplateProperty);
     }
 
     private static void OnPlacementChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
