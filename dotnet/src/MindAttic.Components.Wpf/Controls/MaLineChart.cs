@@ -85,10 +85,25 @@ public sealed class MaLineChart : FrameworkElement
         set => SetValue(DataProperty, value);
     }
 
+    /// <summary>Identifies <see cref="Compact"/>.</summary>
+    public static readonly DependencyProperty CompactProperty = DependencyProperty.Register(nameof(Compact), typeof(bool), typeof(MaLineChart),
+        new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.AffectsRender));
+
+    /// <summary>A thumbnail (M.COMP-T193): the same gridlines, reference lines, line and projection in thin margins and
+    /// thinner strokes, with no axis text, no hour ticks and no reference or last-point labels. The one piece of text
+    /// left is the projection's label, kept inside the plot beside where it lands. Made for small spots such as a
+    /// tooltip (about 160 x 60).</summary>
+    public bool Compact
+    {
+        get => (bool)GetValue(CompactProperty);
+        set => SetValue(CompactProperty, value);
+    }
+
     /// <summary>The percents that get a gridline and a label (the 0, 50 and 100 lines a little heavier).</summary>
     public static IReadOnlyList<double> PercentTicks { get; } = [0, 25, 50, 75, 100];
 
-    private const double Left = 44, Bottom = 24, Top = 10, Right = 12, FontSize = 12.5;
+    private const double FullLeft = 44, FullBottom = 24, FullTop = 10, FullRight = 12, FullFontSize = 12.5;
+    private const double CompactMargin = 4, CompactFontSize = 11;
 
     /// <summary>The top of the percent axis: at least 115, headroom of 15 over <paramref name="highest"/> rounded up to
     /// a 10, at most 170.</summary>
@@ -97,6 +112,10 @@ public sealed class MaLineChart : FrameworkElement
     /// <inheritdoc />
     protected override void OnRender(DrawingContext dc)
     {
+        var compact = Compact;
+        var (Left, Bottom, Top, Right, FontSize) = compact
+            ? (CompactMargin, CompactMargin, CompactMargin, CompactMargin, CompactFontSize)
+            : (FullLeft, FullBottom, FullTop, FullRight, FullFontSize);
         if (Data is not { } d || d.EndUtc <= d.StartUtc || ActualWidth <= Left + Right || ActualHeight <= Top + Bottom) return;
         var text = Brush("MaText", Brushes.White);
         var muted = Brush("MaMuted", Brushes.Gray);
@@ -123,11 +142,13 @@ public sealed class MaLineChart : FrameworkElement
         foreach (var p in PercentTicks)
         {
             dc.DrawLine(new Pen(grid, p % 50 == 0 ? 1 : 0.5), P(d.StartUtc, p), P(d.EndUtc, p));
-            Label($"{p}%", muted, new Point(Left - 6, P(d.StartUtc, p).Y), right: true);
+            if (!compact) Label($"{p}%", muted, new Point(Left - 6, P(d.StartUtc, p).Y), right: true);
         }
 
         // The span's start and end at the ends, and between them a faint tick and a label on each whole hour that fits:
         // every hour on a short span, every few hours (or days) on a long one, so no two labels overlap (M.COMP-T161).
+        if (!compact)
+        {
         var labelY = ActualHeight - Bottom / 2;
         var multiDay = d.EndUtc - d.StartUtc > TimeSpan.FromDays(1);
         var endFormat = multiDay ? "ddd h:mm tt" : "t";
@@ -144,6 +165,7 @@ public sealed class MaLineChart : FrameworkElement
             dc.DrawLine(hourPen, new Point(x, Top), new Point(x, Top + h));
             var f = Text(TickText(at, TimeZoneInfo.Local, multiDay), muted);
             dc.DrawText(f, new Point(x - f.Width / 2, labelY - f.Height / 2));
+        }
         }
 
         foreach (var r in d.ReferenceLines ?? [])
@@ -163,7 +185,7 @@ public sealed class MaLineChart : FrameworkElement
                 path.Freeze();
                 dc.DrawGeometry(null, pen, path);
             }
-            if (r.Label is { Length: > 0 } label)
+            if (!compact && r.Label is { Length: > 0 } label)
             {
                 var start = P(r.Path[0].AtUtc, r.Path[0].Percent);
                 Label(label, brush, new Point(start.X + 6, start.Y - 10));
@@ -174,7 +196,7 @@ public sealed class MaLineChart : FrameworkElement
 
         // The line, each stretch in its end point's brush.
         var pens = new Dictionary<Brush, Pen>();
-        Pen PenFor(Brush b) => pens.TryGetValue(b, out var pen) ? pen : pens[b] = new Pen(b, 2.5);
+        Pen PenFor(Brush b) => pens.TryGetValue(b, out var pen) ? pen : pens[b] = new Pen(b, compact ? 1.5 : 2.5);
         for (var i = 1; i < d.Points.Count; i++)
         {
             var (a, b) = (d.Points[i - 1], d.Points[i]);
@@ -183,6 +205,25 @@ public sealed class MaLineChart : FrameworkElement
 
         var plot = new Rect(Left, Top, w, h);
         var now = P(last.AtUtc, last.Percent);
+        if (compact)
+        {
+            // The thumbnail: the dot, the dotted projection and its label alone, the label kept inside the plot.
+            if (d.Projection is { } to)
+            {
+                var landing = to.Brush ?? muted;
+                var at = P(to.AtUtc, to.Percent);
+                dc.DrawLine(new Pen(landing, 1.5) { DashStyle = DashStyles.Dot }, now, at);
+                if (to.Label is { Length: > 0 })
+                {
+                    var f = Text(to.Label, landing);
+                    // Above where it lands when there is room, else below it.
+                    var y = at.Y - 3 - f.Height >= plot.Top ? at.Y - 3 - f.Height : Math.Min(plot.Bottom - f.Height, at.Y + 3);
+                    dc.DrawText(f, new Point(Math.Max(plot.Left, plot.Right - f.Width), Math.Max(plot.Top, y)));
+                }
+            }
+            dc.DrawEllipse(text, null, now, 2.5, 2.5);
+            return;
+        }
         var nowText = Text(d.EndLabel ?? "", text);
 
         // No projection: the line as it ended, its last point labelled (the end-of-axis spot left empty).

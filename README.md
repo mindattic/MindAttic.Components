@@ -133,7 +133,7 @@ Merge the theme once, in `App.xaml`:
 | `Controls.AddressBar` | Back/Forward/Reload(/Home) + URL textbox for a WebView2 pane |
 | `Controls.DropdownMenu` | Pinnable action menu driven by a trigger button |
 | `Controls.MaBadge` (+ `MaTag`) | Outlined state pill: optional icon-font glyph and a word in a state colour; `MaTag` is the plain type/category tag |
-| `Controls.MaLineChart` | Percent-over-time line chart: time and percent axes, reference lines, per-point segment colours, a dotted projection |
+| `Controls.MaLineChart` | Percent-over-time line chart: time and percent axes, reference lines, per-point segment colours, a dotted projection; `Compact="True"` draws a thumbnail with no axis text, only the projection label (for a tooltip) |
 | `Controls.MaModal` (+ `MaBackdrop`) | In-window modal dialog: dimmed backdrop, themed card, heading, close button, footer |
 | `Controls.MaMessageBox` | Themed `MessageBox.Show` stand-in for prompts with no app window to host an `MaModal` |
 | `Controls.MaStatusLight` | 8px status dot: `Status` Good / Warning / Bad / Other draws in `MaGood` / `MaWarn` / `MaBad` / `MaOther`; its accessible name and tooltip are `Label` or the status word |
