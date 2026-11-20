@@ -122,6 +122,19 @@ public sealed class MaSpinnerTests
     });
 
     [Fact]
+    public void The_infinity_kind_draws_on_its_own_thread_and_stops_when_hidden() => Sta(root =>
+    {
+        var spinner = new MaSpinner { Kind = MaSpinnerKind.Infinity, Width = 14, Height = 14, StrokeThickness = 1.4 };
+        root.Children.Add(spinner);
+        Pump();
+        Assert.True(spinner.IsSpinning);
+
+        spinner.Visibility = Visibility.Collapsed;
+        Pump();
+        Assert.False(spinner.IsSpinning);
+    });
+
+    [Fact]
     public void It_is_44_square_by_default_and_takes_its_width_and_height() => Sta(root =>
     {
         var plain = new MaSpinner { HorizontalAlignment = HorizontalAlignment.Left };

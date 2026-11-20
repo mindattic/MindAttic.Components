@@ -17,6 +17,11 @@ public enum MaSpinnerKind
     /// <summary>A small rotating glyph on its own, with no ring: meant to sit inside a caller-provided colored badge
     /// (e.g. <c>ctl:MaBadge</c>) rather than draw its own background, the way a status badge's own busy mark does.</summary>
     Glyph,
+
+    /// <summary>An infinity sign: a faint track with two bright strokes chasing round it (M.ORCH-T1861, lifted from the
+    /// Orchestrator's "working under a /goal" badge, M.ORCH-T1856). Drawn in <see cref="MaSpinner.Stroke"/> at
+    /// <see cref="MaSpinner.StrokeThickness"/>; <see cref="MaSpinner.Period"/> is one lap of the chase.</summary>
+    Infinity,
 }
 
 /// <summary>
@@ -143,7 +148,12 @@ public sealed class MaSpinner : FrameworkElement
         {
             started = Dispatcher.CurrentDispatcher;
             var source = new VisualTarget(target);
-            source.RootVisual = kind == MaSpinnerKind.Glyph ? Glyph(size, stroke, period, pixelsPerDip, out turn) : Ring(size, thickness, stroke, period, out turn);
+            source.RootVisual = kind switch
+            {
+                MaSpinnerKind.Glyph => Glyph(size, stroke, period, pixelsPerDip, out turn),
+                MaSpinnerKind.Infinity => Infinity(size, thickness, stroke, period, out turn),
+                _ => Ring(size, thickness, stroke, period, out turn),
+            };
             ready.Set();
             Dispatcher.Run();
             source.Dispose();
@@ -177,6 +187,37 @@ public sealed class MaSpinner : FrameworkElement
         turn = new RotateTransform(0, size / 2, size / 2);
         visual.Transform = turn;
         turn.BeginAnimation(RotateTransform.AngleProperty, new DoubleAnimation(0, 360, period) { RepeatBehavior = RepeatBehavior.Forever });
+        return visual;
+    }
+
+    /// <summary>The infinity kind (M.ORCH-T1861): a figure eight (14 x 7 units, scaled to fit <paramref name="size"/>) drawn
+    /// as a faint track plus a dashed stroke whose dash offset runs round it, so two bright strokes chase along the
+    /// curve. The eight crosses itself at the centre with a smooth tangent, so the strokes run on without a jump. There
+    /// is nothing to rotate, so <paramref name="turn"/> is an unused identity transform (<see cref="Angle"/> stays 0).</summary>
+    private static DrawingVisual Infinity(double size, double thickness, Brush stroke, Duration period, out RotateTransform turn)
+    {
+        var geometry = Geometry.Parse("M 7,3.5 C 9,1 13,0.5 13,3.5 C 13,6.5 9,6 7,3.5 C 5,1 1,0.5 1,3.5 C 1,6.5 5,6 7,3.5 Z");
+        geometry.Freeze();
+        var track = stroke.CloneCurrentValue();
+        track.Opacity *= 0.4;
+        track.Freeze();
+        var trackPen = new Pen(track, thickness);
+        trackPen.Freeze();
+        var dashes = new DashStyle([5, 5], 10);
+        var tracePen = new Pen(stroke, thickness) { DashStyle = dashes, DashCap = PenLineCap.Round, LineJoin = PenLineJoin.Round };
+        dashes.BeginAnimation(DashStyle.OffsetProperty, new DoubleAnimation(10, 0, period) { RepeatBehavior = RepeatBehavior.Forever });
+        var visual = new DrawingVisual();
+        using (var dc = visual.RenderOpen())
+        {
+            var scale = size / 14;
+            dc.PushTransform(new TranslateTransform(0, (size - 7 * scale) / 2));
+            dc.PushTransform(new ScaleTransform(scale, scale));
+            dc.DrawGeometry(null, trackPen, geometry);
+            dc.DrawGeometry(null, tracePen, geometry);
+            dc.Pop();
+            dc.Pop();
+        }
+        turn = new RotateTransform(0, size / 2, size / 2);
         return visual;
     }
 

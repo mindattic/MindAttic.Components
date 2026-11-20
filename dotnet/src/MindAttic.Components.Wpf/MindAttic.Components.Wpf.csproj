@@ -21,7 +21,7 @@
     <!-- 43.0.0: MaSeparator spans the full row width in light gray (MaMuted) (M.COMP-T190). -->
     <!-- 44.0.0: MaCallout.ToolTipTemplate: a callout tooltip can draw rich content (a chart, any element) from a DataTemplate, not only text (M.COMP-T193). -->
     <!-- 45.0.0: MaLineChart.Compact: a thumbnail with no axis text, only the projection label (for a tooltip) (M.COMP-T193). -->
-    <Version>45.0.0</Version>
+    <Version>46.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>
