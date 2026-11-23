@@ -1678,6 +1678,98 @@
         </Setter>
     </Style>
 
+    <!-- Implicit: every Controls.MaTree (M.COMP-T110). A plain themed TreeView: no chrome of its own (Background
+         Transparent) so a host decides its surround, scrolling via the themed ScrollBar style above. Rows are
+         Controls.MaTreeItem. -->
+    <Style TargetType="{x:Type ctl:MaTree}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaTree}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">
+                        <ScrollViewer Padding="{TemplateBinding Padding}" CanContentScroll="False" Focusable="False">
+                            <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained" />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Implicit: every Controls.MaTreeItem. A group row (PART_Arrow, a chevron that rotates 90 degrees to point
+         down when expanded) with no bar and never highlighted as chosen; a leaf row (no arrow) highlighted MaHover,
+         outlined MaFocus with keyboard focus, and marked chosen with a 3px MaAccent bar (PART_SelectedBar) and
+         SemiBold, as Controls.MaPickerItem marks its chosen option. Each level indents 16px. -->
+    <Style TargetType="{x:Type ctl:MaTreeItem}">
+        <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+        <Setter Property="Padding" Value="6,5" />
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaTreeItem}">
+                    <StackPanel>
+                        <Grid SnapsToDevicePixels="True">
+                            <Border x:Name="Bd" Background="Transparent" BorderBrush="Transparent" BorderThickness="1" CornerRadius="4"
+                                    Padding="{TemplateBinding Padding}">
+                                <DockPanel>
+                                    <TextBlock x:Name="PART_Arrow" DockPanel.Dock="Left" Text="&#xE76C;" Width="16"
+                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"
+                                               Foreground="{DynamicResource MaMuted}" VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <TextBlock.RenderTransform>
+                                            <RotateTransform Angle="0" />
+                                        </TextBlock.RenderTransform>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                </DockPanel>
+                            </Border>
+                            <Border x:Name="PART_SelectedBar" Width="3" HorizontalAlignment="Left" Margin="1,4" CornerRadius="1.5"
+                                    Background="{DynamicResource MaAccent}" Visibility="Hidden" />
+                        </Grid>
+                        <ItemsPresenter x:Name="ItemsHost" Margin="16,0,0,0" Visibility="Collapsed" />
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsLeaf}" Value="True">
+                            <Setter TargetName="PART_Arrow" Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                        <Trigger Property="IsExpanded" Value="True">
+                            <Setter TargetName="ItemsHost" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="PART_Arrow" Property="RenderTransform">
+                                <Setter.Value>
+                                    <RotateTransform Angle="90" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="HasItems" Value="False">
+                            <Setter TargetName="PART_Arrow" Property="Visibility" Value="Hidden" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource MaHover}" />
+                        </Trigger>
+                        <Trigger Property="IsKeyboardFocused" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource MaFocus}" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="PART_SelectedBar" Property="Visibility" Value="Visible" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Implicit: every ToolTip in an app that merges this dictionary gets the dark chrome look
          automatically, with no per-ToolTip Style reference needed (MindAttic.Orchestrator and
          MindAttic.Tickets.Desktop both rely on this one now, rather than a local copy of their own). -->

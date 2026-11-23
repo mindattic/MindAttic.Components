@@ -21,7 +21,10 @@
     <!-- 43.0.0: MaSeparator spans the full row width in light gray (MaMuted) (M.COMP-T190). -->
     <!-- 44.0.0: MaCallout.ToolTipTemplate: a callout tooltip can draw rich content (a chart, any element) from a DataTemplate, not only text (M.COMP-T193). -->
     <!-- 45.0.0: MaLineChart.Compact: a thumbnail with no axis text, only the projection label (for a tooltip) (M.COMP-T193). -->
-    <Version>46.0.0</Version>
+    <!-- 47.0.0: MaTree / MaTreeItem, a themed data-bindable tree; MaTreeNode.GroupByDelimiter groups a flat list into a
+         prefix tree by a delimiter (dots nest any number of levels deep); first consumer is Orchestrator's repo picker
+         (M.ORCH-T2107, M.COMP-T110). -->
+    <Version>47.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>
@@ -74,7 +77,10 @@
       MaCheck is a themed check box. MaSecretBox is a masked secret field (click to reveal, auto-masked after 30 s or
       on focus or window change, no value in the automation tree, copies kept out of clipboard history and cleared after
       30 s). MaSettingsForm renders a settings manifest (JSON) as one full-width row per setting with an editor per field
-      kind, nested objects and add/remove/edit collections, validation, ScrollTo deep links and pluggable editors.</Description>
+      kind, nested objects and add/remove/edit collections, validation, ScrollTo deep links and pluggable editors.
+      MaTree is a themed data-bindable tree (groups expand/collapse, only leaves select); MaTreeNode.GroupByDelimiter
+      groups a flat list of strings (or any item type with a name/key) into a prefix tree by a delimiter, nesting any
+      number of levels deep.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
