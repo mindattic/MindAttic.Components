@@ -159,6 +159,8 @@ Merge the theme once, in `App.xaml`:
 | `Controls.MaTile.IsSelected` / `SelectedBrush` | On any `MaTileButton`-based tile (`MaStatCard`, `MaSmallStat`, `MaAccentTile`): a 2px outline in `SelectedBrush` (`MaFocus` by default) and "Selected" as its UI Automation item status |
 | `Controls.MaAccentTile` | An `MaTileButton` tile with a 4px bar down its left edge in its own `Accent` (`AccentWidth`); free content padded inside the bar |
 | `Controls.MaPicker` + `Controls.MaPickerItem` | A themed `ComboBox` for choosing a person or login: each option and the closed box show the name, an optional leading `MaStatusLight` and a muted trailing text, bound with `StatusMemberPath` / `StatusLabelMemberPath` / `TrailingMemberPath` (or set on direct `MaPickerItem`s); `Placeholder` while nothing is chosen; `SelectedStatus` / `SelectedTrailing` read the choice. Keyboard and automation come from `ComboBox` |
+| `Controls.MaPanel` (+ `MaPanelInset`, `MaPanelNestedInset`) | A titled content container: optional `Title` header (`TitleTemplate` for non-text), a light-gray rule under it (`ShowDivider`), content set in by `ContentInset`; nests, with opt-in `IsCollapsible` / `IsExpanded` (chevron, `Expanded` / `Collapsed`). See [Panels](#panels) |
+| `Controls.MaPanelGroup` (+ `MaPanelDropIndicator`) | A vertical stack of `MaPanel`s: `MaPanelGroup.FillsRemainingSpace` panels share the leftover height; `MaPanelGroup.IsDraggable` panels reorder by a header grip or Alt+Up/Down, `OrderChanged` reports it and `Order` / `ApplyOrder` save and restore it by `MaPanelGroup.PanelKey`. See [Panels](#panels) |
 
 Every templated control restores a keyboard-focus outline (`MaFocus`). Every style refers to the palette as `DynamicResource`, so re-keying a brush in your own `Application.Resources` (which win over the merged theme) restyles every library control, live. `Controls.DropdownMenu` closes its own popup before invoking an action, so it is never on screen for a screenshot or the start of a recording; see its XML docs.
 
@@ -334,6 +336,37 @@ It is 6px tall; set `Height` for a thicker bar.
 ```
 
 Each toast is a MaSurface card outlined in its accent (MaAccent by default) with a 4px stripe on the left; its title and a body clipped to two lines are one clickable button (`OpenCommand`, or a toast's own `Command` and `Click`), and a MaToolButton (x) dismisses it (`DismissCommand`, both with the item as parameter; with no command the host removes the item itself). `TitlePath`, `BodyPath` and `AccentPath` rename the item properties. The card is named by its title with the body as help text, the dismiss button is "Dismiss: {Title}", the row is the "Notifications" group, and every toast added after the first load is read out politely ("{Title}. {Body}") through a hidden live region without moving focus. A `MaToast` also works on its own, or as a direct item of the host.
+
+### Panels
+
+`Controls.MaPanel` is the standard section container. `Title` (usually a string; `TitleTemplate` draws anything else) is a header in the `MaSectionLabel` look with a 1px light-gray (`MaMuted`) rule under it (`ShowDivider="False"` hides the rule alone); with no `Title` the header row and rule collapse and the panel is only its content. The content is set in by `ContentInset`, the shared `MaPanelInset` resource (12,6,0,10) by default, so every panel's content starts at the same left pixel. Panels nest: a panel inside another (`IsNested`, read-only) draws a smaller sub-header and takes `MaPanelNestedInset` (left 0), so it lines up with its parent's other content instead of stepping in again; set `ContentInset` locally to step in anyway. `IsCollapsible="True"` adds a chevron to the header; clicking it, or Enter/Space on the focused header, flips `IsExpanded` (two-way by default), which hides the rule and the content and raises `Expanded` or `Collapsed` on that panel only. A panel reads to UI Automation as a group named by its title; a collapsible one also offers ExpandCollapse.
+
+`Controls.MaPanelGroup` stacks panels top to bottom, declared in XAML or from an `ItemsSource` (each item gets an `MaPanel` container; style it through `ItemContainerStyle`). Each panel takes its desired height except those marked `ctl:MaPanelGroup.FillsRemainingSpace="True"`, which split the height the others leave, wherever they sit. The group draws no dividers of its own, and a group inside a panel lays out on its own.
+
+Panels marked `ctl:MaPanelGroup.IsDraggable="True"` show a grip in their header (`CanDrag`): drag it past the system threshold and a ghost follows the pointer with an `MaPanelDropIndicator` line at the target slot; Esc or a lost capture cancels. Alt+Up / Alt+Down on the header moves the panel one slot and announces its new position. Panels that are not draggable keep their own fixed slots and the draggable ones shift around them; `MovePanel(panel, index)` does the same from code. Declared children and an `IList` `ItemsSource` are reordered in place; any other source is left to the host, which gets the intended order in `OrderChanged`.
+
+To remember the order, give each panel a stable `ctl:MaPanelGroup.PanelKey` and bind `Order` (two-way) to a saved `List<string>`, or save `OrderChanged`'s `PanelKeys` and call `ApplyOrder(keys)` at load. Applying ignores unknown keys, leaves a draggable panel with no saved key where it is (so a panel added later still shows) and raises no `OrderChanged`, so nothing is written back. The group does not store collapse state: save each panel's `IsExpanded` by its key.
+
+```xml
+<ctl:MaPanelGroup Order="{Binding Settings.SidebarPanelOrder}" OrderChanged="OnPanelOrderChanged">
+    <ctl:MaPanel Title="Account" ctl:MaPanelGroup.PanelKey="account">...</ctl:MaPanel>
+    <ctl:MaPanel Title="Sessions" IsCollapsible="True" IsExpanded="{Binding SessionsExpanded}"
+                 ctl:MaPanelGroup.PanelKey="sessions" ctl:MaPanelGroup.IsDraggable="True">
+        <StackPanel>
+            <ctl:MaPanel Title="Running" IsCollapsible="True">...</ctl:MaPanel>
+            <ctl:MaPanel Title="Idle" IsCollapsible="True" IsExpanded="False">...</ctl:MaPanel>
+        </StackPanel>
+    </ctl:MaPanel>
+    <ctl:MaPanel Title="Tickets" IsCollapsible="True" ctl:MaPanelGroup.FillsRemainingSpace="True"
+                 ctl:MaPanelGroup.PanelKey="tickets" ctl:MaPanelGroup.IsDraggable="True">
+        <ScrollViewer Style="{StaticResource MaPaneScroll}">...</ScrollViewer>
+    </ctl:MaPanel>
+    <ctl:MaPanel Title="Usage" IsCollapsible="True"
+                 ctl:MaPanelGroup.PanelKey="usage" ctl:MaPanelGroup.IsDraggable="True">...</ctl:MaPanel>
+</ctl:MaPanelGroup>
+```
+
+Here "Account" keeps the top slot, the other three reorder among themselves, and "Tickets" takes whatever height is left.
 
 Consumers so far: MindAttic.Browser, JobHunt, Prose.Launcher, Prose.Writer, Automata, KdpPublish. MediaButler, ProcessLogger and MindAttic.Log.Reader are still WebView2/Blazor shells with no native WPF chrome, so their UI belongs to the web side, not this package.
 

@@ -24,7 +24,10 @@
     <!-- 47.0.0: MaTree / MaTreeItem, a themed data-bindable tree; MaTreeNode.GroupByDelimiter groups a flat list into a
          prefix tree by a delimiter (dots nest any number of levels deep); first consumer is Orchestrator's repo picker
          (M.ORCH-T2107, M.COMP-T110). -->
-    <Version>47.0.0</Version>
+    <!-- 48.0.0: MaPanel (titled, nestable, collapsible section) and MaPanelGroup (fill slot, drag and Alt+Up/Down
+         reorder of draggable panels, Order/ApplyOrder for persistence); first consumer is Orchestrator's sidebar
+         (M.COMP-T213, M.COMP-T227). -->
+    <Version>48.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>
@@ -80,7 +83,11 @@
       kind, nested objects and add/remove/edit collections, validation, ScrollTo deep links and pluggable editors.
       MaTree is a themed data-bindable tree (groups expand/collapse, only leaves select); MaTreeNode.GroupByDelimiter
       groups a flat list of strings (or any item type with a name/key) into a prefix tree by a delimiter, nesting any
-      number of levels deep.</Description>
+      number of levels deep.
+      MaPanel is a titled content container (an optional header with a light-gray rule, one shared content inset,
+      nestable, opt-in expand/collapse), and MaPanelGroup stacks them with a fill-remaining-space slot, drag and
+      Alt+Up/Down reordering of the draggable panels around fixed ones, an OrderChanged event and a bindable Order
+      (ApplyOrder) to save and restore the order by panel key.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
