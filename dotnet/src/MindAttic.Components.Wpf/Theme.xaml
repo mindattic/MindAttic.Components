@@ -856,6 +856,136 @@
         </Setter>
     </Style>
 
+    <!-- A themed slider (M.COMP-T228): a 4px MaSurface rail outlined in MaControlBorder, the part below the value
+         filled in the slider's Foreground (MaAccent unless the host sets one), and a 14px MaText thumb that turns
+         MaAccentBorder on hover and while dragged. Keyboard focus rings the thumb in MaFocus; disabled dims it.
+         Horizontal or vertical (Orientation), IsDirectionReversed honoured; no tick marks. Every brush is dynamic,
+         so it follows MaTheme.Set live. Parts: PART_Rail, PART_Track, and in the thumb Dot and Ring. -->
+    <Style x:Key="MaSliderThumb" TargetType="{x:Type Thumb}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Width" Value="14" />
+        <Setter Property="Height" Value="14" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Grid>
+                        <Ellipse x:Name="Ring" Margin="-3" Stroke="{DynamicResource MaFocus}" StrokeThickness="2" Visibility="Collapsed" />
+                        <Ellipse x:Name="Dot" Fill="{DynamicResource MaText}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Dot" Property="Fill" Value="{DynamicResource MaAccentBorder}" />
+                        </Trigger>
+                        <Trigger Property="IsDragging" Value="True">
+                            <Setter TargetName="Dot" Property="Fill" Value="{DynamicResource MaAccentBorder}" />
+                        </Trigger>
+                        <DataTrigger Binding="{Binding IsKeyboardFocused, RelativeSource={RelativeSource AncestorType={x:Type Slider}}}" Value="True">
+                            <Setter TargetName="Ring" Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MaSliderPage" TargetType="{x:Type RepeatButton}">
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Grid Background="Transparent">
+                        <Border Height="4" CornerRadius="2" VerticalAlignment="Center" Background="{TemplateBinding Background}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MaSliderPageVertical" TargetType="{x:Type RepeatButton}" BasedOn="{StaticResource MaSliderPage}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type RepeatButton}">
+                    <Grid Background="Transparent">
+                        <Border Width="4" CornerRadius="2" HorizontalAlignment="Center" Background="{TemplateBinding Background}" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="MaSlider" TargetType="{x:Type Slider}">
+        <Setter Property="Foreground" Value="{DynamicResource MaAccent}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="MinHeight" Value="18" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Slider}">
+                    <Grid Background="{TemplateBinding Background}">
+                        <Border x:Name="PART_Rail" Height="4" CornerRadius="2" VerticalAlignment="Center" Margin="7,0"
+                                Background="{DynamicResource MaSurface}" BorderBrush="{DynamicResource MaControlBorder}" BorderThickness="1" />
+                        <Track x:Name="PART_Track" IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
+                            <Track.DecreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource MaSliderPage}" Command="Slider.DecreaseLarge"
+                                              Background="{TemplateBinding Foreground}" />
+                            </Track.DecreaseRepeatButton>
+                            <Track.IncreaseRepeatButton>
+                                <RepeatButton Style="{StaticResource MaSliderPage}" Command="Slider.IncreaseLarge" />
+                            </Track.IncreaseRepeatButton>
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource MaSliderThumb}" />
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.5" />
+                            <Setter Property="Cursor" Value="Arrow" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Vertical">
+                <Setter Property="MinHeight" Value="0" />
+                <Setter Property="MinWidth" Value="18" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Slider}">
+                            <Grid Background="{TemplateBinding Background}">
+                                <Border x:Name="PART_Rail" Width="4" CornerRadius="2" HorizontalAlignment="Center" Margin="0,7"
+                                        Background="{DynamicResource MaSurface}" BorderBrush="{DynamicResource MaControlBorder}" BorderThickness="1" />
+                                <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton Style="{StaticResource MaSliderPageVertical}" Command="Slider.DecreaseLarge"
+                                                      Background="{TemplateBinding Foreground}" />
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton Style="{StaticResource MaSliderPageVertical}" Command="Slider.IncreaseLarge" />
+                                    </Track.IncreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb Style="{StaticResource MaSliderThumb}" />
+                                    </Track.Thumb>
+                                </Track>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.5" />
+                                    <Setter Property="Cursor" Value="Arrow" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <!-- MaModal's backdrop: MaChrome's near-black at 60%, dimming whatever is behind the card. -->
     <SolidColorBrush x:Key="MaBackdrop" Color="#99000000" />
 

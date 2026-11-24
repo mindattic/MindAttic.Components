@@ -127,6 +127,7 @@ Merge the theme once, in `App.xaml`:
 | `MaTextArea` | Multi-line `MaTextBox` (Enter adds a line, wraps, top-aligned) whose thin scroll bars show when the text overflows |
 | `MaScrollBar` (+ `MaScrollBarThumb`) | Thin dark `ScrollBar` on a clear track: `MaControlBorder` thumb, `MaMuted` on hover, `MaText` while dragged, no arrows (the text boxes use it) |
 | `MaProgressBar` | Thin rounded `ProgressBar`: `MaSurface` track, `MaControlBorder` outline, `Foreground` fill; determinate or indeterminate |
+| `MaSlider` (+ `MaSliderThumb`, `MaSliderPage`) | Thin rounded `Slider`, horizontal or vertical: `MaSurface` rail, `Foreground` fill below the value, `MaText` thumb with an `MaFocus` ring on keyboard focus |
 | `MaDropdownMenu`, `MaDropdownMenuItem`, `MaSeparator`, `MaPinToggle` | Dropdown parts (used by `DropdownMenu`) |
 | *(implicit)* `ToolTip` | Every tooltip in the app |
 | *(implicit)* `ScrollBar`, `ScrollViewer` | Every other scroll bar is `MaScrollBar` on a `MaChrome` track; the corner where two bars meet is `MaChrome` |
@@ -307,6 +308,13 @@ It takes OK, OK/Cancel, Yes/No and Yes/No/Cancel and the Information, Warning, E
 ```
 
 It is 6px tall; set `Height` for a thicker bar.
+
+`MaSlider` styles a stock `Slider` (a seek or volume bar): a 4px `MaSurface` rail outlined in `MaControlBorder`, filled in the slider's `Foreground` (`MaAccent` by default) from `Minimum` up to the thumb, and a 14px `MaText` thumb that turns `MaAccentBorder` on hover and while dragged. Keyboard focus rings the thumb in `MaFocus` (the arrow keys move it); disabled dims it to half opacity. `Orientation="Vertical"` runs it bottom to top, and `IsDirectionReversed` flips either. It draws no tick marks. It is keyed, not implicit; an app that wants every slider themed adds one line:
+
+```xml
+<Slider Style="{StaticResource MaSlider}" Maximum="{Binding Duration}" Value="{Binding Position}" />
+<Style TargetType="Slider" BasedOn="{StaticResource MaSlider}" />
+```
 
 `Controls.MaBadge` is a small outlined pill for a state: set `Foreground` to the state colour and the glyph, the word and the outline all follow it (the outline unless `BorderBrush` is set), so the state reads as a word and a glyph as well as a colour (WCAG 1.4.1). `Glyph` is an icon-font character (Segoe MDL2 Assets by default, `GlyphFontFamily` to change it); leave it empty for a word only. The `MaTag` style is the plain variant: a squarer, neutral-outlined, normal-weight label for a type or category. The glyph is decoration and is left out of the UI Automation tree; the badge reads as text named by its content.
 
