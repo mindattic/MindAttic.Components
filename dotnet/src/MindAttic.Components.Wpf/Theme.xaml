@@ -1770,6 +1770,75 @@
         </Setter>
     </Style>
 
+    <!-- Controls.MaPanel's content inset (M.COMP-T221): every top-level panel's content starts ContentInset.Left in
+         from its edge. A nested panel takes MaPanelNestedInset (left 0) so its header and content keep the parent's
+         left edge instead of stepping in again. Re-key either to move every panel's content at once. -->
+    <Thickness x:Key="MaPanelInset">12,6,0,10</Thickness>
+    <Thickness x:Key="MaPanelNestedInset">0,4,0,6</Thickness>
+
+    <!-- Implicit: every Controls.MaPanel (M.COMP-T221). A transparent container: the Title header in the
+         MaSectionLabel look (11px SemiBold MaMuted; 10px with tighter spacing while nested), a 1px MaMuted rule under
+         it (the light gray MaSeparator uses), then the content set in by ContentInset. The header row's first two
+         columns are reserved for a drag grip and an expand/collapse chevron. -->
+    <Style TargetType="{x:Type ctl:MaPanel}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        <Setter Property="ContentInset" Value="{DynamicResource MaPanelInset}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaPanel}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <DockPanel LastChildFill="True">
+                            <StackPanel x:Name="PART_Header" DockPanel.Dock="Top">
+                                <Grid x:Name="HeaderRow" Margin="0,12,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <ContentPresenter x:Name="PART_Title" Grid.Column="2" Content="{TemplateBinding Title}"
+                                                      ContentTemplate="{TemplateBinding TitleTemplate}"
+                                                      VerticalAlignment="Center" RecognizesAccessKey="False"
+                                                      AutomationProperties.HeadingLevel="Level3"
+                                                      TextElement.Foreground="{DynamicResource MaMuted}"
+                                                      TextElement.FontSize="11" TextElement.FontWeight="SemiBold" />
+                                </Grid>
+                                <Border x:Name="PART_Divider" Height="1" Background="{DynamicResource MaMuted}"
+                                        SnapsToDevicePixels="True" IsHitTestVisible="False" />
+                            </StackPanel>
+                            <ContentPresenter x:Name="PART_Content" Margin="{TemplateBinding ContentInset}"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </DockPanel>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Title" Value="{x:Null}">
+                            <Setter TargetName="PART_Header" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="ShowDivider" Value="False">
+                            <Setter TargetName="PART_Divider" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="IsNested" Value="True">
+                            <Setter TargetName="HeaderRow" Property="Margin" Value="0,8,0,4" />
+                            <Setter TargetName="PART_Title" Property="TextElement.FontSize" Value="10" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsNested" Value="True">
+                <Setter Property="ContentInset" Value="{DynamicResource MaPanelNestedInset}" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
     <!-- Implicit: every ToolTip in an app that merges this dictionary gets the dark chrome look
          automatically, with no per-ToolTip Style reference needed (MindAttic.Orchestrator and
          MindAttic.Tickets.Desktop both rely on this one now, rather than a local copy of their own). -->
