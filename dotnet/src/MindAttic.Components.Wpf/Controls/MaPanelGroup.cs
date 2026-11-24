@@ -70,6 +70,11 @@ public class MaPanelGroup : ItemsControl
     /// <summary>The read-only <see cref="LastAnnouncement"/> property.</summary>
     public static readonly DependencyProperty LastAnnouncementProperty = LastAnnouncementPropertyKey.DependencyProperty;
 
+    /// <summary>The <see cref="Order"/> property; binds two-way by default.</summary>
+    public static readonly DependencyProperty OrderProperty = DependencyProperty.Register(
+        nameof(Order), typeof(IList<string>), typeof(MaPanelGroup),
+        new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnOrderPropertyChanged));
+
     static MaPanelGroup()
     {
         FocusableProperty.OverrideMetadata(typeof(MaPanelGroup), new FrameworkPropertyMetadata(false));
@@ -79,6 +84,17 @@ public class MaPanelGroup : ItemsControl
         ItemsPanelProperty.OverrideMetadata(typeof(MaPanelGroup), new FrameworkPropertyMetadata(panel));
     }
 
+    public MaPanelGroup()
+    {
+        OrderChanged += (_, e) => SyncOrder(e.PanelKeys.OfType<string>().ToList());
+        Loaded += (_, _) => ReapplyOrder();
+        ItemContainerGenerator.StatusChanged += (_, _) =>
+        {
+            if (ItemContainerGenerator.Status == System.Windows.Controls.Primitives.GeneratorStatus.ContainersGenerated)
+                ReapplyOrder();
+        };
+    }
+
     /// <summary>Raised after a panel moves. With an <c>ItemsSource</c> that is not an <see cref="IList"/> the group
     /// cannot move the item itself: it raises this with the intended order for the host to apply, as
     /// <see cref="MaTabControl.Reordered"/> does.</summary>
@@ -86,6 +102,20 @@ public class MaPanelGroup : ItemsControl
 
     /// <summary>The text most recently sent to screen readers by a keyboard move.</summary>
     public string LastAnnouncement => (string)GetValue(LastAnnouncementProperty);
+
+    /// <summary>
+    /// The host's persistence hook (M.COMP-T226): the panels' <see cref="PanelKeyProperty">keys</see> in order. Setting
+    /// it (or calling <see cref="ApplyOrder"/>) rearranges the draggable panels to match, and it is kept as given, so a
+    /// panel that arrives later (a container generated, an item added) is placed by it too. Each move by the user
+    /// replaces it with the group's new order, before <see cref="OrderChanged"/> reaches the host's handlers. Bind it
+    /// to a saved <c>List&lt;string&gt;</c>. The group does not store collapse state: hosts save each panel's
+    /// <see cref="MaPanel.IsExpanded"/> per <see cref="PanelKeyProperty"/> themselves.
+    /// </summary>
+    public IList<string>? Order
+    {
+        get => (IList<string>?)GetValue(OrderProperty);
+        set => SetValue(OrderProperty, value);
+    }
 
     /// <summary>
     /// Moves a draggable <paramref name="panel"/> to <paramref name="newIndex"/> in the group's order. Panels that are
@@ -187,16 +217,90 @@ public class MaPanelGroup : ItemsControl
     private string? KeyOf(object item) => ContainerFor(item) is { } panel ? GetPanelKey(panel) : null;
 
     /// <summary>Puts <paramref name="list"/> into <paramref name="order"/>, moving only what is out of place.</summary>
-    private static void Apply(IList list, IReadOnlyList<object> order)
+    private void Apply(IList list, IReadOnlyList<object> order)
     {
-        for (var i = 0; i < order.Count; i++)
+        _reordering = true;
+        try
         {
-            if (Equals(list[i], order[i])) continue;
-            var from = IndexOfFrom(list, order[i], i + 1);
-            var moving = list[from];
-            list.RemoveAt(from);
-            list.Insert(i, moving);
+            for (var i = 0; i < order.Count; i++)
+            {
+                if (Equals(list[i], order[i])) continue;
+                var from = IndexOfFrom(list, order[i], i + 1);
+                var moving = list[from];
+                list.RemoveAt(from);
+                list.Insert(i, moving);
+            }
         }
+        finally
+        {
+            _reordering = false;
+        }
+    }
+
+    private bool _reordering;
+    private bool _syncingOrder;
+
+    /// <summary>
+    /// Rearranges the draggable panels to follow <paramref name="keys"/> (M.COMP-T226) and makes them the
+    /// <see cref="Order"/>. Unknown keys are ignored; a draggable panel whose key is not listed keeps its place, so a
+    /// panel added after the order was saved still shows; panels that are not draggable keep their fixed slots. Does not
+    /// raise <see cref="OrderChanged"/>, so a host that saves on it does not write back what it just loaded. With an
+    /// <c>ItemsSource</c> that is not a writable <see cref="IList"/> nothing moves.
+    /// </summary>
+    public void ApplyOrder(IEnumerable<string> keys)
+    {
+        var list = keys.ToList();
+        SyncOrder(list);
+        ArrangeBy(list);
+    }
+
+    private static void OnOrderPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        var group = (MaPanelGroup)d;
+        if (!group._syncingOrder && e.NewValue is IList<string> keys) group.ArrangeBy(keys);
+    }
+
+    private void SyncOrder(List<string> keys)
+    {
+        _syncingOrder = true;
+        try { SetCurrentValue(OrderProperty, keys); }
+        finally { _syncingOrder = false; }
+    }
+
+    private void ReapplyOrder()
+    {
+        if (!_reordering && Order is { } keys) ArrangeBy(keys);
+    }
+
+    protected override void OnItemsChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    {
+        base.OnItemsChanged(e);
+        if (e.Action is System.Collections.Specialized.NotifyCollectionChangedAction.Add
+            or System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+            ReapplyOrder();
+    }
+
+    private void ArrangeBy(IList<string> keys)
+    {
+        if (_reordering) return;
+        var rank = new Dictionary<string, int>();
+        foreach (var key in keys) rank.TryAdd(key, rank.Count);
+
+        var order = Items.Cast<object>().ToList();
+        var listed = new List<int>();
+        for (var i = 0; i < order.Count; i++)
+            if (PanelAt(i) is { } p && GetIsDraggable(p) && GetPanelKey(p) is { } k && rank.ContainsKey(k)) listed.Add(i);
+        var sorted = listed.Select(i => order[i]).OrderBy(item => rank[KeyOf(item)!]).ToList();
+        var changed = false;
+        for (var s = 0; s < listed.Count; s++)
+        {
+            changed |= !ReferenceEquals(order[listed[s]], sorted[s]);
+            order[listed[s]] = sorted[s];
+        }
+        if (!changed) return;
+
+        if (ItemsSource is null) Apply(Items, order);
+        else if (ItemsSource is IList list && !list.IsFixedSize && !list.IsReadOnly) Apply(list, order);
     }
 
     private static int IndexOfFrom(IList list, object item, int start)

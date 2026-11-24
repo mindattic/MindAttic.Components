@@ -217,4 +217,80 @@ public sealed class MaPanelGroupTests
         Assert.Equal("two", args!.MovedItem);
         Assert.Equal(0, args.NewIndex);
     });
+
+    [Fact]
+    public void A_move_updates_Order_and_a_new_group_restores_it_without_OrderChanged() => StaHost.Run(h =>
+    {
+        var group = h.Show(new MaPanelGroup { Items = { Movable("a"), Movable("b"), Movable("c") } });
+        IList<string>? seenInHandler = null;
+        group.OrderChanged += (_, _) => seenInHandler = group.Order;
+
+        Assert.True(group.MovePanel((MaPanel)group.Items[0], 2));
+        Assert.Equal(new[] { "b", "c", "a" }, group.Order);
+        Assert.Equal(new[] { "b", "c", "a" }, seenInHandler);
+
+        var restored = new MaPanelGroup { Items = { Movable("a"), Movable("b"), Movable("c") } };
+        var raised = 0;
+        restored.OrderChanged += (_, _) => raised++;
+        restored.ApplyOrder(group.Order!);
+
+        Assert.Equal(new[] { "b", "c", "a" }, Keys(restored));
+        Assert.Equal(new[] { "b", "c", "a" }, restored.Order);
+        Assert.Equal(0, raised);
+    });
+
+    [Fact]
+    public void Unknown_keys_are_ignored_and_unlisted_panels_keep_their_place() => StaHost.Run(h =>
+    {
+        var group = h.Show(new MaPanelGroup { Items = { Movable("a"), Movable("b"), Movable("new"), Movable("c") } });
+
+        group.ApplyOrder(new[] { "gone", "c", "b", "a" });
+
+        Assert.Equal(new[] { "c", "b", "new", "a" }, Keys(group));
+    });
+
+    [Fact]
+    public void Applying_an_order_leaves_fixed_panels_in_their_slots() => StaHost.Run(h =>
+    {
+        var group = h.Show(new MaPanelGroup { Items = { Movable("a"), Movable("pinned", draggable: false), Movable("c") } });
+
+        group.ApplyOrder(new[] { "pinned", "c", "a" });
+
+        Assert.Equal(new[] { "c", "pinned", "a" }, Keys(group));
+    });
+
+    [Fact]
+    public void A_bound_Order_set_before_the_panels_arrive_arranges_them() => StaHost.Run(h =>
+    {
+        var group = new MaPanelGroup();
+        var raised = 0;
+        group.OrderChanged += (_, _) => raised++;
+        group.SetBinding(MaPanelGroup.OrderProperty,
+            new Binding("Saved") { Source = new SavedOrder { Saved = new List<string> { "c", "a", "b" } } });
+
+        foreach (var key in new[] { "a", "b", "c" }) group.Items.Add(Movable(key));
+        h.Show(group);
+
+        Assert.Equal(new[] { "c", "a", "b" }, Keys(group));
+        Assert.Equal(0, raised);
+    });
+
+    [Fact]
+    public void A_user_move_writes_the_new_order_back_to_the_bound_setting() => StaHost.Run(h =>
+    {
+        var saved = new SavedOrder { Saved = new List<string> { "b", "a" } };
+        var group = new MaPanelGroup { Items = { Movable("a"), Movable("b") } };
+        group.SetBinding(MaPanelGroup.OrderProperty, new Binding("Saved") { Source = saved });
+        h.Show(group);
+        Assert.Equal(new[] { "b", "a" }, Keys(group));
+
+        Assert.True(group.MovePanel((MaPanel)group.Items[1], 0));
+
+        Assert.Equal(new[] { "a", "b" }, saved.Saved);
+    });
+
+    public sealed class SavedOrder
+    {
+        public List<string> Saved { get; set; } = [];
+    }
 }
