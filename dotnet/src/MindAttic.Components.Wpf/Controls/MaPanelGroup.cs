@@ -1,5 +1,10 @@
+using System.Collections;
 using System.Windows;
+using System.Windows.Automation;
+using System.Windows.Automation.Peers;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace MindAttic.Components.Wpf.Controls;
 
@@ -22,6 +27,11 @@ namespace MindAttic.Components.Wpf.Controls;
 /// laid out by <see cref="MaPanelGroupPanel"/>. Dividers come from the panels themselves (each rule sits under its own
 /// header), so the group draws none. A group inside an <see cref="MaPanel"/> lays out on its own.
 /// </para>
+/// <para>
+/// Panels marked <see cref="IsDraggableProperty"/> can be reordered (M.COMP-T224) with <see cref="MovePanel"/> or
+/// Alt+Up/Down on their header; the others keep fixed slots. <see cref="OrderChanged"/> reports each move with every
+/// panel's <see cref="PanelKeyProperty"/> so a host can save the order.
+/// </para>
 /// </summary>
 public class MaPanelGroup : ItemsControl
 {
@@ -36,6 +46,30 @@ public class MaPanelGroup : ItemsControl
     public static void SetFillsRemainingSpace(DependencyObject element, bool value) =>
         element.SetValue(FillsRemainingSpaceProperty, value);
 
+    /// <summary>Set on a panel in a group (M.COMP-T224): it can be moved by <see cref="MovePanel"/> and Alt+Up/Down on
+    /// its header. False (the default) pins the panel to its own fixed slot, which no other panel can land in.</summary>
+    public static readonly DependencyProperty IsDraggableProperty = DependencyProperty.RegisterAttached(
+        "IsDraggable", typeof(bool), typeof(MaPanelGroup), new FrameworkPropertyMetadata(false));
+
+    public static bool GetIsDraggable(DependencyObject element) => (bool)element.GetValue(IsDraggableProperty);
+
+    public static void SetIsDraggable(DependencyObject element, bool value) => element.SetValue(IsDraggableProperty, value);
+
+    /// <summary>Set on a panel in a group: the stable id a host saves the group's order by (see
+    /// <see cref="PanelOrderChangedEventArgs.PanelKeys"/>).</summary>
+    public static readonly DependencyProperty PanelKeyProperty = DependencyProperty.RegisterAttached(
+        "PanelKey", typeof(string), typeof(MaPanelGroup), new FrameworkPropertyMetadata(null));
+
+    public static string? GetPanelKey(DependencyObject element) => (string?)element.GetValue(PanelKeyProperty);
+
+    public static void SetPanelKey(DependencyObject element, string? value) => element.SetValue(PanelKeyProperty, value);
+
+    private static readonly DependencyPropertyKey LastAnnouncementPropertyKey = DependencyProperty.RegisterReadOnly(
+        nameof(LastAnnouncement), typeof(string), typeof(MaPanelGroup), new FrameworkPropertyMetadata(string.Empty));
+
+    /// <summary>The read-only <see cref="LastAnnouncement"/> property.</summary>
+    public static readonly DependencyProperty LastAnnouncementProperty = LastAnnouncementPropertyKey.DependencyProperty;
+
     static MaPanelGroup()
     {
         FocusableProperty.OverrideMetadata(typeof(MaPanelGroup), new FrameworkPropertyMetadata(false));
@@ -45,9 +79,153 @@ public class MaPanelGroup : ItemsControl
         ItemsPanelProperty.OverrideMetadata(typeof(MaPanelGroup), new FrameworkPropertyMetadata(panel));
     }
 
+    /// <summary>Raised after a panel moves. With an <c>ItemsSource</c> that is not an <see cref="IList"/> the group
+    /// cannot move the item itself: it raises this with the intended order for the host to apply, as
+    /// <see cref="MaTabControl.Reordered"/> does.</summary>
+    public event EventHandler<PanelOrderChangedEventArgs>? OrderChanged;
+
+    /// <summary>The text most recently sent to screen readers by a keyboard move.</summary>
+    public string LastAnnouncement => (string)GetValue(LastAnnouncementProperty);
+
+    /// <summary>
+    /// Moves a draggable <paramref name="panel"/> to <paramref name="newIndex"/> in the group's order. Panels that are
+    /// not <see cref="IsDraggableProperty">draggable</see> keep their own slots, so the draggable ones shift around
+    /// them; a move onto a fixed slot, of a fixed panel, or out of range does nothing. Declared children and an
+    /// <see cref="IList"/> <c>ItemsSource</c> are reordered in place; any other <c>ItemsSource</c> is left to the host.
+    /// Returns whether the order changed (or, for a host-applied source, whether <see cref="OrderChanged"/> was raised).
+    /// </summary>
+    public bool MovePanel(MaPanel panel, int newIndex)
+    {
+        var item = ItemContainerGenerator.ItemFromContainer(panel);
+        if (item == DependencyProperty.UnsetValue) item = panel;
+        var oldIndex = Items.IndexOf(item);
+        if (oldIndex < 0 || newIndex < 0 || newIndex >= Items.Count || newIndex == oldIndex) return false;
+        if (!GetIsDraggable(panel)) return false;
+
+        var slots = new List<int>();
+        for (var i = 0; i < Items.Count; i++)
+            if (i == oldIndex || PanelAt(i) is { } p && GetIsDraggable(p)) slots.Add(i);
+        var newSlot = slots.IndexOf(newIndex);
+        if (newSlot < 0) return false;
+
+        var order = Items.Cast<object>().ToList();
+        var moving = slots.Select(i => order[i]).ToList();
+        moving.RemoveAt(slots.IndexOf(oldIndex));
+        moving.Insert(newSlot, item);
+        for (var s = 0; s < slots.Count; s++) order[slots[s]] = moving[s];
+
+        var keys = order.Select(KeyOf).ToList();
+        if (ItemsSource is null) Apply(Items, order);
+        else if (ItemsSource is IList list && !list.IsFixedSize && !list.IsReadOnly) Apply(list, order);
+
+        OrderChanged?.Invoke(this, new PanelOrderChangedEventArgs(item, oldIndex, newIndex, keys));
+        return true;
+    }
+
+    /// <summary>Alt+Up / Alt+Down on a draggable panel's header: moves it to the neighbouring slot it may take,
+    /// skipping fixed panels, and announces the new position. Returns whether it moved.</summary>
+    internal bool HandleReorderKey(object? originalSource, Key key, ModifierKeys modifiers)
+    {
+        if (modifiers != ModifierKeys.Alt || key is not (Key.Up or Key.Down)) return false;
+        if (PanelOwningHeader(originalSource as DependencyObject) is not { } panel || !GetIsDraggable(panel)) return false;
+
+        var item = ItemContainerGenerator.ItemFromContainer(panel);
+        if (item == DependencyProperty.UnsetValue) item = panel;
+        var step = key == Key.Up ? -1 : 1;
+        for (var i = Items.IndexOf(item) + step; i >= 0 && i < Items.Count; i += step)
+        {
+            if (PanelAt(i) is not { } other || !GetIsDraggable(other)) continue;
+            if (!MovePanel(panel, i)) return false;
+            Announce(panel, i);
+            UpdateLayout();
+            if (ContainerFor(item) is { } moved && moved.Template?.FindName(MaPanel.PartHeader, moved) is UIElement header)
+                header.Focus();
+            return true;
+        }
+        return false;
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (e.Handled) return;
+        var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        if (HandleReorderKey(e.OriginalSource, key, Keyboard.Modifiers)) e.Handled = true;
+    }
+
+    private void Announce(MaPanel panel, int index)
+    {
+        var name = AutomationProperties.GetName(panel) is { Length: > 0 } n ? n : panel.Title as string;
+        var text = $"{(string.IsNullOrEmpty(name) ? "Panel" : name)} moved to position {index + 1} of {Items.Count}";
+        SetValue(LastAnnouncementPropertyKey, text);
+        (UIElementAutomationPeer.FromElement(this) ?? UIElementAutomationPeer.CreatePeerForElement(this))
+            ?.RaiseNotificationEvent(AutomationNotificationKind.ActionCompleted,
+                AutomationNotificationProcessing.MostRecent, text, "MaPanelGroup.Reorder");
+    }
+
+    /// <summary>The panel of this group whose header contains <paramref name="source"/>.</summary>
+    private MaPanel? PanelOwningHeader(DependencyObject? source)
+    {
+        for (var node = source; node is not null && node != this; node = ParentOf(node))
+        {
+            if (node is not MaPanel panel || ItemsControlFromItemContainer(panel) != this) continue;
+            var header = panel.Template?.FindName(MaPanel.PartHeader, panel) as DependencyObject;
+            for (var inner = source; inner is not null && inner != panel; inner = ParentOf(inner))
+                if (inner == header) return panel;
+            return null;
+        }
+        return null;
+    }
+
+    private static DependencyObject? ParentOf(DependencyObject node) =>
+        node is Visual ? VisualTreeHelper.GetParent(node) : LogicalTreeHelper.GetParent(node);
+
+    private MaPanel? PanelAt(int index) => Items[index] as MaPanel ?? ItemContainerGenerator.ContainerFromIndex(index) as MaPanel;
+
+    private MaPanel? ContainerFor(object item) => item as MaPanel ?? ItemContainerGenerator.ContainerFromItem(item) as MaPanel;
+
+    private string? KeyOf(object item) => ContainerFor(item) is { } panel ? GetPanelKey(panel) : null;
+
+    /// <summary>Puts <paramref name="list"/> into <paramref name="order"/>, moving only what is out of place.</summary>
+    private static void Apply(IList list, IReadOnlyList<object> order)
+    {
+        for (var i = 0; i < order.Count; i++)
+        {
+            if (Equals(list[i], order[i])) continue;
+            var from = IndexOfFrom(list, order[i], i + 1);
+            var moving = list[from];
+            list.RemoveAt(from);
+            list.Insert(i, moving);
+        }
+    }
+
+    private static int IndexOfFrom(IList list, object item, int start)
+    {
+        for (var i = start; i < list.Count; i++)
+            if (ReferenceEquals(list[i], item)) return i;
+        for (var i = start; i < list.Count; i++)
+            if (Equals(list[i], item)) return i;
+        return -1;
+    }
+
     protected override bool IsItemItsOwnContainerOverride(object item) => item is MaPanel;
 
     protected override DependencyObject GetContainerForItemOverride() => new MaPanel();
+}
+
+/// <summary>A panel moved in an <see cref="MaPanelGroup"/>. See <see cref="MaPanelGroup.OrderChanged"/>.</summary>
+public sealed class PanelOrderChangedEventArgs(object movedItem, int oldIndex, int newIndex, IReadOnlyList<string?> panelKeys)
+    : EventArgs
+{
+    /// <summary>The panel moved, or its <c>ItemsSource</c> item.</summary>
+    public object MovedItem { get; } = movedItem;
+
+    public int OldIndex { get; } = oldIndex;
+
+    public int NewIndex { get; } = newIndex;
+
+    /// <summary>Every panel's <see cref="MaPanelGroup.PanelKeyProperty"/>, in the order after the move.</summary>
+    public IReadOnlyList<string?> PanelKeys { get; } = panelKeys;
 }
 
 /// <summary>
