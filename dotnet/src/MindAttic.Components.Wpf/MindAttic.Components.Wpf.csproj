@@ -27,7 +27,9 @@
     <!-- 48.0.0: MaPanel (titled, nestable, collapsible section) and MaPanelGroup (fill slot, drag and Alt+Up/Down
          reorder of draggable panels, Order/ApplyOrder for persistence); first consumer is Orchestrator's sidebar
          (M.COMP-T213, M.COMP-T227). -->
-    <Version>48.0.0</Version>
+    <!-- 49.0.0: MaSlider, a themed Slider style (horizontal or vertical, accent fill, focus-ringed thumb); first
+         consumer is MediaViewer (M.COMP-T228, M.COMP-T229). -->
+    <Version>49.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>
@@ -87,7 +89,9 @@
       MaPanel is a titled content container (an optional header with a light-gray rule, one shared content inset,
       nestable, opt-in expand/collapse), and MaPanelGroup stacks them with a fill-remaining-space slot, drag and
       Alt+Up/Down reordering of the draggable panels around fixed ones, an OrderChanged event and a bindable Order
-      (ApplyOrder) to save and restore the order by panel key.</Description>
+      (ApplyOrder) to save and restore the order by panel key.
+      MaSlider styles a Slider as a thin rounded rail, horizontal or vertical, filled in its Foreground up to a thumb
+      that is ringed in MaFocus on keyboard focus.</Description>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
