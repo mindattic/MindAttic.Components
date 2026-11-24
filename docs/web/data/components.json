@@ -153,7 +153,7 @@
       "type": "js-only",
       "folder": "components/CaptureDemo",
       "doc": "components/CaptureDemo/CaptureDemo.md",
-      "summary": "Decides when a page runs its hands-free demo: ?demo=1, or the MindAttic.Capture bridge reports the session is being filmed.",
+      "summary": "Decides when a page runs its hands-free demo: ?demo=1, or the MindAttic.Media.Capture bridge reports the session is being filmed.",
       "feeds": []
     },
     {

@@ -1,6 +1,6 @@
 /* MindAttic.Components - CaptureDemo/capture-demo.js
    When should a page run its hands-free demo? When ?demo=1 is in the URL, or when the
-   MindAttic.Capture bridge (window.mindattic.capture) says the session is being filmed.
+   MindAttic.Media.Capture bridge (window.mindattic.capture) says the session is being filmed.
    The tour itself belongs to each page; this only decides when to start it:
 
      MindAtticCaptureDemo.armed(function startMyTour() { ... });  */
