@@ -1,6 +1,9 @@
 using System.Windows;
+using System.Windows.Automation;
 using System.Windows.Automation.Peers;
+using System.Windows.Automation.Provider;
 using System.Windows.Controls;
+using System.Windows.Input;
 using MindAttic.Components.Wpf.Controls;
 using Xunit;
 
@@ -93,5 +96,113 @@ public sealed class MaPanelTests
         Assert.Equal(AutomationControlType.Group, peer.GetAutomationControlType());
         Assert.Equal("Sessions", peer.GetName());
         Assert.False(panel.Focusable);
+    });
+
+    private static void ClickToggle(MaPanel panel)
+    {
+        Part<UIElement>(panel, MaPanel.PartToggle).RaiseEvent(new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
+        {
+            RoutedEvent = UIElement.MouseLeftButtonDownEvent,
+        });
+    }
+
+    private static void PressOnHeader(StaHost h, MaPanel panel, Key key)
+    {
+        var header = Part<UIElement>(panel, MaPanel.PartHeader);
+        header.RaiseEvent(new KeyEventArgs(Keyboard.PrimaryDevice, PresentationSource.FromVisual(h.Window)!, 0, key)
+        {
+            RoutedEvent = Keyboard.KeyDownEvent,
+        });
+        h.Pump();
+    }
+
+    [Fact]
+    public void Toggling_a_collapsible_panel_hides_its_content_and_rule_but_keeps_the_header() => StaHost.Run(h =>
+    {
+        var panel = h.Show(new MaPanel { Title = "Sessions", IsCollapsible = true, Content = new TextBlock { Text = "a" } });
+        var toggle = Part<FrameworkElement>(panel, MaPanel.PartToggle);
+
+        Assert.True(panel.IsExpanded);
+        Assert.Equal(Visibility.Visible, toggle.Visibility);
+        Assert.True(Part<UIElement>(panel, MaPanel.PartHeader).Focusable);
+
+        ClickToggle(panel);
+        h.Pump();
+        Assert.False(panel.IsExpanded);
+        Assert.Equal(Visibility.Collapsed, Part<FrameworkElement>(panel, MaPanel.PartContent).Visibility);
+        Assert.Equal(Visibility.Collapsed, Part<FrameworkElement>(panel, MaPanel.PartDivider).Visibility);
+        Assert.Equal(Visibility.Visible, Part<FrameworkElement>(panel, MaPanel.PartHeader).Visibility);
+
+        PressOnHeader(h, panel, Key.Enter);
+        Assert.True(panel.IsExpanded);
+        Assert.Equal(Visibility.Visible, Part<FrameworkElement>(panel, MaPanel.PartContent).Visibility);
+
+        PressOnHeader(h, panel, Key.Space);
+        Assert.False(panel.IsExpanded);
+    });
+
+    [Fact]
+    public void A_panel_that_is_not_collapsible_ignores_the_chevron_and_keys() => StaHost.Run(h =>
+    {
+        var panel = h.Show(new MaPanel { Title = "Sessions", Content = new TextBlock { Text = "a" } });
+
+        Assert.Equal(Visibility.Collapsed, Part<FrameworkElement>(panel, MaPanel.PartToggle).Visibility);
+        Assert.False(Part<UIElement>(panel, MaPanel.PartHeader).Focusable);
+
+        ClickToggle(panel);
+        PressOnHeader(h, panel, Key.Enter);
+        PressOnHeader(h, panel, Key.Space);
+        Assert.True(panel.IsExpanded);
+    });
+
+    [Fact]
+    public void Expanded_and_Collapsed_fire_once_per_toggle() => StaHost.Run(h =>
+    {
+        var panel = h.Show(new MaPanel { Title = "Sessions", IsCollapsible = true });
+        int expanded = 0, collapsed = 0;
+        panel.Expanded += (_, _) => expanded++;
+        panel.Collapsed += (_, _) => collapsed++;
+
+        ClickToggle(panel);
+        Assert.Equal((0, 1), (expanded, collapsed));
+        ClickToggle(panel);
+        Assert.Equal((1, 1), (expanded, collapsed));
+    });
+
+    [Fact]
+    public void A_nested_panels_toggle_does_not_raise_its_parents_events() => StaHost.Run(h =>
+    {
+        var inner = new MaPanel { Title = "Idle", IsCollapsible = true };
+        var outer = h.Show(new MaPanel { Title = "Sessions", IsCollapsible = true, Content = inner });
+        h.Pump();
+        var outerEvents = 0;
+        outer.Expanded += (_, _) => outerEvents++;
+        outer.Collapsed += (_, _) => outerEvents++;
+
+        ClickToggle(inner);
+        PressOnHeader(h, inner, Key.Enter);
+        PressOnHeader(h, inner, Key.Space);
+
+        Assert.False(inner.IsExpanded);
+        Assert.True(outer.IsExpanded);
+        Assert.Equal(0, outerEvents);
+    });
+
+    [Fact]
+    public void Only_a_collapsible_panel_offers_the_ExpandCollapse_pattern() => StaHost.Run(h =>
+    {
+        var plain = h.Show(new MaPanel { Title = "Plain" });
+        var collapsible = h.Show(new MaPanel { Title = "Sessions", IsCollapsible = true });
+
+        Assert.Null(UIElementAutomationPeer.CreatePeerForElement(plain).GetPattern(PatternInterface.ExpandCollapse));
+
+        var provider = (IExpandCollapseProvider)UIElementAutomationPeer.CreatePeerForElement(collapsible)
+            .GetPattern(PatternInterface.ExpandCollapse);
+        Assert.Equal(ExpandCollapseState.Expanded, provider.ExpandCollapseState);
+        provider.Collapse();
+        Assert.False(collapsible.IsExpanded);
+        Assert.Equal(ExpandCollapseState.Collapsed, provider.ExpandCollapseState);
+        provider.Expand();
+        Assert.True(collapsible.IsExpanded);
     });
 }
