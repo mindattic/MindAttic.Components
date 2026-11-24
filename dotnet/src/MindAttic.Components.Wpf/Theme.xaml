@@ -1776,11 +1776,15 @@
     <Thickness x:Key="MaPanelInset">12,6,0,10</Thickness>
     <Thickness x:Key="MaPanelNestedInset">0,4,0,6</Thickness>
 
+    <!-- The insertion line a dragged Controls.MaPanel shows at its target slot in an MaPanelGroup (M.COMP-T225). -->
+    <SolidColorBrush x:Key="MaPanelDropIndicator" Color="#FF3B5BDB" />
+
     <!-- Implicit: every Controls.MaPanel (M.COMP-T221). A transparent container: the Title header in the
          MaSectionLabel look (11px SemiBold MaMuted; 10px with tighter spacing while nested), a 1px MaMuted rule under
          it (the light gray MaSeparator uses), then the content set in by ContentInset. The header row's first column
-         is reserved for a drag grip; the second holds PART_Toggle, MaTreeItem's chevron (pointing down while
-         expanded), shown while IsCollapsible (M.COMP-T222). IsExpanded false hides the rule and the content. -->
+         holds PART_Grip, the drag grip shown (with a focusable header) while CanDrag (M.COMP-T225); the second
+         holds PART_Toggle, MaTreeItem's chevron (pointing down while expanded), shown while IsCollapsible
+         (M.COMP-T222). IsExpanded false hides the rule and the content. -->
     <Style TargetType="{x:Type ctl:MaPanel}">
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Foreground" Value="{DynamicResource MaText}" />
@@ -1803,6 +1807,11 @@
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
+                                    <TextBlock x:Name="PART_Grip" Grid.Column="0" Text="&#xE76F;" Width="16"
+                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"
+                                               Foreground="{DynamicResource MaMuted}" Background="Transparent"
+                                               VerticalAlignment="Center" TextAlignment="Center" Cursor="SizeNS"
+                                               ToolTip="Drag to reorder (Alt+Up/Down)" Visibility="Collapsed" />
                                     <TextBlock x:Name="PART_Toggle" Grid.Column="1" Text="&#xE76C;" Width="16"
                                                FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"
                                                Foreground="{DynamicResource MaMuted}" Background="Transparent"
@@ -1840,6 +1849,10 @@
                         </Trigger>
                         <Trigger Property="IsCollapsible" Value="True">
                             <Setter TargetName="PART_Toggle" Property="Visibility" Value="Visible" />
+                            <Setter TargetName="PART_Header" Property="Focusable" Value="True" />
+                        </Trigger>
+                        <Trigger Property="CanDrag" Value="True">
+                            <Setter TargetName="PART_Grip" Property="Visibility" Value="Visible" />
                             <Setter TargetName="PART_Header" Property="Focusable" Value="True" />
                         </Trigger>
                         <MultiTrigger>

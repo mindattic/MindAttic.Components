@@ -3,6 +3,7 @@ using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 using System.Windows.Automation.Provider;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -37,6 +38,12 @@ namespace MindAttic.Components.Wpf.Controls;
 /// Its look is the implicit <c>MaPanel</c> style in Theme.xaml; the header row (<see cref="PartHeader"/>) keeps
 /// leading columns free for a drag grip and an expand/collapse chevron.
 /// </para>
+/// <para>
+/// In an <see cref="MaPanelGroup"/> with <see cref="MaPanelGroup.IsDraggableProperty"/> set (<see cref="CanDrag"/>,
+/// M.COMP-T225) the header shows a grip (<see cref="PartGrip"/>): pressing it and moving past the system drag threshold
+/// drags a ghost of the panel with an insertion line at the target slot, and the drop calls
+/// <see cref="MaPanelGroup.MovePanel"/>. Esc or a lost mouse capture cancels with no change.
+/// </para>
 /// </summary>
 public class MaPanel : ContentControl
 {
@@ -60,6 +67,9 @@ public class MaPanel : ContentControl
         nameof(Title), typeof(object), typeof(MaPanel),
         new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
+    /// <summary>The template part, the header's drag grip, shown while <see cref="CanDrag"/>.</summary>
+    public const string PartGrip = "PART_Grip";
+
     /// <summary>The <see cref="TitleTemplate"/> property.</summary>
     public static readonly DependencyProperty TitleTemplateProperty = DependencyProperty.Register(
         nameof(TitleTemplate), typeof(DataTemplate), typeof(MaPanel),
@@ -80,6 +90,12 @@ public class MaPanel : ContentControl
 
     /// <summary>The read-only <see cref="IsNested"/> property.</summary>
     public static readonly DependencyProperty IsNestedProperty = IsNestedPropertyKey.DependencyProperty;
+
+    private static readonly DependencyPropertyKey CanDragPropertyKey = DependencyProperty.RegisterReadOnly(
+        nameof(CanDrag), typeof(bool), typeof(MaPanel), new FrameworkPropertyMetadata(false));
+
+    /// <summary>The read-only <see cref="CanDrag"/> property.</summary>
+    public static readonly DependencyProperty CanDragProperty = CanDragPropertyKey.DependencyProperty;
 
     /// <summary>The <see cref="IsCollapsible"/> property.</summary>
     public static readonly DependencyProperty IsCollapsibleProperty = DependencyProperty.Register(
@@ -103,6 +119,7 @@ public class MaPanel : ContentControl
 
     private UIElement? _header;
     private UIElement? _toggle;
+    private UIElement? _grip;
 
     static MaPanel()
     {
@@ -114,7 +131,11 @@ public class MaPanel : ContentControl
     /// <summary>Creates a panel; whether it is nested is worked out once it loads.</summary>
     public MaPanel()
     {
-        Loaded += (_, _) => UpdateIsNested();
+        Loaded += (_, _) =>
+        {
+            UpdateIsNested();
+            UpdateCanDrag();
+        };
     }
 
     /// <summary>The header (usually a string); null (the default) collapses the header row and its rule.</summary>
@@ -148,6 +169,11 @@ public class MaPanel : ContentControl
 
     /// <summary>True while this panel sits inside another <see cref="MaPanel"/>.</summary>
     public bool IsNested => (bool)GetValue(IsNestedProperty);
+
+    /// <summary>True while this panel sits in an <see cref="MaPanelGroup"/> with
+    /// <see cref="MaPanelGroup.IsDraggableProperty"/> set (M.COMP-T225): its header shows the drag grip and takes
+    /// focus, so it can be dragged or moved with Alt+Up/Down.</summary>
+    public bool CanDrag => (bool)GetValue(CanDragProperty);
 
     /// <summary>Whether the header shows a chevron that expands and collapses the panel; false by default.</summary>
     public bool IsCollapsible
@@ -183,11 +209,14 @@ public class MaPanel : ContentControl
     {
         if (_toggle is not null) _toggle.MouseLeftButtonDown -= OnToggleMouseDown;
         if (_header is not null) _header.KeyDown -= OnHeaderKeyDown;
+        if (_grip is not null) _grip.MouseLeftButtonDown -= OnGripMouseDown;
         base.OnApplyTemplate();
         _toggle = GetTemplateChild(PartToggle) as UIElement;
         _header = GetTemplateChild(PartHeader) as UIElement;
+        _grip = GetTemplateChild(PartGrip) as UIElement;
         if (_toggle is not null) _toggle.MouseLeftButtonDown += OnToggleMouseDown;
         if (_header is not null) _header.KeyDown += OnHeaderKeyDown;
+        if (_grip is not null) _grip.MouseLeftButtonDown += OnGripMouseDown;
     }
 
     private void OnToggleMouseDown(object sender, MouseButtonEventArgs e)
@@ -218,6 +247,211 @@ public class MaPanel : ContentControl
     {
         base.OnVisualParentChanged(oldParent);
         UpdateIsNested();
+        UpdateCanDrag();
+    }
+
+    /// <inheritdoc />
+    protected override void OnPropertyChanged(DependencyPropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.Property == MaPanelGroup.IsDraggableProperty) UpdateCanDrag();
+    }
+
+    private void UpdateCanDrag() =>
+        SetValue(CanDragPropertyKey, MaPanelGroup.GetIsDraggable(this) && Group is not null);
+
+    private MaPanelGroup? Group => ItemsControl.ItemsControlFromItemContainer(this) as MaPanelGroup;
+
+    // ---- drag-to-reorder (M.COMP-T225) ------------------------------------------------------------
+
+    private MaPanelGroup? _dragGroup;
+    private Point _dragStart;
+    private double _grabOffsetY;
+    private int _dragStartIndex;
+    private bool _isDragging;
+    private AdornerLayer? _dragAdornerLayer;
+    private PanelDragAdorner? _dragAdorner;
+
+    /// <summary>True between the pointer passing the drag threshold and the drop or cancel.</summary>
+    internal bool IsDragging => _isDragging;
+
+    /// <summary>The slot the panel would land in if dropped now (its own while no drag is in progress).</summary>
+    internal int DropIndex { get; private set; } = -1;
+
+    private void OnGripMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (Group is not { } group || !BeginDrag(group, e.GetPosition(group))) return;
+        _header?.Focus();
+        CaptureMouse();
+        e.Handled = true;
+    }
+
+    /// <inheritdoc />
+    protected override void OnMouseMove(MouseEventArgs e)
+    {
+        base.OnMouseMove(e);
+        if (_dragGroup is not { } group) return;
+        if (e.LeftButton != MouseButtonState.Pressed) CancelDrag();
+        else UpdateDrag(e.GetPosition(group));
+        e.Handled = true;
+    }
+
+    /// <inheritdoc />
+    protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+    {
+        base.OnMouseLeftButtonUp(e);
+        if (_dragGroup is not { } group) return;
+        EndDrag(e.GetPosition(group));
+        e.Handled = true;
+    }
+
+    /// <inheritdoc />
+    protected override void OnLostMouseCapture(MouseEventArgs e)
+    {
+        base.OnLostMouseCapture(e);
+        CancelDrag();
+    }
+
+    /// <inheritdoc />
+    protected override void OnPreviewKeyDown(KeyEventArgs e)
+    {
+        base.OnPreviewKeyDown(e);
+        if (!_isDragging || e.Key != Key.Escape) return;
+        CancelDrag();
+        e.Handled = true;
+    }
+
+    /// <summary>Arms a drag pressed on the grip at <paramref name="groupPosition"/> (in <paramref name="group"/>'s
+    /// coordinates); a no-op unless this panel <see cref="CanDrag"/> in that group. Like <see cref="UpdateDrag"/> and
+    /// <see cref="EndDrag"/> it takes plain points, so a whole gesture can be driven from a test.</summary>
+    internal bool BeginDrag(MaPanelGroup group, Point groupPosition)
+    {
+        if (!CanDrag || Group != group) return false;
+        _dragGroup = group;
+        _dragStart = groupPosition;
+        _grabOffsetY = groupPosition.Y - TranslatePoint(new Point(0, 0), group).Y;
+        _dragStartIndex = group.ItemContainerGenerator.IndexFromContainer(this);
+        DropIndex = _dragStartIndex;
+        return true;
+    }
+
+    /// <summary>Moves an armed drag to <paramref name="groupPosition"/>: past the system drag threshold it starts the
+    /// ghost and the insertion line, then keeps them under the pointer.</summary>
+    internal void UpdateDrag(Point groupPosition)
+    {
+        if (_dragGroup is not { } group) return;
+        if (!_isDragging)
+        {
+            if (Math.Abs(groupPosition.Y - _dragStart.Y) < SystemParameters.MinimumVerticalDragDistance) return;
+            _isDragging = true;
+            _dragAdornerLayer = AdornerLayer.GetAdornerLayer(group);
+            if (_dragAdornerLayer is not null)
+            {
+                _dragAdorner = new PanelDragAdorner(group, this);
+                _dragAdornerLayer.Add(_dragAdorner);
+            }
+        }
+
+        DropIndex = DropIndexAt(group, groupPosition.Y);
+        if (_dragAdorner is null) return;
+        _dragAdorner.GhostTop = groupPosition.Y - _grabOffsetY;
+        _dragAdorner.LineY = InsertionLineY(group, DropIndex);
+        _dragAdorner.InvalidateVisual();
+    }
+
+    /// <summary>Drops an armed drag at <paramref name="groupPosition"/>: moves the panel with
+    /// <see cref="MaPanelGroup.MovePanel"/> (so <see cref="MaPanelGroup.OrderChanged"/> fires once) when it started
+    /// and lands in another slot. Returns whether the panel moved.</summary>
+    internal bool EndDrag(Point groupPosition)
+    {
+        if (_dragGroup is not { } group) return false;
+        var dropped = _isDragging ? DropIndexAt(group, groupPosition.Y) : _dragStartIndex;
+        var start = _dragStartIndex;
+        StopDrag();
+        return dropped != start && group.MovePanel(this, dropped);
+    }
+
+    /// <summary>Ends a drag with no change, as Esc or a lost mouse capture does.</summary>
+    internal void CancelDrag() => StopDrag();
+
+    private void StopDrag()
+    {
+        if (_dragGroup is null) return;
+        _dragGroup = null;
+        _isDragging = false;
+        DropIndex = -1;
+        if (_dragAdornerLayer is not null && _dragAdorner is not null) _dragAdornerLayer.Remove(_dragAdorner);
+        _dragAdornerLayer = null;
+        _dragAdorner = null;
+        if (IsMouseCaptured) ReleaseMouseCapture();
+    }
+
+    private int DropIndexAt(MaPanelGroup group, double pointerY)
+    {
+        var midpoints = new List<double>();
+        var draggable = new List<bool>();
+        for (var i = 0; i < group.Items.Count; i++)
+        {
+            var panel = group.ItemContainerGenerator.ContainerFromIndex(i) as MaPanel;
+            midpoints.Add(panel is null ? double.NaN : panel.TranslatePoint(new Point(0, 0), group).Y + panel.ActualHeight / 2);
+            draggable.Add(panel is not null && MaPanelGroup.GetIsDraggable(panel));
+        }
+        return ComputeDropIndex(midpoints, draggable, _dragStartIndex, pointerY);
+    }
+
+    /// <summary>Where a drag drops: the dragged panel and the other draggable ones share the draggable slots, and it
+    /// takes the slot after every other draggable panel whose midpoint is above <paramref name="pointerY"/>. Fixed
+    /// (non-draggable) slots are skipped, as <see cref="MaPanelGroup.MovePanel"/> requires.</summary>
+    internal static int ComputeDropIndex(IReadOnlyList<double> midpoints, IReadOnlyList<bool> isDraggable, int draggedIndex, double pointerY)
+    {
+        var slots = new List<int>();
+        var before = 0;
+        for (var i = 0; i < midpoints.Count; i++)
+        {
+            if (i != draggedIndex && !isDraggable[i]) continue;
+            slots.Add(i);
+            if (i != draggedIndex && midpoints[i] < pointerY) before++;
+        }
+        return slots.Count == 0 ? draggedIndex : slots[Math.Min(before, slots.Count - 1)];
+    }
+
+    /// <summary>The insertion line's y in <paramref name="group"/>: above the panel whose slot it takes when moving up,
+    /// below it when moving down; NaN (no line) over its own slot.</summary>
+    private double InsertionLineY(MaPanelGroup group, int dropIndex)
+    {
+        if (dropIndex == _dragStartIndex || group.ItemContainerGenerator.ContainerFromIndex(dropIndex) is not MaPanel target)
+            return double.NaN;
+        var top = target.TranslatePoint(new Point(0, 0), group).Y;
+        return dropIndex < _dragStartIndex ? top : top + target.ActualHeight;
+    }
+
+    /// <summary>Drawn over the group while a panel is dragged: a live <see cref="VisualBrush"/> ghost of the panel
+    /// following the pointer (as <see cref="MaTabItem"/>'s drag does) and a 2px <c>MaPanelDropIndicator</c> line at
+    /// the target slot.</summary>
+    private sealed class PanelDragAdorner : Adorner
+    {
+        private readonly VisualBrush _ghost;
+        private readonly Rect _ghostSize;
+        private readonly Brush _lineBrush;
+
+        public PanelDragAdorner(MaPanelGroup group, MaPanel panel) : base(group)
+        {
+            _ghost = new VisualBrush(panel) { Opacity = 0.7 };
+            _ghostSize = new Rect(panel.TranslatePoint(new Point(0, 0), group), new Size(panel.ActualWidth, panel.ActualHeight));
+            _lineBrush = group.TryFindResource("MaPanelDropIndicator") as Brush ?? Brushes.CornflowerBlue;
+            IsHitTestVisible = false;
+        }
+
+        public double GhostTop { get; set; }
+
+        public double LineY { get; set; } = double.NaN;
+
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            drawingContext.DrawRectangle(_ghost, null, new Rect(_ghostSize.X, GhostTop, _ghostSize.Width, _ghostSize.Height));
+            if (!double.IsNaN(LineY))
+                drawingContext.DrawRectangle(_lineBrush, null, new Rect(0, LineY - 1, AdornedElement.RenderSize.Width, 2));
+        }
     }
 
     private void UpdateIsNested()
