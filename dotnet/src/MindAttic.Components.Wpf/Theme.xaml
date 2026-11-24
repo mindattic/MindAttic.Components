@@ -1839,6 +1839,34 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Implicit: every Controls.MaPanelGroup (M.COMP-T223). A transparent stack of MaPanels laid out by
+         Controls.MaPanelGroupPanel: each panel at its desired height, the ones marked
+         ctl:MaPanelGroup.FillsRemainingSpace sharing what is left. No dividers of its own; the panels draw theirs. -->
+    <Style TargetType="{x:Type ctl:MaPanelGroup}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource MaText}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="ItemsPanel">
+            <Setter.Value>
+                <ItemsPanelTemplate>
+                    <ctl:MaPanelGroupPanel />
+                </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ctl:MaPanelGroup}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <ItemsPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- Implicit: every ToolTip in an app that merges this dictionary gets the dark chrome look
          automatically, with no per-ToolTip Style reference needed (MindAttic.Orchestrator and
          MindAttic.Tickets.Desktop both rely on this one now, rather than a local copy of their own). -->
