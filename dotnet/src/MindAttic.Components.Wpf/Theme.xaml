@@ -1964,11 +1964,15 @@
                                         <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock x:Name="PART_Grip" Grid.Column="0" Text="&#xE76F;" Width="16"
-                                               FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"
-                                               Foreground="{DynamicResource MaMuted}" Background="Transparent"
-                                               VerticalAlignment="Center" TextAlignment="Center" Cursor="SizeNS"
-                                               ToolTip="Drag to reorder (Alt+Up/Down)" Visibility="Collapsed" />
+                                    <!-- A 3x2 grid of dots, a ':::' handle to grab (M.COMP-T240; was the MDL2 glyph E76F,
+                                         which read as a minus sign). -->
+                                    <Border x:Name="PART_Grip" Grid.Column="0" Width="16" Height="14" Background="Transparent"
+                                            VerticalAlignment="Center" Cursor="SizeNS"
+                                            ToolTip="Drag to reorder (Alt+Up/Down)" Visibility="Collapsed">
+                                        <Path x:Name="GripDots" Fill="{DynamicResource MaMuted}" Stretch="None"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center" SnapsToDevicePixels="True"
+                                              Data="M0,0 h2 v2 h-2 z M4,0 h2 v2 h-2 z M8,0 h2 v2 h-2 z M0,4 h2 v2 h-2 z M4,4 h2 v2 h-2 z M8,4 h2 v2 h-2 z" />
+                                    </Border>
                                     <TextBlock x:Name="PART_Toggle" Grid.Column="1" Text="&#xE76C;" Width="16"
                                                FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="10"
                                                Foreground="{DynamicResource MaMuted}" Background="Transparent"
@@ -2011,6 +2015,9 @@
                         <Trigger Property="CanDrag" Value="True">
                             <Setter TargetName="PART_Grip" Property="Visibility" Value="Visible" />
                             <Setter TargetName="PART_Header" Property="Focusable" Value="True" />
+                        </Trigger>
+                        <Trigger SourceName="PART_Grip" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="GripDots" Property="Fill" Value="{DynamicResource MaText}" />
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
