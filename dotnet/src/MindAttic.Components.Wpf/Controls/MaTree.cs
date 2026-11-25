@@ -19,6 +19,7 @@ namespace MindAttic.Components.Wpf.Controls;
 public sealed class MaTreeNode : ObservableObject
 {
     private bool _isExpanded;
+    private bool _isChecked;
 
     public MaTreeNode(string name, string key, bool isLeaf, object? tag = null)
     {
@@ -52,6 +53,22 @@ public sealed class MaTreeNode : ObservableObject
         get => _isExpanded;
         set => Set(ref _isExpanded, value);
     }
+
+    /// <summary>Whether this leaf's check box is ticked, while its <see cref="MaTree"/> has
+    /// <see cref="MaTree.ShowCheckBoxes"/> on (M.COMP-T238); bound two-way, so the host reads every checked leaf
+    /// off the model. Groups and dividers have no check box.</summary>
+    public bool IsChecked
+    {
+        get => _isChecked;
+        set => Set(ref _isChecked, value);
+    }
+
+    /// <summary>True for a <see cref="Divider"/>: a rule between rows, never selected, checked, focused or highlighted.</summary>
+    public bool IsDivider { get; private init; }
+
+    /// <summary>A divider row (M.COMP-T238): a full-width MaSeparator line between the nodes around it, with no
+    /// interactivity at all (not selectable, checkable, focusable or hover-highlighted, and skipped by the keyboard).</summary>
+    public static MaTreeNode Divider() => new(string.Empty, string.Empty, isLeaf: false) { IsDivider = true };
 
     /// <summary>Groups <paramref name="keys"/> into a prefix tree by splitting each on <paramref name="delimiter"/>
     /// (a dot by default): "Unity.GridGame" and "Unity.Eve" both land under a "Unity" group, while "Gadfly" (no
@@ -140,6 +157,18 @@ public class MaTree : TreeView
     /// <summary>The chosen leaf, or null while nothing is chosen (a group is never the selected leaf).</summary>
     public MaTreeNode? SelectedLeaf => (MaTreeNode?)GetValue(SelectedLeafProperty);
 
+    /// <summary>The <see cref="ShowCheckBoxes"/> property.</summary>
+    public static readonly DependencyProperty ShowCheckBoxesProperty = DependencyProperty.Register(
+        nameof(ShowCheckBoxes), typeof(bool), typeof(MaTree), new FrameworkPropertyMetadata(false));
+
+    /// <summary>Gives every leaf a check box bound to <see cref="MaTreeNode.IsChecked"/> (M.COMP-T238), for picking
+    /// several leaves at once; clicking a leaf's row, or Space on it, toggles it too. Off by default.</summary>
+    public bool ShowCheckBoxes
+    {
+        get => (bool)GetValue(ShowCheckBoxesProperty);
+        set => SetValue(ShowCheckBoxesProperty, value);
+    }
+
     protected override DependencyObject GetContainerForItemOverride() => new MaTreeItem();
 
     protected override bool IsItemItsOwnContainerOverride(object item) => item is MaTreeItem;
@@ -199,8 +228,22 @@ public class MaTreeItem : TreeViewItem
             container.SetValue(AutomationProperties.NameProperty, node.Name);
     }
 
+    /// <summary>The <see cref="MaTree"/> this row belongs to, however deep it's nested.</summary>
+    private MaTree? OwnerTree
+    {
+        get
+        {
+            var owner = ItemsControlFromItemContainer(this);
+            while (owner is MaTreeItem parent) owner = ItemsControlFromItemContainer(parent);
+            return owner as MaTree;
+        }
+    }
+
+    private bool IsCheckableLeaf => DataContext is MaTreeNode { IsLeaf: true } && OwnerTree is { ShowCheckBoxes: true };
+
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
+        if (DataContext is MaTreeNode { IsDivider: true }) { e.Handled = true; return; }
         if (DataContext is MaTreeNode { IsLeaf: false })
         {
             IsExpanded = !IsExpanded;
@@ -208,6 +251,7 @@ public class MaTreeItem : TreeViewItem
             e.Handled = true;
             return;
         }
+        if (IsCheckableLeaf && DataContext is MaTreeNode leaf) leaf.IsChecked = !leaf.IsChecked;
         base.OnMouseLeftButtonDown(e);
     }
 
@@ -216,6 +260,12 @@ public class MaTreeItem : TreeViewItem
         if (DataContext is MaTreeNode { IsLeaf: false } && e.Key is Key.Enter or Key.Space)
         {
             IsExpanded = !IsExpanded;
+            e.Handled = true;
+            return;
+        }
+        if (e.Key == Key.Space && IsCheckableLeaf && DataContext is MaTreeNode leaf)
+        {
+            leaf.IsChecked = !leaf.IsChecked;
             e.Handled = true;
             return;
         }

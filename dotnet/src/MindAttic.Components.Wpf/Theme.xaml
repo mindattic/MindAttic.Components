@@ -1834,7 +1834,8 @@
     <!-- Implicit: every Controls.MaTreeItem. A group row (PART_Arrow, a chevron that rotates 90 degrees to point
          down when expanded) with no bar and never highlighted as chosen; a leaf row (no arrow) highlighted MaHover,
          outlined MaFocus with keyboard focus, and marked chosen with a 3px MaAccent bar (PART_SelectedBar) and
-         SemiBold, as Controls.MaPickerItem marks its chosen option. Each level indents 16px. -->
+         SemiBold, as Controls.MaPickerItem marks its chosen option. Each level indents 16px. With MaTree.ShowCheckBoxes a
+         leaf row leads with an MaCheck bound to MaTreeNode.IsChecked; a divider node draws only an MaSeparator (M.COMP-T238). -->
     <Style TargetType="{x:Type ctl:MaTreeItem}">
         <Setter Property="Foreground" Value="{DynamicResource MaText}" />
         <Setter Property="Padding" Value="6,5" />
@@ -1858,17 +1859,32 @@
                                             <RotateTransform Angle="0" />
                                         </TextBlock.RenderTransform>
                                     </TextBlock>
+                                    <CheckBox x:Name="PART_Check" DockPanel.Dock="Left" Style="{StaticResource MaCheck}" Focusable="False"
+                                              IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center"
+                                              Margin="0,0,6,0" Visibility="Collapsed" />
                                     <TextBlock Text="{Binding Name}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                                 </DockPanel>
                             </Border>
                             <Border x:Name="PART_SelectedBar" Width="3" HorizontalAlignment="Left" Margin="1,4" CornerRadius="1.5"
                                     Background="{DynamicResource MaAccent}" Visibility="Hidden" />
+                            <Separator x:Name="PART_Divider" Style="{StaticResource MaSeparator}" Visibility="Collapsed" />
                         </Grid>
                         <ItemsPresenter x:Name="ItemsHost" Margin="16,0,0,0" Visibility="Collapsed" />
                     </StackPanel>
                     <ControlTemplate.Triggers>
                         <DataTrigger Binding="{Binding IsLeaf}" Value="True">
                             <Setter TargetName="PART_Arrow" Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding IsLeaf}" Value="True" />
+                                <Condition Binding="{Binding ShowCheckBoxes, RelativeSource={RelativeSource AncestorType={x:Type ctl:MaTree}}}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter TargetName="PART_Check" Property="Visibility" Value="Visible" />
+                        </MultiDataTrigger>
+                        <DataTrigger Binding="{Binding IsDivider}" Value="True">
+                            <Setter TargetName="Bd" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="PART_Divider" Property="Visibility" Value="Visible" />
                         </DataTrigger>
                         <Trigger Property="IsExpanded" Value="True">
                             <Setter TargetName="ItemsHost" Property="Visibility" Value="Visible" />
@@ -1898,6 +1914,17 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Style.Triggers>
+            <!-- A divider row (MaTreeNode.Divider, M.COMP-T238): no focus, no tab stop, no hit testing (so no hover,
+                 click or selection), no hand cursor. -->
+            <DataTrigger Binding="{Binding IsDivider}" Value="True">
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="IsTabStop" Value="False" />
+                <Setter Property="IsHitTestVisible" Value="False" />
+                <Setter Property="Cursor" Value="Arrow" />
+                <Setter Property="MinHeight" Value="0" />
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
 
     <!-- Controls.MaPanel's content inset (M.COMP-T221): every top-level panel's content starts ContentInset.Left in

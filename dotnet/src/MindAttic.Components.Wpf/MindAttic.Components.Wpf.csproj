@@ -29,7 +29,9 @@
          (M.COMP-T213, M.COMP-T227). -->
     <!-- 49.0.0: MaSlider, a themed Slider style (horizontal or vertical, accent fill, focus-ringed thumb); first
          consumer is MediaViewer (M.COMP-T228, M.COMP-T229). -->
-    <Version>49.0.0</Version>
+    <!-- 50.0.0: MaTree.ShowCheckBoxes + MaTreeNode.IsChecked (multi-pick leaves) and MaTreeNode.Divider (a
+         non-interactive rule row); first consumer is Orchestrator's Open Project modal (M.COMP-T238, M.ORCH-T2204). -->
+    <Version>50.0.0</Version>
     <Authors>MindAttic</Authors>
     <Company>MindAttic</Company>
     <Copyright>Copyright (c) 2026 MindAttic. All rights reserved.</Copyright>

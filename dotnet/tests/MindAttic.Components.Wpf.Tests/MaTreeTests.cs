@@ -47,6 +47,17 @@ public sealed class MaTreeTests
     }
 
     [Fact]
+    public void A_divider_is_neither_a_leaf_nor_checked_and_leaves_start_unchecked()
+    {
+        var divider = MaTreeNode.Divider();
+        Assert.True(divider.IsDivider);
+        Assert.False(divider.IsLeaf);
+        Assert.False(divider.IsChecked);
+        Assert.Empty(divider.Children);
+        Assert.All(MaTreeNode.GroupByDelimiter(["A.B", "C"]), n => Assert.False(n.IsDivider || n.IsChecked));
+    }
+
+    [Fact]
     public void Groups_sort_before_leaves_each_alphabetical_and_collapsed_by_default()
     {
         var roots = MaTreeNode.GroupByDelimiter(["Zebra", "Ant.One", "Beta.Two", "Apple"]);
