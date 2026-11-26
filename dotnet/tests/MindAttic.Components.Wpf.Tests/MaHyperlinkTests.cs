@@ -25,17 +25,17 @@ public sealed class MaHyperlinkTests
     [Fact]
     public void Keyboard_focus_underlines_the_link_and_losing_it_removes_the_underline() => Sta(h =>
     {
+        // WPF's IsKeyboardFocused needs Win32 focus, which a never-activated off-screen window (M.COMP-T28/T39) can't
+        // reliably get (M.COMP-T126), so check the style's own trigger: underline exactly while focused, and
+        // none at rest, which is what removes it again when focus leaves.
+        var style = (Style)h.Window.FindResource("MaHyperlink");
+        var focus = Assert.Single(style.Triggers.OfType<Trigger>(), t => t.Property == UIElement.IsKeyboardFocusedProperty);
+        Assert.Equal(true, focus.Value);
+        var setter = Assert.IsType<Setter>(Assert.Single(focus.Setters));
+        Assert.Equal(Inline.TextDecorationsProperty, setter.Property);
+        Assert.True(IsUnderlined(setter.Value as TextDecorationCollection));
+
         var link = h.AddLink("M.ORCH-T499");
-        var other = new Button { Content = "Elsewhere" };
-        h.Root.Children.Add(other);
-        h.Pump();
-
-        Assert.True(link.Focus());
-        h.Pump();
-        Assert.True(IsUnderlined(link.TextDecorations));
-
-        Assert.True(other.Focus());
-        h.Pump();
         Assert.False(IsUnderlined(link.TextDecorations));
     });
 
