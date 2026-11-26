@@ -255,6 +255,20 @@ public class MaTreeItem : TreeViewItem
         base.OnMouseLeftButtonDown(e);
     }
 
+    // A TreeViewItem selects itself whenever it gets keyboard focus (so arrow-key navigation moves the selection
+    // too), and OnMouseLeftButtonDown above calls Focus() on a group row to keep it keyboard-reachable after
+    // toggling -- that focus call alone flips IsSelected on through TreeViewItem's own focus-follows-selection
+    // logic, bypassing the IsLeaf guard above. Block it here instead, however selection was reached.
+    protected override void OnSelected(RoutedEventArgs e)
+    {
+        if (DataContext is MaTreeNode { IsLeaf: false })
+        {
+            IsSelected = false;
+            return;
+        }
+        base.OnSelected(e);
+    }
+
     protected override void OnKeyDown(KeyEventArgs e)
     {
         if (DataContext is MaTreeNode { IsLeaf: false } && e.Key is Key.Enter or Key.Space)
