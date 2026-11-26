@@ -5,6 +5,7 @@ using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using MindAttic.Components.Wpf.Controls;
 using Xunit;
@@ -103,11 +104,67 @@ public sealed class MaTextBoxTests
         Assert.Equal(Visibility.Visible, Host(area).ComputedHorizontalScrollBarVisibility);
     });
 
+    [Fact]
+    public void MaTextBox_leaves_room_below_descenders_instead_of_clipping_them() => Sta(window =>
+    {
+        // M.COMP-T241: MaTextBox's vertical padding was too tight (6,4) and the ScrollViewer clipped the tails
+        // of g, j, p, q and y flush against the bottom border. M.COMP-T242 catches a regression by rasterizing
+        // the box and checking that the lowest ink pixel sits clear of the control's bottom edge.
+        var box = Add(window, "MaTextBox", b =>
+        {
+            b.FontSize = 20;
+            b.Text = "gjpqy";
+            b.Foreground = Brushes.White;
+            b.Background = Brushes.Black;
+            b.BorderBrush = Brushes.Black;
+        });
+
+        var width = (int)Math.Ceiling(box.ActualWidth);
+        var height = (int)Math.Ceiling(box.ActualHeight);
+        var pixels = Render(box, width, height);
+
+        var lowestInk = -1;
+        for (var y = height - 1; y >= 0 && lowestInk < 0; y--)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                if (pixels[y * width + x].R > 128) { lowestInk = y; break; }
+            }
+        }
+
+        Assert.True(lowestInk >= 0, "No rendered text found; the box drew nothing.");
+        Assert.True(lowestInk <= height - 3,
+            $"The lowest descender ink sits at row {lowestInk} of {height}: too close to (or clipped by) the bottom border.");
+    });
+
     // ---- harness ----
 
     private static string Lines(int count) => string.Join("\n", Enumerable.Range(1, count).Select(i => $"line {i}"));
 
     private static ScrollViewer Host(TextBox box) => (ScrollViewer)box.Template.FindName("PART_ContentHost", box);
+
+    // Through a VisualBrush, so the element's offset inside its parent doesn't shift the picture.
+    private static Color[] Render(FrameworkElement element, int width, int height)
+    {
+        var visual = new DrawingVisual();
+        using (var dc = visual.RenderOpen())
+        {
+            dc.DrawRectangle(new VisualBrush(element) { Stretch = Stretch.None, AlignmentX = AlignmentX.Left, AlignmentY = AlignmentY.Top },
+                null, new Rect(0, 0, width, height));
+        }
+
+        var bitmap = new RenderTargetBitmap(width, height, 96, 96, PixelFormats.Pbgra32);
+        bitmap.Render(visual);
+        var raw = new byte[width * height * 4];
+        bitmap.CopyPixels(raw, width * 4, 0);
+        var colors = new Color[width * height];
+        for (var i = 0; i < colors.Length; i++)
+        {
+            colors[i] = Color.FromArgb(raw[i * 4 + 3], raw[i * 4 + 2], raw[i * 4 + 1], raw[i * 4]);
+        }
+
+        return colors;
+    }
 
     private static T? Ancestor<T>(DependencyObject node) where T : DependencyObject
     {
