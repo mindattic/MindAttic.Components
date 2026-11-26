@@ -4,7 +4,6 @@ using System.Windows.Automation;
 using System.Windows.Automation.Peers;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace MindAttic.Components.Wpf.Controls;
 
@@ -63,6 +62,19 @@ public class MaPanelGroup : ItemsControl
     public static string? GetPanelKey(DependencyObject element) => (string?)element.GetValue(PanelKeyProperty);
 
     public static void SetPanelKey(DependencyObject element, string? value) => element.SetValue(PanelKeyProperty, value);
+
+    /// <summary>Set on an <see cref="MaPanel"/>'s header template part (M.COMP-T236): lets a header reference survive
+    /// the panel's own template being rebuilt by a reorder (WPF re-templates a self-owning container when its index in
+    /// <c>Items</c> changes), so <see cref="HandleReorderKey"/> still resolves the panel that owns a now-stale header
+    /// instead of walking a visual tree the move already tore down. Inherited, so a focused descendant of the header
+    /// resolves it too.</summary>
+    private static readonly DependencyProperty HeaderOwnerProperty = DependencyProperty.RegisterAttached(
+        "HeaderOwner", typeof(MaPanel), typeof(MaPanelGroup), new FrameworkPropertyMetadata(null,
+            FrameworkPropertyMetadataOptions.Inherits));
+
+    internal static MaPanel? GetHeaderOwner(DependencyObject element) => (MaPanel?)element.GetValue(HeaderOwnerProperty);
+
+    internal static void SetHeaderOwner(DependencyObject element, MaPanel? value) => element.SetValue(HeaderOwnerProperty, value);
 
     private static readonly DependencyPropertyKey LastAnnouncementPropertyKey = DependencyProperty.RegisterReadOnly(
         nameof(LastAnnouncement), typeof(string), typeof(MaPanelGroup), new FrameworkPropertyMetadata(string.Empty));
@@ -193,22 +205,13 @@ public class MaPanelGroup : ItemsControl
                 AutomationNotificationProcessing.MostRecent, text, "MaPanelGroup.Reorder");
     }
 
-    /// <summary>The panel of this group whose header contains <paramref name="source"/>.</summary>
-    private MaPanel? PanelOwningHeader(DependencyObject? source)
-    {
-        for (var node = source; node is not null && node != this; node = ParentOf(node))
-        {
-            if (node is not MaPanel panel || ItemsControlFromItemContainer(panel) != this) continue;
-            var header = panel.Template?.FindName(MaPanel.PartHeader, panel) as DependencyObject;
-            for (var inner = source; inner is not null && inner != panel; inner = ParentOf(inner))
-                if (inner == header) return panel;
-            return null;
-        }
-        return null;
-    }
-
-    private static DependencyObject? ParentOf(DependencyObject node) =>
-        node is Visual ? VisualTreeHelper.GetParent(node) : LogicalTreeHelper.GetParent(node);
+    /// <summary>The panel of this group whose header <paramref name="source"/> is (or is inside of), by the
+    /// <see cref="HeaderOwnerProperty"/> marker rather than a tree walk, so a header a prior move already re-templated
+    /// still resolves.</summary>
+    private MaPanel? PanelOwningHeader(DependencyObject? source) =>
+        source is not null && GetHeaderOwner(source) is { } panel && ItemsControlFromItemContainer(panel) == this
+            ? panel
+            : null;
 
     private MaPanel? PanelAt(int index) => Items[index] as MaPanel ?? ItemContainerGenerator.ContainerFromIndex(index) as MaPanel;
 

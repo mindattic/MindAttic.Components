@@ -215,7 +215,11 @@ public class MaPanel : ContentControl
         _header = GetTemplateChild(PartHeader) as UIElement;
         _grip = GetTemplateChild(PartGrip) as UIElement;
         if (_toggle is not null) _toggle.MouseLeftButtonDown += OnToggleMouseDown;
-        if (_header is not null) _header.KeyDown += OnHeaderKeyDown;
+        if (_header is not null)
+        {
+            _header.KeyDown += OnHeaderKeyDown;
+            MaPanelGroup.SetHeaderOwner(_header, this);
+        }
         if (_grip is not null) _grip.MouseLeftButtonDown += OnGripMouseDown;
     }
 
