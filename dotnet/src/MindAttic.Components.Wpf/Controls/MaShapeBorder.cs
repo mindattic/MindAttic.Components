@@ -184,7 +184,7 @@ public sealed class MaShapeBorder : Decorator
         base.OnVisualChildrenChanged(visualAdded, visualRemoved);
     }
 
-    /// <summary>Sets (or clears) the child's clip to the outline, in the child's coordinates; leaves a clip it didn't set alone.</summary>
+    /// <summary>Sets (or clears) the child's clip to the outline, sized to the child's own box inside the padding and border, so it's already in the child's coordinates; leaves a clip it didn't set alone.</summary>
     private void ClipChild(Size size, Thickness pad)
     {
         if (Child is not { } child)
@@ -192,7 +192,9 @@ public sealed class MaShapeBorder : Decorator
             return;
         }
 
-        if (!ClipToShape || Shape == MaShape.None || size.Width <= 0 || size.Height <= 0)
+        var w = Math.Max(0, size.Width - pad.Left - pad.Right);
+        var h = Math.Max(0, size.Height - pad.Top - pad.Bottom);
+        if (!ClipToShape || Shape == MaShape.None || w <= 0 || h <= 0)
         {
             if (_childClip is not null && ReferenceEquals(child.Clip, _childClip))
             {
@@ -203,7 +205,6 @@ public sealed class MaShapeBorder : Decorator
             return;
         }
 
-        var (w, h) = (size.Width, size.Height);
         Geometry outline = Shape switch
         {
             MaShape.Rectangle => new RectangleGeometry(new Rect(0, 0, w, h)),
@@ -212,7 +213,6 @@ public sealed class MaShapeBorder : Decorator
             _ => Outline(w, h, StrokeThickness),
         };
         var clip = outline.CloneCurrentValue();
-        clip.Transform = new TranslateTransform(-pad.Left, -pad.Top);
         clip.Freeze();
         child.Clip = _childClip = clip;
     }
