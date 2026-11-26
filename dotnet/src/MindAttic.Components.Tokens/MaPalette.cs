@@ -18,6 +18,7 @@ public sealed class MaPalette
         "MaAccent", "MaAccentHover", "MaOnAccent", "MaTileHover", "MaAccentBorder", "MaAccentDisabled", "MaOnAccentDisabled",
         "MaControlBorder", "MaFieldBorder", "MaFocus", "MaDisabledText",
         "MaGood", "MaWarn", "MaBad", "MaOther", "MaLink", "MaChartGrid", "MaBackdrop",
+        "MaPanelDropIndicator",
     });
 
     /// <summary>The dark palette, the default theme (Theme.xaml).</summary>
@@ -50,6 +51,7 @@ public sealed class MaPalette
         ["MaLink"] = "#FF7A93F0",
         ["MaChartGrid"] = "#FF6B6B6B",
         ["MaBackdrop"] = "#99000000",
+        ["MaPanelDropIndicator"] = "#FF3B5BDB",
     });
 
     /// <summary>The light palette (Themes/Light.xaml): a light grey chrome with white raised surfaces.</summary>
@@ -82,6 +84,7 @@ public sealed class MaPalette
         ["MaLink"] = "#FF2F4AB8",
         ["MaChartGrid"] = "#FF8A8D96",
         ["MaBackdrop"] = "#73000000",
+        ["MaPanelDropIndicator"] = "#FF3B5BDB",
     });
 
     /// <summary>Both palettes, dark first.</summary>
@@ -174,4 +177,6 @@ public sealed class MaPalette
     public MaColor ChartGrid => this["MaChartGrid"];
     /// <summary>A modal's dimmed backdrop (translucent).</summary>
     public MaColor Backdrop => this["MaBackdrop"];
+    /// <summary>The insertion line a dragged panel shows at its target slot in an MaPanelGroup.</summary>
+    public MaColor PanelDropIndicator => this["MaPanelDropIndicator"];
 }

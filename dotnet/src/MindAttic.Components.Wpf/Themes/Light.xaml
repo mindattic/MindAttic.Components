@@ -53,4 +53,7 @@
     <SolidColorBrush x:Key="MaChartGrid" Color="#FF8A8D96" />
     <!-- MaModal's dimmed backdrop, a little lighter over a light page. -->
     <SolidColorBrush x:Key="MaBackdrop" Color="#73000000" />
+
+    <!-- The insertion line a dragged Controls.MaPanel shows at its target slot in an MaPanelGroup: the same accent blue. -->
+    <SolidColorBrush x:Key="MaPanelDropIndicator" Color="#FF3B5BDB" />
 </ResourceDictionary>
