@@ -20,7 +20,7 @@
                     Visibility="Collapsed" />
         </StackPanel>
 
-        <TextBox x:Name="Address" Grid.Column="1" Margin="6,4,6,4" Padding="8,4"
+        <TextBox x:Name="Address" Grid.Column="1" Margin="6,4,6,4" Padding="8,6"
                  VerticalContentAlignment="Center" FontSize="13"
                  Style="{DynamicResource MaTextBox}"
                  Text="{Binding AddressText, ElementName=Root, UpdateSourceTrigger=PropertyChanged}"
