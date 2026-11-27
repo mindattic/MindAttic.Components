@@ -263,7 +263,7 @@ _Nothing recorded yet._
 | M.COMP-T240 | 2026-11-25 | feature | closed | Owner 2026-11-25 (from Orchestrator's sidebar): the MaPanelGroup drag grip on a draggable MaPanel header looks like a minus sign; draw it as a small 3x2 grid of dots (a ':::' grab rectangle), sized and coloured to match the header (muted, hover brightens), same hit area and cursor. Orchestrator picks it up on its next Components package bump. | — |
 | M.COMP-T241 | 2026-11-25 | fix | closed | Fix MaTextBox vertical padding so descenders (j, g, y) aren't clipped | cbbc6f5 |
 | M.COMP-T242 | 2026-11-25 | fix | closed | Add a rendering test that catches descender clipping in MaTextBox | 22be740 |
-| M.COMP-T243 | 2026-11-27 | chore | open | Portfolio reset (MAT-T324): release charter (docs/RELEASE.md, one milestone), bible, and triage of every open ticket into epic>feature>task for: MindAttic.Components, MindAttic.Components.SIDEBAR | — |
+| M.COMP-T243 | 2026-11-27 | chore | closed | Portfolio reset (MAT-T324): release charter (docs/RELEASE.md, one milestone), bible, and triage of every open ticket into epic>feature>task for: MindAttic.Components, MindAttic.Components.SIDEBAR | 6596325 |
 | M.COMP-T244 | 2026-11-27 | feature | open | Every legacy Button/ToggleButton style in Theme.xaml becomes a pixel-perfect MaButton preset, so MaButton is the one button with no one-off templates | — |
 | M.COMP-T245 | 2026-11-27 | feature | open | The library gains every control and style Tickets Desktop and the Orchestrator still keep locally (combo, chip, lists, grid, menus) | — |
 | M.COMP-T246 | 2026-11-27 | feature | open | NUnit tests, CI on every push gating the nuget.org publish, and a README that matches the package | — |
